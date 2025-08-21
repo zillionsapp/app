@@ -1,0 +1,44 @@
+@import "tailwindcss";
+@plugin "daisyui";
+
+@plugin "daisyui/theme" {
+  name: "light";
+  default: true;
+  color-scheme: light;
+  --color-base-100: #0f222d;
+  --color-base-200: #112d39;
+  --color-base-300: #0f222d;
+  --color-base-content: #ecf0ed;
+  --color-primary: #a4031f;
+  --color-primary-content: #ecf0ed;
+  --color-secondary: #e9724c;
+  --color-secondary-content: #ecf0ed;
+  --color-accent: #e9724c;
+  --color-accent-content: #ecf0ed;
+  --color-neutral: #0f222d;
+  --color-neutral-content: #ecf0ed;
+}
+
+@plugin "daisyui/theme" {
+  name: "dark";
+  prefersdark: true;
+  color-scheme: dark;
+  --color-base-100: #0f222d;
+  --color-base-200: #112d39;
+  --color-base-300: #0f222d;
+  --color-base-content: #0f222d;
+  --color-primary: #a4031f;
+  --color-primary-content: #ecf0ed;
+  --color-secondary: #e9724c;
+  --color-secondary-content: #ecf0ed;
+  --color-accent: #e9724c;
+  --color-accent-content: #ecf0ed;
+  --color-neutral: #0f222d;
+  --color-neutral-content: #ecf0ed;
+}
+
+/* Glass effect for cards */
+.glass-card {
+  background: color-mix(in srgb, var(--b1), #ffffff 6%);
+  backdrop-filter: blur(8px);
+}
