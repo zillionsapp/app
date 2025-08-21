@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col bg-base-100 text-base-content" data-theme="zillions">
+  <div class="flex flex-col bg-base-200/60 text-base-content" data-theme="zillions">
     <!-- Top bar -->
 <!--     <header class="navbar px-4 lg:px-6 py-4 max-w-3xl mx-auto w-full">
       <div class="navbar-start">
@@ -9,7 +9,7 @@
 
     <!-- Balance + Chart -->
     <main class="max-w-3xl mx-auto w-full px-4 lg:px-6 flex-1">
-      <section class="card bg-base-100 border border-base-300 shadow-sm">
+      <section class="card">
         <div class="card-body">
           <!-- Balance headline -->
           <div class="flex items-baseline justify-between">
@@ -34,7 +34,7 @@
 
           <!-- Sparkline / area chart -->
           <div class="mt-6">
-            <div class="w-full h-40 md:h-48 rounded-2xl bg-base-200 border border-base-300 relative overflow-hidden">
+            <div class="w-full h-40 md:h-48 rounded-2xl relative overflow-hidden">
               <svg :viewBox="`0 0 ${chartWidth} ${chartHeight}`" class="w-full h-full">
                 <!-- grid lines -->
                 <g opacity="0.15">
@@ -63,7 +63,7 @@
 
           <!-- Mini stats -->
           <div class="mt-6 grid grid-cols-2 md:grid-cols-2 gap-3">
-            <div class="stat bg-base-200/60 rounded-2xl p-4 border border-base-300/60">
+            <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60"">
               <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 2v20M2 12h20" stroke-linecap="round"/>
@@ -74,7 +74,7 @@
               <div class="stat-desc text-xs opacity-70">All time</div>
             </div>
 
-            <div class="stat bg-base-200/60 rounded-2xl p-4 border border-base-300/60">
+            <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
               <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 20V4m-7 5l7-5 7 5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -91,7 +91,7 @@
       </section>
 
       <!-- Strategy dominance section -->
-      <section class="mt-6 card bg-base-100 border border-base-300 shadow-sm">
+      <section class="mt-6 card">
         <div class="card-body">
           <h3 class="card-title text-lg">Current market regimes</h3>
           <p class="text-sm opacity-70 mb-4">
@@ -102,7 +102,7 @@
               v-for="reg in regimes"
               :key="reg.name"
               class="p-3 rounded-xl border"
-              :class="reg.active ? 'border-primary bg-primary/5' : 'border-base-300 bg-base-200/50'"
+              :class="reg.active ? 'border-primary bg-primary/5' : 'border-base-300 bg-base-100'"
             >
               <div class="flex items-center justify-between">
                 <div class="flex items-center gap-2">
@@ -133,7 +133,7 @@
     </main>
 
     <!-- Action bar -->
-    <footer class="sticky bottom-0 left-0 right-0 bg-base-100/95 backdrop-blur border-t border-base-300">
+    <footer class="sticky bottom-0 left-0 right-0">
       <div class="max-w-3xl mx-auto px-4 lg:px-6">
         <div class="grid grid-cols-3 gap-3 py-4">
           <button class="btn btn-lg rounded-2xl btn-primary gap-2" @click="emit('deposit')">
@@ -142,13 +142,13 @@
             </svg>
             Deposit
           </button>
-          <button class="btn btn-lg rounded-2xl btn-ghost border border-base-300 gap-2" @click="emit('withdraw')">
+          <button class="btn btn-lg rounded-2xl btn-ghost gap-2" @click="emit('withdraw')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 20V4M6 12l6-6 6 6" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>
             Withdraw
           </button>
-          <button class="btn btn-lg rounded-2xl btn-ghost border border-base-300 gap-2" @click="emit('send')">
+          <button class="btn btn-lg rounded-2xl btn-ghost gap-2" @click="emit('send')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="round" stroke-linejoin="round"/>
             </svg>

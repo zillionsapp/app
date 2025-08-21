@@ -41,14 +41,14 @@
             Become a <span class="text-primary">Zillionaire</span>
           </h1>
           <p class="mt-6 text-base md:text-lg text-base-content/80 leading-relaxed animate-fade-in">
-            Zillions is an <b>autonomous trading app</b> that detects
-            <em>which trading strategies dominate right now on-chain</em> - then aligns to those market regimes in real time.
-            No configuration, no endless toggles. Fund once, and let the AI adapt.
+            <span class="text-primary"> <b>Stop grinding as a trader</b></span> and use an <b>autonomous trading app</b> that detects
+            <em>which trading strategies dominate on-chain</em> - then aligns to those market regimes in real time. <br>
+            <span class="italic">No configuration, no endless toggles. Fund once, and let the AI do the rest.</span> 
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
             <a href="#waitlist" class="btn btn-primary btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">Join the waitlist</a>
-            <a href="#how" class="btn btn-ghost btn-lg hover:bg-base-200 transition-all duration-300">See how it works</a>
+            <a href="#how" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">See how it works</a>
           </div>
 
         </div>
@@ -90,7 +90,7 @@
     <section id="features" class="py-16 lg:py-24 bg-base-200/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
-        <p class="mt-2 text-base-content/70">Not another “pick a strategy” app. Zillions detects who’s winning now - and adapts.</p>
+        <p class="mt-2 text-base-content/70">Not another “pick a strategy” or "auto trading" app. Zillions detects who’s winning - and adapts.</p>
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
@@ -238,6 +238,7 @@
                 <li class="hover:translate-x-1 transition-transform duration-300">Expect you to pick & tune strategies.</li>
                 <li class="hover:translate-x-1 transition-transform duration-300">Opaque logic, off‑chain execution.</li>
                 <li class="hover:translate-x-1 transition-transform duration-300">Hard to onboard; easy to make mistakes.</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">Manual Trading is tough - you can't ourperform masters & algos.</li>
               </ul>
             </div>
           </div>
@@ -249,6 +250,7 @@
                 <li class="hover:translate-x-1 transition-transform duration-300">Meta‑trading engine aligns with the dominant regime.</li>
                 <li class="hover:translate-x-1 transition-transform duration-300">On‑chain, transparent vaults; simple by default.</li>
                 <li class="hover:translate-x-1 transition-transform duration-300">Designed for everyone. No need to be a pro.</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">AI & Scoring algo detects which stratagies works the best.</li>
               </ul>
             </div>
           </div>
@@ -263,7 +265,7 @@
           <div class="card-body text-center">
             <!-- Heading -->
             <h2 class="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
-              Be the first to trade smarter
+              Be one of the first to trade smarter
             </h2>
             <p class="mt-3 text-base md:text-lg opacity-80">
               Join the Zillions waitlist and unlock early access to the on-chain meta-trader.  
