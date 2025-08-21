@@ -9,7 +9,7 @@
         <div class="space-y-4">
           <h4 class="text-lg font-semibold text-base-content border-b border-base-300/40 pb-2">Information We Collect</h4>
           <p class="leading-relaxed hover:text-base-content transition-colors duration-200">
-            When you join our waitlist, we collect your email address to keep you updated about Zillions.ai's development and launch. 
+            When you join our waitlist, we collect your email address to keep you updated about Zillions's development and launch. 
             We may also collect anonymous usage data to improve our service.
           </p>
         </div>
@@ -17,7 +17,7 @@
         <div class="space-y-4">
           <h4 class="text-lg font-semibold text-base-content border-b border-base-300/40 pb-2">How We Use Your Information</h4>
           <ul class="list-disc pl-5 space-y-2">
-            <li class="hover:text-base-content transition-colors duration-200">To communicate updates about Zillions.ai</li>
+            <li class="hover:text-base-content transition-colors duration-200">To communicate updates about Zillions</li>
             <li class="hover:text-base-content transition-colors duration-200">To provide early access opportunities</li>
             <li class="hover:text-base-content transition-colors duration-200">To improve our service and user experience</li>
             <li class="hover:text-base-content transition-colors duration-200">To send important announcements and updates</li>
@@ -60,7 +60,7 @@
           <h4 class="text-lg font-semibold text-base-content border-b border-base-300/40 pb-2">Contact Us</h4>
           <p class="leading-relaxed hover:text-base-content transition-colors duration-200">
             If you have questions about this privacy policy, please contact us at 
-            <a href="mailto:privacy@zillions.ai" class="text-primary hover:underline">privacy@zillions.ai</a>
+            <a href="mailto:privacy@Zillions" class="text-primary hover:underline">privacy@Zillions</a>
           </p>
         </div> -->
       </div>

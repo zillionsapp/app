@@ -16,8 +16,8 @@
     <!-- Navbar -->
     <header class="navbar max-w-7xl mx-auto w-full px-4 lg:px-6 py-6 backdrop-blur-sm bg-base-100/80 sticky top-0 z-50">
       <div class="navbar-start gap-3">
-        <img :src="logoToUse" alt="Zillions.ai" class="h-8 w-auto rounded-full" />
-        <a class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary">.ai</span></a>
+        <img :src="logoToUse" alt="Zillions" class="h-8 w-auto rounded-full" />
+        <a class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary"> </span></a>
       </div>
       <div class="navbar-center hidden md:flex">
         <ul class="menu menu-horizontal px-1">
@@ -38,11 +38,11 @@
         <div>
           <div class="badge badge-outline badge-lg border-base-300 text-xs md:text-sm mb-6 animate-fade-in">On‑chain • Non‑custodial • AI‑driven</div>
           <h1 class="text-4xl md:text-6xl/tight font-bold tracking-tight animate-slide-up">
-            Let the <span class="text-primary">on‑chain meta‑trader</span> trade for you.
+            Become a <span class="text-primary">Zillionaire</span>
           </h1>
           <p class="mt-6 text-base md:text-lg text-base-content/80 leading-relaxed animate-fade-in">
-            Zillions.ai is an autonomous, on‑chain trading app that detects
-            <em>which kinds of strategies dominate right now</em> - then aligns to those market regimes in real time.
+            Zillions is an <b>autonomous trading app</b> that detects
+            <em>which trading strategies dominate right now on-chain</em> - then aligns to those market regimes in real time.
             No configuration, no endless toggles. Fund once, and let the AI adapt.
           </p>
 
@@ -89,7 +89,7 @@
     <!-- Feature grid -->
     <section id="features" class="py-16 lg:py-24 bg-base-200/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
-        <h2 class="text-2xl md:text-3xl font-bold">Why Zillions.ai is different</h2>
+        <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
         <p class="mt-2 text-base-content/70">Not another “pick a strategy” app. Zillions detects who’s winning now - and adapts.</p>
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
@@ -244,7 +244,7 @@
           <div class="card bg-base-200 border-2 border-primary hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge badge-primary mb-2">Modern</div>
-              <h3 class="card-title text-xl">Zillions.ai</h3>
+              <h3 class="card-title text-xl">Zillions</h3>
               <ul class="list-disc ms-5 text-sm opacity-90 space-y-3 mt-4">
                 <li class="hover:translate-x-1 transition-transform duration-300">Meta‑trading engine aligns with the dominant regime.</li>
                 <li class="hover:translate-x-1 transition-transform duration-300">On‑chain, transparent vaults; simple by default.</li>
@@ -266,7 +266,7 @@
               Be the first to trade smarter
             </h2>
             <p class="mt-3 text-base md:text-lg opacity-80">
-              Join the Zillions.ai waitlist and unlock early access to the on-chain meta-trader.  
+              Join the Zillions waitlist and unlock early access to the on-chain meta-trader.  
               Simple, adaptive, transparent.
             </p>
 
@@ -293,7 +293,7 @@
             <label class="label cursor-pointer justify-center gap-2 mt-3">
               <input type="checkbox" class="checkbox checkbox-sm" v-model="consent" />
               <span class="label-text text-xs opacity-70">
-                I agree to receive emails about Zillions.ai and understand this is not financial advice.
+                I agree to receive emails about Zillions and understand this is not financial advice.
               </span>
             </label>
 
@@ -322,7 +322,7 @@
     <section id="faq" class="py-20 lg:py-28">
       <div class="max-w-4xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold text-center">FAQ</h2>
-        <p class="mt-3 text-base-content/70 text-center">Common questions about Zillions.ai</p>
+        <p class="mt-3 text-base-content/70 text-center">Common questions about Zillions</p>
         <div class="mt-10 join join-vertical w-full">
           <div class="collapse collapse-arrow join-item border border-base-300 hover:bg-base-200/50 transition-all duration-300">
             <input type="checkbox" />
@@ -361,13 +361,13 @@
       <div class="max-w-7xl mx-auto px-4 lg:px-6 py-10 grid md:grid-cols-2 gap-6">
         <div>
           <div class="flex items-center gap-3">
-            <img :src="logoToUse" alt="Zillions.ai" class="h-6 w-auto rounded-full" />
-            <span class="font-semibold">Zillions.ai</span>
+            <img :src="logoToUse" alt="Zillions" class="h-6 w-auto rounded-full" />
+            <span class="font-semibold">Zillions</span>
           </div>
           <p class="text-xs opacity-70 mt-3">
-            Zillions.ai is an on‑chain, autonomous “meta‑trading” app designed to help more people participate in markets - without needing to be a pro.
+            Zillions is an on‑chain, autonomous “meta‑trading” app designed to help more people participate in markets - without needing to be a pro.
           </p>
-          <p class="text-xs opacity-60 mt-2">© {{ new Date().getFullYear() }} Zillions.ai. All rights reserved.</p>
+          <p class="text-xs opacity-60 mt-2">© {{ new Date().getFullYear() }} Zillions. All rights reserved.</p>
         </div>
         <div class="text-xs opacity-70">
           <div class="font-semibold mb-2">Disclosures</div>

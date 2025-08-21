@@ -18,7 +18,7 @@
           <h4 class="text-lg font-semibold text-base-content border-b border-base-300/40 pb-2">Waitlist Service</h4>
           <p class="leading-relaxed mb-2 hover:text-base-content transition-colors duration-200">By joining our waitlist:</p>
           <ul class="list-disc pl-5 space-y-2">
-            <li class="hover:text-base-content transition-colors duration-200">You agree to receive updates about Zillions.ai</li>
+            <li class="hover:text-base-content transition-colors duration-200">You agree to receive updates about Zillions</li>
             <li class="hover:text-base-content transition-colors duration-200">You understand this does not guarantee access to the service</li>
             <li class="hover:text-base-content transition-colors duration-200">You acknowledge this is not an offer of securities or investment advice</li>
           </ul>
@@ -39,7 +39,7 @@
         <div class="space-y-4">
           <h4 class="text-lg font-semibold text-base-content border-b border-base-300/40 pb-2">No Investment Advice</h4>
           <p class="leading-relaxed hover:text-base-content transition-colors duration-200">
-            Zillions.ai provides automated trading technology. We do not provide personalized investment advice. 
+            Zillions provides automated trading technology. We do not provide personalized investment advice. 
             All trading decisions are made by our autonomous system based on predefined parameters.
           </p>
         </div>
@@ -55,7 +55,7 @@
         <div class="space-y-4">
           <h4 class="text-lg font-semibold text-base-content border-b border-base-300/40 pb-2">Intellectual Property</h4>
           <p class="leading-relaxed hover:text-base-content transition-colors duration-200">
-            The Zillions.ai service, including all content and technology, is protected by copyright, trademark, and other laws. 
+            The Zillions service, including all content and technology, is protected by copyright, trademark, and other laws. 
             Our trademarks and trade dress may not be used without our prior written permission.
           </p>
         </div>
@@ -63,7 +63,7 @@
         <div class="space-y-4">
           <h4 class="text-lg font-semibold text-base-content border-b border-base-300/40 pb-2">Limitation of Liability</h4>
           <p class="leading-relaxed hover:text-base-content transition-colors duration-200">
-            To the maximum extent permitted by law, Zillions.ai shall not be liable for any indirect, incidental, special, 
+            To the maximum extent permitted by law, Zillions shall not be liable for any indirect, incidental, special, 
             consequential, or punitive damages resulting from your use or inability to use the service.
           </p>
         </div>
@@ -80,7 +80,7 @@
           <h4 class="text-lg font-semibold text-base-content border-b border-base-300/40 pb-2">Contact Us</h4>
           <p class="leading-relaxed hover:text-base-content transition-colors duration-200">
             If you have questions about these terms, please contact us at 
-            <a href="mailto:legal@zillions.ai" class="text-primary hover:underline">legal@zillions.ai</a>
+            <a href="mailto:legal@Zillions" class="text-primary hover:underline">legal@Zillions</a>
           </p>
         </div> -->
       </div>
