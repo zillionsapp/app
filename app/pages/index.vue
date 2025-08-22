@@ -41,9 +41,10 @@
             Become a <span class="text-primary">Zillionaire</span>
           </h1>
           <p class="mt-6 text-base md:text-lg text-base-content/80 leading-relaxed animate-fade-in">
-            <span class="text-primary"> <b>Stop grinding as a trader</b></span> and use an <b>autonomous trading app</b> that detects
-            <em>which trading strategies dominate on-chain</em> - then aligns to those market regimes in real time. <br>
-            <span class="italic">No configuration, no endless toggles. Fund once, and let the AI do the rest.</span> 
+            <span class="text-primary"> <b>Stop grinding as a trader</b></span> and use an <b>autonomous trading app</b>. 
+            <b>Only 3% of all traders make it.</b> Become one of them!<br>
+            
+            <span class="italic">Fund once, and let the AI do the rest.</span> 
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
