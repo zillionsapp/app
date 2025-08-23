@@ -1,6 +1,6 @@
 <!-- ZillionsLanding.vue -->
 <template>
-  <div class="min-h-screen flex flex-col bg-base-100 text-base-content selection:bg-primary/10 overflow-x-hidden">
+  <div class="min-h-screen flex flex-col bg-base-100 text-white selection:bg-primary/10 overflow-x-hidden">
     <!-- Subtle gradient backdrop -->
     <div class="pointer-events-none fixed inset-0 -z-10">
       <div
@@ -40,7 +40,7 @@
           <h1 class="text-4xl md:text-6xl/tight font-bold tracking-tight animate-slide-up">
             Become a <span class="text-primary">Zillionaire</span>
           </h1>
-          <p class="mt-6 text-base md:text-lg text-base-content/80 leading-relaxed animate-fade-in">
+          <p class="mt-6 text-base md:text-lg text-white/80 leading-relaxed animate-fade-in">
             <span class="text-primary"> <b>Stop grinding as a trader</b></span> and use an <b>autonomous trading app</b>. 
             <b>Only 3% of all traders make it.</b> Become one of them!<br>
             
@@ -68,20 +68,20 @@
       <div class="max-w-7xl mx-auto px-4 lg:px-6 my-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in">
           <div class="stat bg-base-200/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70">No expertise needed</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-base-content/70 bg-clip-text text-transparent whitespace-nowrap">For everyone</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">No expertise needed</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">For everyone</div>
           </div>
           <div class="stat bg-base-200/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70">On‑chain</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-base-content/70 bg-clip-text text-transparent whitespace-nowrap">Transparent</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">On‑chain</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Transparent</div>
           </div>
           <div class="stat bg-base-200/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70">Adaptive</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-base-content/70 bg-clip-text text-transparent whitespace-nowrap">Regime‑aware</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">Adaptive</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Regime‑aware</div>
           </div>
           <div class="stat bg-base-200/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70">Hands‑off</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-base-content/70 bg-clip-text text-transparent whitespace-nowrap">Auto‑pilot</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">Hands‑off</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Auto‑pilot</div>
           </div>
         </div>
       </div>
@@ -91,7 +91,7 @@
     <section id="features" class="py-16 lg:py-24 bg-base-200/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
-        <p class="mt-2 text-base-content/70">Not another “pick a strategy” or "auto trading" app. Zillions detects who’s winning - and adapts.</p>
+        <p class="mt-2 text-white/70">Not another “pick a strategy” or "auto trading" app. Zillions detects who’s winning - and adapts.</p>
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
@@ -162,7 +162,7 @@
     <section id="tech" class="py-14 lg:py-20 bg-base-200/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Inside the engine</h2>
-        <p class="mt-2 text-base-content/70">We don’t just run a fixed strategy. We detect <em>footprints</em> of who’s driving price now:</p>
+        <p class="mt-2 text-white/70">We don’t just run a fixed strategy. We detect <em>footprints</em> of who’s driving price now:</p>
 
         <div class="mt-8 grid md:grid-cols-2 gap-6">
           <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
@@ -216,7 +216,7 @@
                 <li class="hover:translate-x-1 transition-transform duration-300">Fewer knobs. More outcomes.</li>
                 <li class="hover:translate-x-1 transition-transform duration-300">Risk controls aligned to regime conditions.</li>
               </ul>
-              <div class="alert alert-info text-base-content bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
+              <div class="alert alert-info text-white bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
                 <span>We aim for growth, but markets are risky. Returns aren't guaranteed.</span>
               </div>
             </div>
@@ -325,7 +325,7 @@
     <section id="faq" class="py-20 lg:py-28">
       <div class="max-w-4xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold text-center">FAQ</h2>
-        <p class="mt-3 text-base-content/70 text-center">Common questions about Zillions</p>
+        <p class="mt-3 text-white/70 text-center">Common questions about Zillions</p>
         <div class="mt-10 join join-vertical w-full">
           <div class="collapse collapse-arrow join-item border border-base-300 hover:bg-base-200/50 transition-all duration-300">
             <input type="checkbox" />

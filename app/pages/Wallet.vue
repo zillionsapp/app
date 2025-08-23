@@ -7,6 +7,8 @@
       </div>
     </header>
 
+    <SolanaPrice />
+
     <!-- Balance + Chart -->
     <main class="max-w-3xl mx-auto w-full px-4 lg:px-6 flex-1">
       <section class="card">
