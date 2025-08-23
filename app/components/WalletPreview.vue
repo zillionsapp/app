@@ -1,5 +1,5 @@
 <template>
-  <div class="flex flex-col bg-base-200/60 text-base-content" data-theme="zillions">
+  <div class="flex flex-col bg-base-200/60 text-white" data-theme="zillions">
     <!-- Top bar -->
 <!--     <header class="navbar px-4 lg:px-6 py-4 max-w-3xl mx-auto w-full">
       <div class="navbar-start">
