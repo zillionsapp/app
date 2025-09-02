@@ -1,13 +1,12 @@
+<!-- components/WalletDashboard.vue -->
 <template>
-  <div class="flex flex-col justify-between bg-base-200/60 text-base-content min-h-screen" data-theme="zillions">
+  <div class="flex flex-col justify-between bg-base-200/60 text-white min-h-screen" data-theme="zillions">
     <!-- Top bar -->
     <header class="navbar px-4 lg:px-6 py-4 max-w-3xl mx-auto w-full">
       <div class="navbar-start">
-        <span class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary"> </span></span>
+        <span class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary"> Paper Trade Mode </span></span>
       </div>
     </header>
-
-    <SolanaPrice />
 
     <!-- Balance + Chart -->
     <main class="max-w-3xl mx-auto w-full px-4 lg:px-6 flex-1">
@@ -20,9 +19,12 @@
               <h1 class="text-4xl md:text-5xl font-bold tracking-tight mt-1">
                 {{ currency }}{{ formatMoney(totalBalance) }}
               </h1>
+              <p v-if="latestPrice" class="text-xs opacity-70 mt-1">
+                SOL last: ${{ formatMoney(latestPrice!) }} ({{ period }})
+              </p>
             </div>
             <div class="text-right">
-              <p class="text-sm opacity-70">All‑time P&L</p>
+              <p class="text-sm opacity-70">All-time P&L</p>
               <div class="mt-1 inline-flex items-center gap-2">
                 <span
                   class="badge"
@@ -50,7 +52,7 @@
                 <!-- line -->
                 <path :d="linePath" fill="none" stroke="currentColor" stroke-width="2.5" />
                 <!-- last point marker -->
-                <circle :cx="points[points.length-1].x" :cy="points[points.length-1].y" r="3.5" class="text-primary" fill="currentColor"/>
+                <circle v-if="points.length" :cx="points[points.length-1].x" :cy="points[points.length-1].y" r="3.5" class="text-primary" fill="currentColor"/>
               </svg>
 
               <!-- period selector -->
@@ -58,14 +60,21 @@
                 <button v-for="p in periods" :key="p"
                         class="btn btn-xs join-item"
                         :class="period === p ? 'btn-primary' : 'btn-ghost'"
-                        @click="setPeriod(p)">{{ p }}</button>
+                        :disabled="loading"
+                        @click="setPeriod(p as Period)">{{ p }}</button>
               </div>
+            </div>
+
+            <!-- status / error -->
+            <div class="text-xs opacity-70 mt-2 min-h-5">
+              <span v-if="loading">Updating {{ period }}…</span>
+              <span v-else-if="error" class="text-error">Failed to load data: {{ error }}</span>
             </div>
           </div>
 
           <!-- Mini stats -->
           <div class="mt-6 grid grid-cols-2 md:grid-cols-2 gap-3">
-            <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60"">
+            <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
               <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
                 <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
                   <path d="M12 2v20M2 12h20" stroke-linecap="round"/>
@@ -164,6 +173,7 @@
 
 <script setup lang="ts">
 import { computed, ref } from 'vue'
+import { useSeries, PERIODS, type Period } from '@/composables/useSeries'
 
 type Point = { x: number; y: number }
 
@@ -178,24 +188,14 @@ const props = withDefaults(defineProps<{
   deposited?: number
   totalBalance?: number
   earnings?: number
-  series?: number[] // chronological equity values for chart (current period)
 }>(), {
   currency: '$',
   deposited: 5000,
   totalBalance: 6740.23,
   earnings: 1740.23,
-  series: () => [5100, 5050, 5200, 5250, 5400, 5380, 5600, 5850, 6100, 6020, 6400, 6740],
 })
 
-/* Period selector */
-const periods = ['1W', '1M', '3M', '1Y']
-const period = ref<'1W'|'1M'|'3M'|'1Y'>('1M')
-
-function setPeriod(p: typeof period.value) {
-  period.value = p
-  // In a real app you'd fetch / recompute series here
-}
-
+/* Regimes (static for now) */
 const regimes = ref([
   { name: 'Momentum', desc: 'Breakouts persist', active: true },
   { name: 'Mean Reversion', desc: 'Tight spreads & fades', active: false },
@@ -204,36 +204,35 @@ const regimes = ref([
   { name: 'Swing Traders', desc: 'Bigger intraday ranges', active: false },
 ])
 
-/* Derived figures */
+/* Money + P&L */
 const currency = computed(() => props.currency)
 const deposited = computed(() => props.deposited)
 const totalBalance = computed(() => props.totalBalance)
 const earnings = computed(() => props.earnings)
-
-/* P&L overall */
 const netChange = computed(() => totalBalance.value - deposited.value)
 const netChangePct = computed(() => deposited.value ? (netChange.value / deposited.value) * 100 : 0)
 
-/* Period change (from first to last of visible series) */
-const periodChange = computed(() => {
-  const s = props.series || []
-  if (s.length < 2) return 0
-  return s[s.length - 1] - s[0]
-})
-const periodChangePct = computed(() => {
-  const s = props.series || []
-  if (s.length < 2 || s[0] === 0) return 0
-  return ((s[s.length - 1] - s[0]) / s[0]) * 100
-})
+/* Live SOL series via composable */
+const {
+  PERIODS: periodsArr,
+  period,
+  setPeriod,
+  loading,
+  error,
+  series,      // closes[]
+  seriesTs,    // timestamps[]
+  latestPrice, // number | null
+} = useSeries('SOLUSDT', '1M')
 
-/* Chart: lightweight sparkline with area */
+const periods = periodsArr as unknown as string[]
+
+/* Chart geometry */
 const chartWidth = 600
 const chartHeight = 160
 
 const points = computed<Point[]>(() => {
-  const data = props.series || []
+  const data = series.value || []
   if (data.length === 0) return []
-  
   const min = Math.min(...data)
   const max = Math.max(...data)
   const pad = (max - min) * 0.1 || 1
@@ -241,7 +240,7 @@ const points = computed<Point[]>(() => {
   const hi = max + pad
   const n = data.length
   return data.map((v, i) => {
-    const x = (i / (n - 1)) * chartWidth
+    const x = (i / Math.max(n - 1, 1)) * chartWidth
     const y = chartHeight - ((v - lo) / (hi - lo)) * chartHeight
     return { x, y }
   })
@@ -257,7 +256,6 @@ const areaPath = computed(() => {
   const first = points.value[0]
   const last = points.value[points.value.length - 1]
   if (!first || !last) return ''
-  
   return [
     `M ${first.x} ${chartHeight}`,
     `L ${first.x} ${first.y}`,
@@ -278,7 +276,6 @@ function formatMoney(n: number) {
 </script>
 
 <style scoped>
-/* Minimal brand theme (reuse your landing theme tokens if already set) */
 :root[data-theme="zillions"]{
   --p:#122a37; --pc:#e8eae8;
   --a:#0e222d; --ac:#e8eae8;
@@ -286,7 +283,6 @@ function formatMoney(n: number) {
   --n:#0e222d; --nc:#e8eae8;
 }
 
-/* Keep things airy & crisp */
 h1 { letter-spacing: -0.02em; }
 .badge-success { background: rgba(54,211,153,.15); color:#16a34a; border-color: transparent; }
 .badge-error { background: rgba(248,114,114,.15); color:#dc2626; border-color: transparent; }

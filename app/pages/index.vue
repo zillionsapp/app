@@ -41,10 +41,9 @@
             Become a <span class="text-primary">Zillionaire</span>
           </h1>
           <p class="mt-6 text-base md:text-lg text-white/80 leading-relaxed animate-fade-in">
-            <span class="text-primary"> <b>Stop grinding as a trader</b></span> and use an <b>autonomous trading app</b>. 
-            <b>Only 3% of all traders make it.</b> Become one of them!<br>
+            <span class="text-primary"> <b>DeFAI</b></span> for <b>everyone</b>.<br>
             
-            <span class="italic">Fund once, and let the AI do the rest.</span> 
+            <span class="italic">Grow your capital with ease.</span> 
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
@@ -91,7 +90,7 @@
     <section id="features" class="py-16 lg:py-24 bg-base-200/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
-        <p class="mt-2 text-white/70">Not another “pick a strategy” or "auto trading" app. Zillions detects who’s winning - and adapts.</p>
+        <p class="mt-2 text-white/70">Not another “DeFI” or "auto trading" app. Zillions detects market strategies in real-time - and adapts.</p>
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">

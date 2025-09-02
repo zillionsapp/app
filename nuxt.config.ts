@@ -37,9 +37,9 @@ export default defineNuxtConfig({
 
   // (Good practice) enable Nitro websocket support; the module runs its own server,
   // but Nuxt’s docs recommend this when using sockets in Nuxt 3.
-  nitro: {
+  /* nitro: {
     experimental: { websocket: true }
-  },
+  }, */
 
   runtimeConfig: {
     public: {
