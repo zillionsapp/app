@@ -8,6 +8,12 @@ export default defineNuxtConfig({
     // buildAssetsDir: 'assets/' // optional workaround if you don't want to use .nojekyll
   },
   ssr: true,
+  // Make Nitro target Vercel Node functions (not edge)
+  nitro: { preset: 'vercel' },
+  // Optional: make sure this route is always dynamic and never cached/prerendered
+  routeRules: {
+    '/api/series': { swr: false, cache: false, isr: false }
+  },
   vite: {
     plugins: [tailwindcss()],
   },
