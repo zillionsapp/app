@@ -1,19 +1,26 @@
+// server/api/series.get.ts
 import { H3Event, getQuery, setResponseStatus, setHeaders } from 'h3'
 
-// Binance REST (server-side avoids CORS)
 const BINANCE_BASE = 'https://api.binance.com'
-
-// “UI klines” are fine for charts; fall back to /klines if ever needed.
 type Kline = [ number, string, string, string, string, string, number, string, number, string, string, string ]
 type Period = '1D'|'1W'|'1M'|'6M'|'1Y'|'ALL'
 
 const PERIOD_CFG: Record<Period, { interval: string; lookbackMs?: number }> = {
   '1D':  { interval: '5m', lookbackMs: 24*60*60*1000 },
   '1W':  { interval: '1h', lookbackMs: 7*24*60*60*1000 },
-  '1M':  { interval: '4h', lookbackMs: 30*24*60*1000*24 },
+  '1M':  { interval: '4h', lookbackMs: 30*24*60*60*1000 },
   '6M':  { interval: '1d', lookbackMs: 182*24*60*60*1000 },
   '1Y':  { interval: '1d', lookbackMs: 365*24*60*60*1000 },
   'ALL': { interval: '1w' },
+}
+
+function pickInterval(spanMs: number): string {
+  const day = 24*60*60*1000
+  if (spanMs <= 2*day) return '5m'
+  if (spanMs <= 14*day) return '1h'
+  if (spanMs <= 45*day) return '4h'
+  if (spanMs <= 400*day) return '1d'
+  return '1w'
 }
 
 async function fetchKlines(params: {
@@ -44,41 +51,64 @@ export default defineEventHandler(async (event: H3Event) => {
   try {
     const q = getQuery(event)
     const symbol = (q.symbol as string | undefined)?.toUpperCase() || 'SOLUSDT'
-    const period = (q.period as Period) || '1M'
-    if (!(period in PERIOD_CFG)) {
-      setResponseStatus(event, 400)
-      return { error: 'Invalid period', allowed: Object.keys(PERIOD_CFG) }
-    }
+    const period = (q.period as Period | undefined) || undefined
 
-    const cfg = PERIOD_CFG[period]
+    // NEW: explicit range
+    const from = q.from ? Number(q.from) : undefined
+    const to = q.to ? Number(q.to) : undefined
     const now = Date.now()
 
+    let interval = (q.interval as string | undefined) || undefined
     let klines: Kline[] = []
 
-    if (period === 'ALL') {
-      // Walk back in time page-by-page (weekly candles = light)
-      let end = now
-      let safety = 24 // ~24k weeks is overkill; this caps requests hard.
-      while (safety-- > 0) {
-        const batch = await fetchKlines({ symbol, interval: cfg.interval, endTime: end, limit: 1000 })
+    if (from !== undefined) {
+      // Range mode: from → (to||now), auto-pick interval if not provided
+      const end = to ?? now
+      const span = Math.max(0, end - from)
+      interval ||= pickInterval(span)
+
+      // Page forward from 'from' to 'end'
+      let start = from
+      let safety = 24 // caps requests
+      while (safety-- > 0 && start < end) {
+        const batch = await fetchKlines({
+          symbol, interval, startTime: start, endTime: end, limit: 1000
+        })
         if (!batch.length) break
-        // Prepend older candles
-        klines = [...batch, ...klines]
-        // Next page ends just before first open time
-        const firstOpen = Number(batch[0][0])
-        end = firstOpen - 1
-        if (batch.length < 1000) break
-        // Tiny delay to be polite
-        await new Promise(r => setTimeout(r, 100))
+        klines = [...klines, ...batch]
+        const lastOpen = Number(batch.at(-1)?.[0] ?? 0)
+        const nextStart = lastOpen + 1
+        if (batch.length < 1000 || nextStart <= start) break
+        start = nextStart
+        await new Promise(r => setTimeout(r, 80))
       }
+    } else if (period) {
+      // Period mode (as before)
+      const cfg = PERIOD_CFG[period]
+      if (period === 'ALL') {
+        let end = now
+        let safety = 24
+        while (safety-- > 0) {
+          const batch = await fetchKlines({ symbol, interval: cfg.interval, endTime: end, limit: 1000 })
+          if (!batch.length) break
+          klines = [...batch, ...klines]
+          const firstOpen = Number(batch[0][0])
+          end = firstOpen - 1
+          if (batch.length < 1000) break
+          await new Promise(r => setTimeout(r, 80))
+        }
+      } else {
+        const start = now - (cfg.lookbackMs as number)
+        klines = await fetchKlines({ symbol, interval: cfg.interval, startTime: start, endTime: now })
+      }
+      interval = cfg.interval
     } else {
-      const start = now - (cfg.lookbackMs as number)
-      klines = await fetchKlines({ symbol, interval: cfg.interval, startTime: start, endTime: now })
+      setResponseStatus(event, 400)
+      return { ok: false, error: 'Provide either ?period= or ?from=' }
     }
 
-    // Normalize
     const candles = klines.map(k => ({
-      t: Number(k[0]),                   // open time (ms)
+      t: Number(k[0]),
       o: Number(k[1]),
       h: Number(k[2]),
       l: Number(k[3]),
@@ -89,13 +119,12 @@ export default defineEventHandler(async (event: H3Event) => {
     const closes = candles.map(c => c.c)
     const timestamps = candles.map(c => c.t)
 
-    // Cache strategy
-    // Short periods: 15s; longer: 60s; ALL: 6h (data rarely changes)
     const cacheControl =
-      period === '1D' ? 'public, max-age=0, s-maxage=15, stale-while-revalidate=30' :
-      period === '1W' ? 'public, max-age=0, s-maxage=30, stale-while-revalidate=60' :
-      period === '1M' ? 'public, max-age=0, s-maxage=60, stale-while-revalidate=120' :
-      period === '6M' || period === '1Y' ? 'public, max-age=0, s-maxage=300, stale-while-revalidate=600' :
+      from !== undefined ? 'public, max-age=0, s-maxage=60, stale-while-revalidate=120' :
+      (period === '1D') ? 'public, max-age=0, s-maxage=15, stale-while-revalidate=30' :
+      (period === '1W') ? 'public, max-age=0, s-maxage=30, stale-while-revalidate=60' :
+      (period === '1M') ? 'public, max-age=0, s-maxage=60, stale-while-revalidate=120' :
+      (period === '6M' || period === '1Y') ? 'public, max-age=0, s-maxage=300, stale-while-revalidate=600' :
       'public, max-age=0, s-maxage=21600, stale-while-revalidate=86400'
 
     setHeaders(event, {
@@ -106,8 +135,8 @@ export default defineEventHandler(async (event: H3Event) => {
     return {
       ok: true,
       symbol,
-      period,
-      interval: cfg.interval,
+      period: period ?? null,
+      interval,
       points: closes.length,
       timestamps,
       closes,
