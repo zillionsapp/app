@@ -4,7 +4,7 @@
     <!-- Top bar -->
     <header class="navbar px-4 lg:px-6 py-4 max-w-3xl mx-auto w-full">
       <div class="navbar-start">
-        <span class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary"> </span></span>
+        <span class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary">Paper Trade Mode</span></span>
       </div>
     </header>
 
