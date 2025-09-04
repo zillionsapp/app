@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 md:p-6 space-y-6">
+  <div class="p-4 md:p-6 space-y-6 text-white">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
@@ -19,41 +19,41 @@
 
     <!-- Stat cards -->
     <div class="stats stats-vertical lg:stats-horizontal shadow">
-      <div class="stat">
-        <div class="stat-title">Start Equity</div>
+      <div class="stat bg-base-200">
+        <div class="stat-title text-white/60">Start Equity</div>
         <div class="stat-value">{{ fmtCurrency(startEquity) }}</div>
-        <div class="stat-desc">Deposit: {{ fmtCurrency(report.deposit) }}</div>
+        <div class="stat-desc text-white/60">Deposit: {{ fmtCurrency(report.deposit) }}</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">Cash</div>
+      <div class="stat bg-base-200">
+        <div class="stat-title text-white/60">Cash</div>
         <div class="stat-value">{{ fmtCurrency(report.cash) }}</div>
-        <div class="stat-desc">Fees: {{ fmtCurrency(totalFees) }} (≈ {{ feeBpsOfTurnover.toFixed(2) }} bps of turnover)</div>
+        <div class="stat-desc text-white/60">Fees: {{ fmtCurrency(totalFees) }} (≈ {{ feeBpsOfTurnover.toFixed(2) }} bps of turnover)</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">Net PnL</div>
+      <div class="stat bg-base-200">
+        <div class="stat-title text-white/60">Net PnL</div>
         <div :class="['stat-value', netPnl >= 0 ? 'text-success' : 'text-error']">{{ fmtCurrency(netPnl) }}</div>
-        <div class="stat-desc">Return: {{ netReturnBps.toFixed(3) }} bps ({{ netReturnPct.toFixed(5) }}%)</div>
+        <div class="stat-desc text-white/60">Return: {{ netReturnBps.toFixed(3) }} bps ({{ netReturnPct.toFixed(5) }}%)</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">Turnover</div>
+      <div class="stat bg-base-200">
+        <div class="stat-title text-white/60">Turnover</div>
         <div class="stat-value">{{ (turnoverRatio*100).toFixed(2) }}%</div>
-        <div class="stat-desc">{{ trades.length }} legs • avg ${{ avgAbsNotional.toFixed(2) }} • session {{ sessionMins.toFixed(1) }}m</div>
+        <div class="stat-desc text-white/60">{{ trades.length }} legs • avg ${{ avgAbsNotional.toFixed(2) }} • session {{ sessionMins.toFixed(1) }}m</div>
       </div>
 
-      <div class="stat">
-        <div class="stat-title">Router</div>
+      <div class="stat bg-base-200">
+        <div class="stat-title text-white/60">Router</div>
         <div class="stat-value text-white">{{ router?.lastStrategyKey || 'n/a' }}</div>
-        <div class="stat-desc">Regime: <span class="badge badge-sm">{{ router?.lastRegime || 'n/a' }}</span></div>
+        <div class="stat-desc text-white/60">Regime: <span class="badge badge-sm text-warning">{{ router?.lastRegime || 'n/a' }}</span></div>
       </div>
     </div>
 
     <!-- Charts -->
     <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
       <!-- Equity / Cashflow -->
-      <div class="card bg-base-100 shadow col-span-1 xl:col-span-2">
+      <div class="card bg-base-200 shadow col-span-1 xl:col-span-2">
         <div class="card-body">
           <h2 class="card-title">Cashflow & PnL (intra-day)</h2>
           <canvas ref="equityCanvas"></canvas>
@@ -62,7 +62,7 @@
       </div>
 
       <!-- Price with markers -->
-      <div class="card bg-base-100 shadow">
+      <div class="card bg-base-200 shadow">
         <div class="card-body">
           <h2 class="card-title">Execution Price Trace</h2>
           <canvas ref="priceCanvas"></canvas>
@@ -71,7 +71,7 @@
       </div>
 
       <!-- Volume / Notional bars -->
-      <div class="card bg-base-100 shadow">
+      <div class="card bg-base-200 shadow">
         <div class="card-body">
           <h2 class="card-title">Trade Notional by Leg</h2>
           <canvas ref="volCanvas"></canvas>
@@ -80,7 +80,7 @@
       </div>
 
       <!-- Recent trades table -->
-      <div class="card bg-base-100 shadow xl:col-span-2">
+      <div class="card bg-base-200 shadow xl:col-span-2">
         <div class="card-body">
           <h2 class="card-title">Recent Trades</h2>
           <div class="overflow-x-auto">
@@ -111,7 +111,7 @@
       </div>
 
       <!-- Strategy / diagnostics -->
-      <div class="card bg-base-100 shadow">
+      <div class="card bg-base-200 shadow">
         <div class="card-body">
           <h2 class="card-title">Strategy Diagnostics</h2>
           <ul class="list-disc list-inside space-y-1 text-sm">
@@ -193,12 +193,14 @@ const sessionMins = computed(() => {
 })
 
 // Data integrity check
-const realizedPnLField = computed(() => Number(market.value.realizedPnL || 0))
+const realizedPnLField = computed(() => -Number(market.value.realizedPnL || 0)) // Flip sign to match cash-deposit convention
 const dataIntegrityWarning = computed(() => {
   // Very light consistency check: realizedPnL should be close to netPnl when position == 0
   const flat = Number(market.value.position || 0) === 0
   const diff = Math.abs(realizedPnLField.value - netPnl.value)
-  return flat && diff > Math.max(1, Math.abs(netPnl.value) * 10) // allow a wide tolerance
+  // Scale tolerance with trading volume (1% of turnover or $1, whichever is larger)
+  const tolerance = Math.max(1, totalAbsNotional.value * 0.01)
+  return flat && diff > tolerance
 })
 
 // Range strategy metrics
