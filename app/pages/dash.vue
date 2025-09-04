@@ -268,6 +268,7 @@ function buildCharts() {
             borderWidth: 2,
             fill: false,
             tension: 0.2,
+            borderColor: '#FFFFFF',
           },
           {
             label: 'Fees (cum.)',
@@ -284,6 +285,7 @@ function buildCharts() {
             pointRadius: 0,
             fill: false,
             tension: 0.2,
+            borderColor: '#FFFFFF',
           },
         ]
       },
@@ -314,6 +316,7 @@ function buildCharts() {
             pointRadius: 4,
             pointHoverRadius: 5,
             pointBackgroundColor: sideColors.value,
+            borderColor: '#FFFFFF',
           }
         ]
       },
