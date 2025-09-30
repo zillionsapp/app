@@ -20,8 +20,8 @@
     <!-- Stat cards -->
     <div class="stats stats-vertical lg:stats-horizontal shadow">
       <div class="stat bg-base-200">
-        <div class="stat-title text-white/60">Start Equity</div>
-        <div class="stat-value">{{ fmtCurrency(startEquity) }}</div>
+        <div class="stat-title text-white/60">Equity</div>
+        <div class="stat-value">{{ fmtCurrency(equity) }}</div>
         <div class="stat-desc text-white/60">Deposit: {{ fmtCurrency(report.deposit) }}</div>
       </div>
 
@@ -51,7 +51,7 @@
     </div>
 
     <!-- Charts -->
-    <div class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+    <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
       <!-- Equity / Cashflow -->
       <div class="card bg-base-200 shadow col-span-1 xl:col-span-2">
         <div class="card-body">
@@ -62,7 +62,7 @@
       </div>
 
       <!-- Price with markers -->
-      <div class="card bg-base-200 shadow">
+      <div class="card bg-base-200 shadow col-span-1 xl:col-span-2">
         <div class="card-body">
           <h2 class="card-title">Execution Price Trace</h2>
           <canvas ref="priceCanvas"></canvas>
@@ -176,6 +176,7 @@ const strategies = computed(() => market.value.strategies || {} as Market['strat
 const router = computed(() => market.value.router || {} as Market['router'])
 
 // Metrics
+const equity = computed(() => Number(report.value.cash || 0) + Number(rangeLastMark.value || 0))
 const startEquity = computed(() => report.value.meta?.dayStartEquity ?? report.value.deposit ?? 0)
 const totalFees = computed(() => Number(market.value.feesPaid || 0))
 const totalAbsNotional = computed(() => trades.value.reduce((s: number, t: Trade) => s + Math.abs(Number(t.notional||0)), 0))

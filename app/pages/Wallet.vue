@@ -131,16 +131,49 @@
 
           <!-- Selected strategies summary -->
           <div v-if="selectedStrategies.length > 0" class="mt-4 p-3 bg-base-100 rounded-xl border border-base-300">
-            <p class="text-sm font-medium mb-2">Active Strategies ({{ selectedStrategies.length }}):</p>
-            <div class="flex flex-wrap gap-2">
-              <span
+            <p class="text-sm font-medium mb-2">Active Strategies ({{ selectedStrategies.length }}) - Portfolio Allocation:</p>
+            <div class="space-y-3">
+              <div
                 v-for="strategy in selectedStrategies"
                 :key="strategy.id"
-                class="badge badge-error badge-sm gap-1"
+                class="flex items-center gap-3 p-2 bg-base-200 rounded-lg"
               >
-                {{ strategy.name }}
-                <button @click="toggleStrategy(strategy.id)" class="ml-1 hover:text-red-300">×</button>
-              </span>
+                <div class="flex-1">
+                  <div class="flex items-center justify-between mb-1">
+                    <span class="font-medium text-sm">{{ strategy.name }}</span>
+                    <span class="text-sm font-semibold text-primary">{{ strategy.allocation || 0 }}%</span>
+                  </div>
+                  <div class="w-full bg-base-300 rounded-full h-2">
+                    <div
+                      class="bg-primary h-2 rounded-full transition-all duration-200"
+                      :style="{ width: `${strategy.allocation || 0}%` }"
+                    ></div>
+                  </div>
+                </div>
+                <div class="flex items-center gap-2">
+                  <input
+                    type="range"
+                    min="0"
+                    max="100"
+                    :value="strategy.allocation || 0"
+                    @input="updateAllocation(strategy.id, ($event.target as HTMLInputElement).value)"
+                    class="range range-xs range-primary"
+                    step="5"
+                  />
+                  <button @click="toggleStrategy(strategy.id)" class="btn btn-ghost btn-xs">×</button>
+                </div>
+              </div>
+
+              <!-- Total allocation display -->
+              <div class="flex items-center justify-between pt-2 border-t border-base-300">
+                <span class="text-sm font-medium">Total Allocation:</span>
+                <span
+                  class="text-sm font-semibold"
+                  :class="totalAllocation === 100 ? 'text-success' : totalAllocation > 100 ? 'text-error' : 'text-warning'"
+                >
+                  {{ totalAllocation }}% {{ totalAllocation !== 100 ? (totalAllocation > 100 ? '(Over-allocated)' : '(Under-allocated)') : '(Balanced)' }}
+                </span>
+              </div>
             </div>
           </div>
         </div>
@@ -200,7 +233,8 @@ const tradingStrategies = ref([
     risk: 'Low Risk',
     riskClass: 'badge-success',
     timeframe: 'Long-term',
-    selected: false
+    selected: false,
+    allocation: 0
   },
   {
     id: 'trading',
@@ -209,7 +243,8 @@ const tradingStrategies = ref([
     risk: 'Mid Risk',
     riskClass: 'badge-warning',
     timeframe: 'Medium-term',
-    selected: false
+    selected: false,
+    allocation: 0
   },
   {
     id: 'sniping',
@@ -218,7 +253,8 @@ const tradingStrategies = ref([
     risk: 'High Risk',
     riskClass: 'badge-error',
     timeframe: 'Short-term',
-    selected: false
+    selected: false,
+    allocation: 0
   }
 ])
 
@@ -227,11 +263,40 @@ const selectedStrategies = computed(() => {
   return tradingStrategies.value.filter(strategy => strategy.selected)
 })
 
+/* Total allocation computed */
+const totalAllocation = computed(() => {
+  return selectedStrategies.value.reduce((total, strategy) => total + (strategy.allocation || 0), 0)
+})
+
+/* Update allocation for a strategy */
+const updateAllocation = (strategyId: string, value: string) => {
+  const newAllocation = parseInt(value, 10) || 0
+  const strategy = tradingStrategies.value.find(s => s.id === strategyId)
+
+  if (!strategy) return
+
+  const currentTotal = selectedStrategies.value.reduce((total, s) =>
+    s.id === strategyId ? total : total + (s?.allocation || 0), 0
+  )
+
+  const maxAllowed = 100 - currentTotal
+
+  if (newAllocation <= maxAllowed) {
+    strategy.allocation = newAllocation
+  } else {
+    strategy.allocation = Math.max(0, maxAllowed)
+  }
+}
+
 /* Toggle strategy selection */
 const toggleStrategy = (strategyId: string) => {
   const strategy = tradingStrategies.value.find(s => s.id === strategyId)
   if (strategy) {
     strategy.selected = !strategy.selected
+    // Reset allocation when deselecting
+    if (!strategy.selected) {
+      strategy.allocation = 0
+    }
   }
 }
 
