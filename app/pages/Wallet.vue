@@ -32,6 +32,7 @@
         :deposit-at="depositAt"
         :earnings-usd="earningsUsd"
         :earnings-pct="earningsPct"
+        :equity="displayBalance"
       />
 
       <TradingStrategySelector
@@ -47,7 +48,7 @@
     <!-- Action bar -->
     <div class="w-full">
       <div class="max-w-3xl mx-auto px-4 lg:px-6">
-        <div class="flex gap-3 py-4">
+        <div class="grid grid-cols-3 gap-3 py-4">
           <button class="flex-1 btn btn-lg rounded-2xl btn-primary gap-2" @click="handleDeposit">
             Deposit
           </button>
