@@ -165,15 +165,6 @@ const toggleStrategy = (strategyId: string) => {
   }
 }
 
-/* Regimes (static) - keeping for backward compatibility */
-const regimes = ref([
-  { name: 'Momentum', desc: 'Breakouts persist', active: true },
-  { name: 'Mean Reversion', desc: 'Tight spreads & fades', active: false },
-  { name: 'Liquidity Hunt', desc: 'Stop-runs, imbalances', active: false },
-  { name: 'Scalpers', desc: 'Micro-mean reverts', active: false },
-  { name: 'Swing Traders', desc: 'Bigger intraday ranges', active: false },
-])
-
 /* Live SOL series + earnings */
 const {
   PERIODS: periodsArr,
