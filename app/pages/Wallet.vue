@@ -154,7 +154,7 @@
                   <input
                     type="range"
                     min="0"
-                    max="100"
+                    :max="getMaxAllocation(strategy.id)"
                     :value="strategy.allocation || 0"
                     @input="updateAllocation(strategy.id, ($event.target as HTMLInputElement).value)"
                     class="range range-xs range-primary"
@@ -268,6 +268,14 @@ const totalAllocation = computed(() => {
   return selectedStrategies.value.reduce((total, strategy) => total + (strategy.allocation || 0), 0)
 })
 
+/* Get max allocation for a strategy */
+const getMaxAllocation = (strategyId: string) => {
+  const currentTotal = selectedStrategies.value.reduce((total, s) =>
+    s.id === strategyId ? total : total + (s.allocation || 0), 0
+  )
+  return Math.max(0, 100 - currentTotal)
+}
+
 /* Update allocation for a strategy */
 const updateAllocation = (strategyId: string, value: string) => {
   const newAllocation = parseInt(value, 10) || 0
@@ -275,11 +283,7 @@ const updateAllocation = (strategyId: string, value: string) => {
 
   if (!strategy) return
 
-  const currentTotal = selectedStrategies.value.reduce((total, s) =>
-    s.id === strategyId ? total : total + (s?.allocation || 0), 0
-  )
-
-  const maxAllowed = 100 - currentTotal
+  const maxAllowed = getMaxAllocation(strategyId)
 
   if (newAllocation <= maxAllowed) {
     strategy.allocation = newAllocation
