@@ -33,6 +33,8 @@
         :earnings-usd="earningsUsd"
         :earnings-pct="earningsPct"
         :equity="displayBalance"
+        :strategies="tradingStrategies"
+        :selected-strategies="selectedStrategies"
       />
 
       <TradingStrategySelector
