@@ -98,28 +98,49 @@
         </div>
       </section>
 
-      <!-- Strategy dominance section (unchanged) -->
+      <!-- Trading Strategy Selection -->
       <section class="mt-6 card">
         <div class="card-body">
-          <h3 class="card-title text-lg">Current market regimes</h3>
+          <h3 class="card-title text-lg">Trading Strategy Selection</h3>
           <p class="text-sm opacity-70 mb-4">
-            The AI adapts to the dominant strategies visible on-chain:
+            Choose your preferred trading strategies. You can select multiple approaches:
           </p>
-          <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-3">
             <div
-              v-for="reg in regimes"
-              :key="reg.name"
-              class="p-3 rounded-xl border"
-              :class="reg.active ? 'border-primary bg-primary/5' : 'border-base-300 bg-base-100'"
+              v-for="strategy in tradingStrategies"
+              :key="strategy.id"
+              class="p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md"
+              :class="strategy.selected
+                ? 'border-red-500 bg-red-50 dark:bg-red-900/10'
+                : 'border-base-300 bg-base-100 hover:border-base-300/80'"
+              @click="toggleStrategy(strategy.id)"
             >
-              <div class="flex items-center justify-between">
+              <div class="flex items-center justify-between mb-2">
                 <div class="flex items-center gap-2">
-                  <!-- icons omitted for brevity (same as before) -->
-                  <span class="font-medium text-sm">{{ reg.name }}</span>
+                  <span class="font-semibold text-sm">{{ strategy.name }}</span>
                 </div>
-                <span v-if="reg.active" class="badge badge-primary badge-sm">Active</span>
+                <span v-if="strategy.selected" class="badge badge-error badge-sm">Active</span>
               </div>
-              <p class="text-xs opacity-70 mt-1">{{ reg.desc }}</p>
+              <p class="text-xs opacity-70 mb-2">{{ strategy.description }}</p>
+              <div class="flex items-center gap-2">
+                <span class="badge badge-xs" :class="strategy.riskClass">{{ strategy.risk }}</span>
+                <span class="text-xs opacity-60">{{ strategy.timeframe }}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selected strategies summary -->
+          <div v-if="selectedStrategies.length > 0" class="mt-4 p-3 bg-base-100 rounded-xl border border-base-300">
+            <p class="text-sm font-medium mb-2">Active Strategies ({{ selectedStrategies.length }}):</p>
+            <div class="flex flex-wrap gap-2">
+              <span
+                v-for="strategy in selectedStrategies"
+                :key="strategy.id"
+                class="badge badge-error badge-sm gap-1"
+              >
+                {{ strategy.name }}
+                <button @click="toggleStrategy(strategy.id)" class="ml-1 hover:text-red-300">×</button>
+              </span>
             </div>
           </div>
         </div>
@@ -170,7 +191,51 @@ const props = withDefaults(defineProps<{
   depositAt: '2025-08-01'
 })
 
-/* Regimes (static) */
+/* Trading Strategies */
+const tradingStrategies = ref([
+  {
+    id: 'investments',
+    name: 'Investments',
+    description: 'Long-term store of value strategy - buy & hold',
+    risk: 'Low Risk',
+    riskClass: 'badge-success',
+    timeframe: 'Long-term',
+    selected: false
+  },
+  {
+    id: 'trading',
+    name: 'Trading',
+    description: 'Buy dips and sell peaks',
+    risk: 'Mid Risk',
+    riskClass: 'badge-warning',
+    timeframe: 'Medium-term',
+    selected: false
+  },
+  {
+    id: 'sniping',
+    name: 'Sniping',
+    description: 'Risk invest into new launched coins',
+    risk: 'High Risk',
+    riskClass: 'badge-error',
+    timeframe: 'Short-term',
+    selected: false
+  }
+])
+
+/* Selected strategies computed */
+const selectedStrategies = computed(() => {
+  return tradingStrategies.value.filter(strategy => strategy.selected)
+})
+
+/* Toggle strategy selection */
+const toggleStrategy = (strategyId: string) => {
+  const strategy = tradingStrategies.value.find(s => s.id === strategyId)
+  if (strategy) {
+    strategy.selected = !strategy.selected
+  }
+}
+
+/* Regimes (static) - keeping for backward compatibility */
 const regimes = ref([
   { name: 'Momentum', desc: 'Breakouts persist', active: true },
   { name: 'Mean Reversion', desc: 'Tight spreads & fades', active: false },
