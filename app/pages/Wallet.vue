@@ -2,49 +2,53 @@
 <template>
   <div class="flex flex-col justify-between bg-base-200/60 text-white min-h-screen" data-theme="zillions">
     <!-- Top bar -->
-    <WalletHeader />
+    <!-- <WalletHeader /> -->
 
     <!-- Balance + Chart -->
-    <main class="max-w-3xl mx-auto w-full px-4 lg:px-6 flex-1">
-      <WalletBalance
-        :currency="currency"
-        :display-balance="displayBalance"
-        :latest-price="latestPrice"
-        :period="period"
-        :deposit-at="depositAt"
-        :earnings-usd="earningsUsd"
-        :earnings-pct="earningsPct"
-        :loading="loading"
-        :error="error"
-        :earnings-loading="earningsLoading"
-        :periods="periods"
-        :points="points"
-        :chart-width="chartWidth"
-        :chart-height="chartHeight"
-        :area-path="areaPath"
-        :line-path="linePath"
-        @set-period="(period) => setPeriod(period as Period)"
-      />
+    <main class="mx-auto w-full px-4 lg:px-6 flex-1 flex flex-wrap">
+      <div class="flex-1">
+        <WalletBalance
+          :currency="currency"
+          :display-balance="displayBalance"
+          :latest-price="latestPrice"
+          :period="period"
+          :deposit-at="depositAt"
+          :earnings-usd="earningsUsd"
+          :earnings-pct="earningsPct"
+          :loading="loading"
+          :error="error"
+          :earnings-loading="earningsLoading"
+          :periods="periods"
+          :points="points"
+          :chart-width="chartWidth"
+          :chart-height="chartHeight"
+          :area-path="areaPath"
+          :line-path="linePath"
+          @set-period="(period) => setPeriod(period as Period)"
+        />
 
-      <WalletStats
-        :currency="currency"
-        :deposited="deposited"
-        :deposit-at="depositAt"
-        :earnings-usd="earningsUsd"
-        :earnings-pct="earningsPct"
-        :equity="displayBalance"
-        :strategies="tradingStrategies"
-        :selected-strategies="selectedStrategies"
-      />
-
-      <TradingStrategySelector
-        :strategies="tradingStrategies"
-        :selected-strategies="selectedStrategies"
-        :total-allocation="totalAllocation"
-        @toggle-strategy="toggleStrategy"
-        @update-allocation="updateAllocation"
-        @get-max-allocation="getMaxAllocation"
-      />
+        <WalletStats
+          :currency="currency"
+          :deposited="deposited"
+          :deposit-at="depositAt"
+          :earnings-usd="earningsUsd"
+          :earnings-pct="earningsPct"
+          :equity="displayBalance"
+          :strategies="tradingStrategies"
+          :selected-strategies="selectedStrategies"
+        />
+      </div>
+      
+      <div class="flex-1">
+        <TradingStrategySelector
+          :strategies="tradingStrategies"
+          :selected-strategies="selectedStrategies"
+          :total-allocation="totalAllocation"
+          @toggle-strategy="toggleStrategy"
+          @update-allocation="updateAllocation"
+          @get-max-allocation="getMaxAllocation"
+        />
+      </div>
     </main>
 
     <!-- Action bar -->

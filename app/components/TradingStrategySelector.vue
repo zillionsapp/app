@@ -1,5 +1,5 @@
 <template>
-  <section class="mt-6 card">
+  <section class="card">
     <div class="card-body">
       <h3 class="card-title text-lg">Trading Strategy Selection</h3>
       <p class="text-sm opacity-70 mb-4">
@@ -11,7 +11,7 @@
           :key="strategy.id"
           class="p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md"
           :class="strategy.selected
-            ? 'border-red-500 bg-red-50 dark:bg-red-900/10'
+            ? 'border-red-500 bg-red-900/10'
             : 'border-base-300 bg-base-100 hover:border-base-300/80'"
           @click="emit('toggleStrategy', strategy.id)"
         >
