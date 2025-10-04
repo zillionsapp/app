@@ -20,6 +20,7 @@
       <!-- Basic Settings -->
       <div class="space-y-4">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">Basic Settings</h3>
+        <p class="italic">{{ isCustomParameters ? 'Custom Algo Trading Bot Parameters.' : 'Current Algo Trading Bot Parameters.' }}</p>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
@@ -205,7 +206,7 @@
 </template>
 
 <script setup>
-defineProps({
+const props = defineProps({
   config: {
     type: Object,
     required: true
@@ -217,4 +218,36 @@ defineProps({
 })
 
 defineEmits(['run-backtest', 'reset-config'])
+
+// Default configuration values - must match parent component defaults
+const defaultConfig = {
+  symbol: 'BTCUSDT',
+  tf: '15m',
+  htf: '1h',
+  lookbackDays: 120,
+  initialCapital: 1000,
+  posPct: 10,
+  useTrend: true,
+  useHTF: true,
+  useTrail: true,
+  tpPct: 10,
+  trailPct: 3.4
+}
+
+// Computed property to check if current config differs from defaults
+const isCustomParameters = computed(() => {
+  return (
+    props.config.symbol !== defaultConfig.symbol ||
+    props.config.tf !== defaultConfig.tf ||
+    props.config.htf !== defaultConfig.htf ||
+    props.config.initialCapital !== defaultConfig.initialCapital ||
+    props.config.posPct !== defaultConfig.posPct ||
+    props.config.lookbackDays !== defaultConfig.lookbackDays ||
+    props.config.useTrend !== defaultConfig.useTrend ||
+    props.config.useHTF !== defaultConfig.useHTF ||
+    props.config.useTrail !== defaultConfig.useTrail ||
+    props.config.tpPct !== defaultConfig.tpPct ||
+    props.config.trailPct !== defaultConfig.trailPct
+  )
+})
 </script>
