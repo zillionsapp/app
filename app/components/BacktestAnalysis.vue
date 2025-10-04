@@ -189,6 +189,29 @@
         </div>
       </div>
 
+      <!-- Action Buttons -->
+      <div class="mt-4 flex gap-2">
+        <button
+          @click="$emit('backtest-optimal-strategy')"
+          class="flex-1 bg-gradient-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-medium py-2 px-3 rounded-md transition duration-200 text-xs flex items-center justify-center"
+        >
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          Backtest This Strategy
+        </button>
+
+        <button
+          @click="$emit('analyze-optimal-performance')"
+          class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-white font-medium py-2 px-3 rounded-md transition duration-200 text-xs flex items-center justify-center"
+        >
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+          </svg>
+          Analyze Performance
+        </button>
+      </div>
+
       <!-- Key Insight -->
       <div class="mt-3 p-2 bg-gradient-to-r from-purple-100 to-pink-100 dark:from-purple-800/30 dark:to-pink-800/30 rounded text-xs text-center">
         <span class="text-purple-700 dark:text-purple-300 font-medium">
@@ -268,5 +291,5 @@ defineProps({
   }
 })
 
-defineEmits(['analyze-trades', 'improve-strategy', 'apply-improvements', 'generate-optimal-trades'])
+defineEmits(['analyze-trades', 'improve-strategy', 'apply-improvements', 'generate-optimal-trades', 'backtest-optimal-strategy', 'analyze-optimal-performance'])
 </script>

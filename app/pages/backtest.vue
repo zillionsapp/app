@@ -30,6 +30,8 @@
             @improve-strategy="improveStrategy"
             @apply-improvements="applyImprovements"
             @generate-optimal-trades="generateOptimalTrades"
+            @backtest-optimal-strategy="backtestOptimalStrategy"
+            @analyze-optimal-performance="analyzeOptimalPerformance"
           />
         </div>
 
@@ -69,7 +71,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, onMounted } from 'vue'
 
 const loading = ref(false)
 const result = ref(null)
@@ -264,6 +266,44 @@ const generateOptimalTrades = async () => {
   } finally {
     generatingOptimal.value = false
   }
+}
+
+// Handler for backtesting the optimal strategy
+const backtestOptimalStrategy = async () => {
+  if (!optimalTrades.value) {
+    console.error('No optimal trades available')
+    return
+  }
+
+  console.log('Backtesting optimal strategy...')
+
+  // For now, we'll run a new backtest with the current config
+  // In the future, we could derive optimal parameters from the optimal trades
+  await runBacktest()
+
+  // Show a message that the backtest is running with current parameters
+  // You could add a toast notification here
+}
+
+// Handler for analyzing optimal performance
+const analyzeOptimalPerformance = () => {
+  if (!optimalTrades.value) {
+    console.error('No optimal trades available')
+    return
+  }
+
+  console.log('Analyzing optimal performance:', optimalTrades.value)
+
+  // For now, just log the performance
+  // In the future, we could run detailed analysis on the optimal trades
+  console.log('Optimal Performance Summary:', {
+    return: optimalTrades.value.performance.totalReturnPct,
+    vsBuyHold: optimalTrades.value.performance.vsBuyAndHold,
+    finalValue: optimalTrades.value.performance.finalValue,
+    totalTrades: optimalTrades.value.performance.totalTrades
+  })
+
+  // You could add a toast notification here showing the analysis
 }
 
 // Auto-run backtest on mount with default config
