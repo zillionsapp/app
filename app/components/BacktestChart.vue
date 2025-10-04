@@ -33,12 +33,13 @@
       <div class="animate-pulse">Loading chart data...</div>
     </div>
 
-    <div v-else class="relative">
+    <div v-else class="relative w-full">
       <svg
         ref="chartSvg"
-        :width="width"
-        :height="height"
-        class="overflow-visible"
+        width="100%"
+        height="100%"
+        viewBox="0 0 800 400"
+        class="w-full h-auto"
         @mousemove="handleMouseMove"
         @mouseleave="showTooltip = false"
       >
@@ -71,7 +72,7 @@
         </g>
 
         <!-- X-axis labels -->
-        <g class="text-xs fill-gray-500 dark:fill-gray-400" transform="translate(0, 380)">
+        <g class="text-xs fill-gray-500 dark:fill-gray-400" :transform="`translate(0, ${height - margin.bottom + 30})`">
           <text v-for="label in xLabels" :key="label.date" :x="label.x" y="20" text-anchor="middle">
             {{ label.text }}
           </text>
@@ -147,9 +148,9 @@
         </g>
 
         <!-- Tooltip -->
-        <g v-if="showTooltip && tooltipData" :transform="`translate(${tooltip.x + 10}, ${tooltip.y - 10})`">
+        <g v-if="showTooltip && tooltipData" :transform="`translate(${tooltip.x}, ${tooltip.y - 10})`">
           <rect
-            :x="0"
+            :x="tooltip.offsetX"
             :y="0"
             :width="tooltipData.buyHold !== undefined ? 220 : 180"
             :height="tooltipData.buyHold !== undefined ? 110 : 80"
@@ -248,9 +249,10 @@ const tooltipData = ref(null)
 const activeView = ref('both')
 const dataReady = ref(false)
 
+// Fixed dimensions for consistent rendering
 const width = 800
 const height = 400
-const margin = { top: 20, right: 20, bottom: 40, left: 60 }
+const margin = { top: 20, right: 60, bottom: 40, left: 60 }
 const chartWidth = width - margin.left - margin.right
 const chartHeight = height - margin.top - margin.bottom
 
@@ -509,7 +511,27 @@ const handleMouseMove = (event) => {
   const y = event.clientY - rect.top - margin.top
 
   if (x >= 0 && x <= chartWidth && y >= 0 && y <= chartHeight) {
-    tooltip.value = { x: event.clientX - rect.left, y: event.clientY - rect.top }
+    const tooltipWidth = tooltipData.value?.buyHold !== undefined ? 220 : 180
+    const chartRightEdge = width - margin.right
+
+    // Position tooltip to the right by default, but flip to left if it would go off-screen
+    let tooltipX = event.clientX - rect.left + 10
+    let offsetX = 0
+
+    if (tooltipX + tooltipWidth > chartRightEdge) {
+      // Position tooltip to the left of cursor
+      tooltipX = event.clientX - rect.left - tooltipWidth - 10
+      offsetX = 0
+    } else {
+      // Position tooltip to the right of cursor
+      offsetX = 0
+    }
+
+    tooltip.value = {
+      x: tooltipX,
+      y: event.clientY - rect.top,
+      offsetX: offsetX
+    }
 
     // Find closest data point index
     const totalPoints = props.priceData.length
@@ -538,7 +560,28 @@ const handleMouseMove = (event) => {
 }
 
 const showPointTooltip = (event, point, type) => {
-  tooltip.value = { x: event.clientX, y: event.clientY }
+  const tooltipWidth = tooltipData.value?.buyHold !== undefined ? 220 : 180
+  const chartRightEdge = width - margin.right
+
+  // Position tooltip to the right by default, but flip to left if it would go off-screen
+  let tooltipX = event.clientX + 10
+  let offsetX = 0
+
+  if (tooltipX + tooltipWidth > chartRightEdge) {
+    // Position tooltip to the left of cursor
+    tooltipX = event.clientX - tooltipWidth - 10
+    offsetX = 0
+  } else {
+    // Position tooltip to the right of cursor
+    offsetX = 0
+  }
+
+  tooltip.value = {
+    x: tooltipX,
+    y: event.clientY,
+    offsetX: offsetX
+  }
+
   tooltipData.value = {
     date: new Date(point.time).toLocaleString(),
     price: type === 'price' ? point.price : null,
@@ -556,6 +599,8 @@ watch([() => props.trades, () => props.priceData], () => {
     emit('data-ready', true)
   })
 }, { deep: true })
+
+
 
 onMounted(() => {
   dataReady.value = true
