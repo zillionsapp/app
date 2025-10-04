@@ -10,7 +10,7 @@
     />
 
     <!-- Summary Cards -->
-    <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+    <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
         <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Portfolio Value</div>
         <div class="text-2xl font-bold text-primary">
@@ -52,13 +52,6 @@
       </div>
 
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Total Trades</div>
-        <div class="text-2xl font-bold text-gray-900 dark:text-white">
-          {{ result.result.tradesCount }}
-        </div>
-      </div>
-
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
         <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Win Rate</div>
         <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
           {{ winRate.toFixed(1) }}%
@@ -66,119 +59,100 @@
       </div>
     </div>
 
-    <!-- Configuration Summary -->
+    <!-- Trades Analyzer -->
     <div class="bg-base-200/60 rounded-lg shadow-md p-6">
-      <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Configuration Used</h3>
-      <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
-        <div>
-          <span class="font-medium text-gray-700 dark:text-gray-300">Symbol:</span>
-          {{ result.config.symbol }}
+      <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Trades Analyzer</h3>
+      <!-- Summary Stats -->
+      <div class="my-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
+        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+          <div class="text-gray-500 dark:text-gray-400">Total Trades</div>
+          <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ roundTripTrades.length }}</div>
         </div>
-        <div>
-          <span class="font-medium text-gray-700 dark:text-gray-300">Timeframe:</span>
-          {{ result.config.tf }}
+        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
+          <div class="text-gray-500 dark:text-gray-400">Winning Trades</div>
+          <div class="text-lg font-semibold text-green-600 dark:text-green-400">{{ winningTrades }}</div>
         </div>
-        <div>
-          <span class="font-medium text-gray-700 dark:text-gray-300">HTF:</span>
-          {{ result.config.htf }}
+        <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
+          <div class="text-gray-500 dark:text-gray-400">Losing Trades</div>
+          <div class="text-lg font-semibold text-red-600 dark:text-red-400">{{ losingTrades }}</div>
         </div>
-        <div>
-          <span class="font-medium text-gray-700 dark:text-gray-300">Capital:</span>
-          ${{ result.config.initialCapital }}
-        </div>
-        <div>
-          <span class="font-medium text-gray-700 dark:text-gray-300">Position Size:</span>
-          {{ result.config.posPct }}%
-        </div>
-        <div>
-          <span class="font-medium text-gray-700 dark:text-gray-300">Trend Filter:</span>
-          {{ result.config.useTrend ? 'On' : 'Off' }}
+        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
+          <div class="text-gray-500 dark:text-gray-400">Win Rate</div>
+          <div class="text-lg font-semibold text-blue-600 dark:text-blue-400">{{ winRate.toFixed(1) }}%</div>
         </div>
       </div>
-    </div>
-
-    <!-- Trades Table -->
-    <div class="bg-base-200/60 rounded-lg shadow-md p-6">
-      <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
-        Recent Trades ({{ result.trades.length }} of {{ result.result.tradesCount }})
-      </h3>
-
+      
+      <!-- Trades Table -->
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
           <thead class="bg-gray-50 dark:bg-gray-700">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Time
+                Trade #
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Side
+                Entry Time
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Price
+                Exit Time
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Duration
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Entry Price
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Exit Price
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Quantity
               </th>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
-                Note
+                P&L ($)
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                P&L (%)
+              </th>
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+                Result
               </th>
             </tr>
           </thead>
           <tbody class="bg-base-200/60 divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-for="trade in result.trades" :key="trade.time" class="hover:bg-gray-50 dark:hover:bg-gray-700">
+            <tr v-for="(roundTrip, index) in roundTripTrades" :key="index" :class="roundTrip.pnl >= 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+                {{ index + 1 }}
+              </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                {{ formatDate(trade.time) }}
+                {{ formatDate(roundTrip.entryTime) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                {{ formatDate(roundTrip.exitTime) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                {{ roundTrip.duration }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                ${{ roundTrip.entryPrice }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                ${{ roundTrip.exitPrice }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+                {{ roundTrip.quantity }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="roundTrip.pnl >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                ${{ roundTrip.pnl.toFixed(2) }}
+              </td>
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="roundTrip.pnlPct >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+                {{ roundTrip.pnlPct.toFixed(2) }}%
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="trade.side === 'BUY' ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'" class="font-medium">
-                  {{ trade.side }}
+                <span :class="roundTrip.pnl >= 0 ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'" class="px-2 py-1 text-xs font-medium rounded-full">
+                  {{ roundTrip.pnl >= 0 ? 'PROFIT' : 'LOSS' }}
                 </span>
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                ${{ trade.price }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
-                {{ trade.qty }}
-              </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">
-                {{ trade.note }}
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
-      <div v-if="result.result.tradesCount > result.trades.length" class="mt-4 text-center">
-        <button
-          @click="$emit('toggle-all-trades')"
-          class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 text-sm font-medium"
-        >
-          {{ showAllTrades ? 'Show Less' : `Show All ${result.result.tradesCount} Trades` }}
-        </button>
-      </div>
-    </div>
-
-    <!-- All Trades (Collapsible) -->
-    <div v-if="showAllTrades && result.result.tradesCount > result.trades.length" class="bg-base-200/60 rounded-lg shadow-md p-6">
-      <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">All Trades</h3>
-      <div class="max-h-96 overflow-y-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-700 sticky top-0">
-            <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Time</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Side</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Price</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Quantity</th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Note</th>
-            </tr>
-          </thead>
-          <tbody class="bg-base-200/60 divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-for="trade in result.allTrades" :key="trade.time">
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(trade.time) }}</td>
-              <td class="px-6 py-4 whitespace-nowrap"><span :class="trade.side === 'BUY' ? 'text-green-600' : 'text-red-600'" class="font-medium">{{ trade.side }}</span></td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">${{ trade.price }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ trade.qty }}</td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500 dark:text-gray-400">{{ trade.note }}</td>
             </tr>
           </tbody>
         </table>
@@ -260,14 +234,132 @@ const strategyVsBuyHoldPct = computed(() => {
   return ((props.result.result.equity - buyHoldFinalValue.value) / buyHoldFinalValue.value) * 100
 })
 
+// Round-trip trades analysis
+const roundTripTrades = computed(() => {
+  if (!props.result || !props.result.allTrades.length) return []
+
+  const trades = props.result.allTrades
+  const roundTrips = []
+  let currentPosition = null
+  let entryTrade = null
+  let totalQuantity = 0
+  let totalCost = 0
+
+  for (const trade of trades) {
+    if (trade.side === 'BUY' && trade.note === 'entry') {
+      // Starting a new position
+      if (currentPosition) {
+        // Close previous position if exists
+        closeCurrentPosition()
+      }
+      currentPosition = 'long'
+      entryTrade = trade
+      totalQuantity = parseFloat(trade.qty)
+      totalCost = parseFloat(trade.price) * totalQuantity
+    } else if (trade.side === 'SELL' && currentPosition === 'long') {
+      // Exiting or reducing position
+      const sellQuantity = parseFloat(trade.qty)
+      const sellValue = parseFloat(trade.price) * sellQuantity
+
+      if (sellQuantity >= totalQuantity) {
+        // Full exit
+        const pnl = sellValue - (totalCost * (sellQuantity / totalQuantity))
+        const pnlPct = (pnl / (totalCost * (sellQuantity / totalQuantity))) * 100
+
+        roundTrips.push({
+          entryTime: entryTrade.time,
+          exitTime: trade.time,
+          duration: calculateDuration(entryTrade.time, trade.time),
+          entryPrice: parseFloat(entryTrade.price),
+          exitPrice: parseFloat(trade.price),
+          quantity: totalQuantity,
+          pnl: pnl,
+          pnlPct: pnlPct
+        })
+
+        currentPosition = null
+        entryTrade = null
+        totalQuantity = 0
+        totalCost = 0
+      } else {
+        // Partial exit - reduce position
+        const exitRatio = sellQuantity / totalQuantity
+        const exitCost = totalCost * exitRatio
+        const pnl = sellValue - exitCost
+        const pnlPct = (pnl / exitCost) * 100
+
+        roundTrips.push({
+          entryTime: entryTrade.time,
+          exitTime: trade.time,
+          duration: calculateDuration(entryTrade.time, trade.time),
+          entryPrice: parseFloat(entryTrade.price),
+          exitPrice: parseFloat(trade.price),
+          quantity: sellQuantity,
+          pnl: pnl,
+          pnlPct: pnlPct
+        })
+
+        // Reduce remaining position
+        totalQuantity -= sellQuantity
+        totalCost -= exitCost
+      }
+    }
+  }
+
+  // Close any remaining position at EOD
+  if (currentPosition && entryTrade) {
+    closeCurrentPosition()
+  }
+
+  return roundTrips
+
+  function closeCurrentPosition() {
+    // Find the last price for EOD close
+    const lastPrice = props.result.priceData.length > 0
+      ? props.result.priceData[props.result.priceData.length - 1].price
+      : entryTrade.price
+
+    const pnl = (parseFloat(lastPrice) * totalQuantity) - totalCost
+    const pnlPct = (pnl / totalCost) * 100
+
+    roundTrips.push({
+      entryTime: entryTrade.time,
+      exitTime: trades[trades.length - 1].time,
+      duration: calculateDuration(entryTrade.time, trades[trades.length - 1].time),
+      entryPrice: parseFloat(entryTrade.price),
+      exitPrice: parseFloat(lastPrice),
+      quantity: totalQuantity,
+      pnl: pnl,
+      pnlPct: pnlPct
+    })
+  }
+
+  function calculateDuration(entryTime, exitTime) {
+    const entry = new Date(entryTime)
+    const exit = new Date(exitTime)
+    const diffMs = exit - entry
+
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+    if (days > 0) return `${days}d ${hours}h`
+    if (hours > 0) return `${hours}h ${minutes}m`
+    return `${minutes}m`
+  }
+})
+
+const winningTrades = computed(() => {
+  return roundTripTrades.value.filter(trade => trade.pnl > 0).length
+})
+
+const losingTrades = computed(() => {
+  return roundTripTrades.value.filter(trade => trade.pnl < 0).length
+})
+
 const winRate = computed(() => {
-  if (!props.result || !props.result.allTrades.length) return 0
-
-  const winningTrades = props.result.allTrades.filter(trade =>
-    trade.note.includes('TP') || trade.note.includes('trailing stop')
-  ).length
-
-  return (winningTrades / props.result.allTrades.length) * 100
+  if (roundTripTrades.value.length === 0) return 0
+  return (winningTrades.value / roundTripTrades.value.length) * 100
 })
 </script>
 
