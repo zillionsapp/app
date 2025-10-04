@@ -56,7 +56,7 @@ const DEFAULT_CONFIG: Required<StrategyConfig> = {
   // Data
   symbol: "BTCUSDT",
   tf: "15m",
-  htf: "1d",
+  htf: "1h",
   lookbackDays: 120,
   limitPerReq: 1000,
 
