@@ -54,7 +54,7 @@
     <!-- Action bar -->
     <div class="w-full">
       <div class="max-w-3xl mx-auto px-4 lg:px-6">
-        <div class="grid grid-cols-3 gap-3 py-4">
+        <div class="grid grid-cols-4 gap-3 py-4">
           <button class="flex-1 btn btn-lg rounded-2xl btn-primary gap-2" @click="handleDeposit">
             Deposit
           </button>
@@ -64,6 +64,9 @@
           <button class="flex-1 btn btn-lg rounded-2xl btn-ghost gap-2" @click="handleSend">
             Send
           </button>
+          <NuxtLink to="/simulation" class="flex-1 btn btn-lg rounded-2xl btn-secondary gap-2">
+            Simulation
+          </NuxtLink>
         </div>
       </div>
     </div>
