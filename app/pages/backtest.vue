@@ -275,14 +275,79 @@ const backtestOptimalStrategy = async () => {
     return
   }
 
-  console.log('Backtesting optimal strategy...')
+  console.log('Taking over optimal trades into backtest results...')
 
-  // For now, we'll run a new backtest with the current config
-  // In the future, we could derive optimal parameters from the optimal trades
-  await runBacktest()
+  // Create a mock backtest result using the optimal trades
+  const mockBacktestResult = createMockBacktestResult(optimalTrades.value)
 
-  // Show a message that the backtest is running with current parameters
-  // You could add a toast notification here
+  // Update the result to show optimal trades
+  result.value = mockBacktestResult
+
+  console.log('Optimal trades now displayed in backtest results')
+}
+
+// Create a mock backtest result from optimal trades
+const createMockBacktestResult = (optimalTradesData) => {
+  const performance = optimalTradesData.performance
+  const trades = optimalTradesData.optimalTrades
+
+  // Use the original price data from the current backtest result
+  const originalPriceData = result.value?.priceData || []
+  const originalStartPrice = originalPriceData.length > 0 ?
+    (typeof originalPriceData[0] === 'number' ? originalPriceData[0] : originalPriceData[0].price) : 50000
+  const originalEndPrice = originalPriceData.length > 0 ?
+    (typeof originalPriceData[originalPriceData.length - 1] === 'number'
+      ? originalPriceData[originalPriceData.length - 1]
+      : originalPriceData[originalPriceData.length - 1].price) : 50000
+
+  // Calculate proper buy & hold return using original price data
+  const properBuyAndHoldReturn = ((originalEndPrice - originalStartPrice) / originalStartPrice) * 100
+
+  // Create properly formatted trades with realistic timestamps
+  const formattedTrades = trades.map((trade, index) => {
+    // Use original price data timestamps if available, otherwise create mock ones
+    const tradeTime = originalPriceData.length > index ?
+      (typeof originalPriceData[index] === 'object' ? originalPriceData[index].time : Date.now() - (trades.length - index) * 15 * 60 * 1000) :
+      new Date(Date.now() - (trades.length - index) * 15 * 60 * 1000).toISOString()
+
+    return {
+      time: tradeTime,
+      side: trade.type,
+      price: trade.price.toFixed(6),
+      qty: (trade.quantity || 1).toFixed(8),
+      note: trade.note
+    }
+  })
+
+  return {
+    ok: true,
+    config: { ...config }, // Use current config
+    result: {
+      equity: performance.finalValue,
+      retPct: performance.totalReturnPct,
+      bars: originalPriceData.length || 1000,
+      lastPrice: originalEndPrice,
+      tradesCount: trades.length
+    },
+    trades: formattedTrades.slice(-20), // Last 20 trades for display
+    allTrades: formattedTrades, // All trades for analysis
+    priceData: originalPriceData, // Use original price data for proper buy & hold calculation
+    data: {
+      ltfCandles: originalPriceData.length || 1000,
+      htfCandles: 200,
+      ltfTimeframe: '15m',
+      htfTimeframe: '1h'
+    }
+  }
+}
+
+// Helper function to extract price data for optimal trades generation
+const extractPriceArray = (priceData) => {
+  if (!priceData || priceData.length === 0) return []
+
+  return priceData.map(item =>
+    typeof item === 'number' ? item : item.price
+  ).filter(price => typeof price === 'number' && price > 0)
 }
 
 // Handler for analyzing optimal performance
