@@ -132,6 +132,10 @@ const runBacktest = async () => {
       body: config
     })
     result.value = response
+
+    // Clear optimal trades when running new backtest since they become irrelevant
+    optimalTrades.value = null
+    console.log('Optimal trades cleared after new backtest')
   } catch (error) {
     console.error('Backtest failed:', error)
     // You could add a toast notification here
