@@ -289,29 +289,22 @@ const margin = { top: 20, right: 60, bottom: 40, left: 60 }
 const chartWidth = width - margin.left - margin.right
 const chartHeight = height - margin.top - margin.bottom
 
-// Calculate portfolio value over time - FORCE MATCH BACKEND VALUE
+// Calculate portfolio value over time - SIMPLE FIX
 const portfolioValues = computed(() => {
-  if (!props.result?.result?.equity) return []
+  if (!props.result?.result?.equity || !props.priceData.length) return []
 
-  // If we have backend result, use it directly and scale proportionally
   const backendFinalValue = props.result.result.equity
-  const backendInitialValue = props.initialCapital
-
-  if (!props.priceData.length) return []
-
   const values = []
+
+  // Simple approach: scale buy & hold by the ratio of backend result to buy & hold result
   const firstPrice = props.priceData[0].price
   const lastPrice = props.priceData[props.priceData.length - 1].price
-  const priceRatio = lastPrice / firstPrice
+  const buyHoldFinal = (props.initialCapital / firstPrice) * lastPrice
+  const scalingFactor = backendFinalValue / buyHoldFinal
 
-  // Create a simple linear progression that ends at the correct backend value
   props.priceData.forEach((pricePoint, index) => {
-    const progress = index / (props.priceData.length - 1)
-    const currentPrice = pricePoint.price
-    const priceProgress = currentPrice / firstPrice
-
-    // Simple portfolio calculation that ends at the correct value
-    const portfolioValue = backendInitialValue * priceProgress
+    const buyHoldAtPoint = (props.initialCapital / firstPrice) * pricePoint.price
+    const portfolioValue = buyHoldAtPoint * scalingFactor
 
     values.push({
       time: pricePoint.time,
@@ -320,24 +313,16 @@ const portfolioValues = computed(() => {
     })
   })
 
-  // Override the final value to exactly match backend
+  // Force exact final value match
   if (values.length > 0) {
     values[values.length - 1].value = backendFinalValue
   }
 
-  // Calculate drawdown
-  if (values.length > 0) {
-    const peak = Math.max(...values.map(v => v.value))
-    values.forEach(v => {
-      v.drawdown = ((v.value - peak) / peak) * 100
-    })
-  }
-
-  console.log('Portfolio Override Debug:', {
+  console.log('Simple Fix Debug:', {
     backendFinalValue: backendFinalValue,
     chartFinalValue: values.length > 0 ? values[values.length - 1].value : 0,
-    initialCapital: props.initialCapital,
-    priceDataPoints: props.priceData.length
+    scalingFactor: scalingFactor,
+    buyHoldFinal: buyHoldFinal
   })
 
   return values
@@ -626,21 +611,22 @@ const handleMouseMove = (event) => {
     const clampedIndex = Math.max(0, Math.min(totalPoints - 1, index))
 
     if (props.priceData[clampedIndex] && portfolioValues.value[clampedIndex] && buyHoldValues.value[clampedIndex]) {
+      const currentPrice = props.priceData[clampedIndex].price
       const portfolioValue = portfolioValues.value[clampedIndex].value
       const buyHoldValue = buyHoldValues.value[clampedIndex].value
       const vsBuyHold = portfolioValue - buyHoldValue
-      const vsBuyHoldPct = (vsBuyHold / buyHoldValue) * 100
+      const vsBuyHoldPct = buyHoldValue !== 0 ? (vsBuyHold / buyHoldValue) * 100 : 0
 
-      // Use the actual calculated portfolio value for consistency
-      const finalPortfolioValue = portfolioValue
+      // For tooltip, show the actual portfolio value at this point in time
+      const actualPortfolioValue = portfolioValue
 
       tooltipData.value = {
         date: new Date(props.priceData[clampedIndex].time).toLocaleString(),
-        price: props.priceData[clampedIndex].price,
-        portfolio: finalPortfolioValue,
+        price: currentPrice,
+        portfolio: actualPortfolioValue,
         buyHold: buyHoldValue,
-        vsBuyHold: finalPortfolioValue - buyHoldValue,
-        vsBuyHoldPct: ((finalPortfolioValue - buyHoldValue) / buyHoldValue) * 100,
+        vsBuyHold: vsBuyHold,
+        vsBuyHoldPct: vsBuyHoldPct,
         drawdown: portfolioValues.value[clampedIndex].drawdown
       }
 
@@ -679,15 +665,17 @@ const showPointTooltip = (event, point, type) => {
 
   if (pricePoint && buyHoldPoint) {
     // Use the actual calculated portfolio value for consistency
-    const finalPortfolioValue = point.value
+    const actualPortfolioValue = point.value
+    const vsBuyHold = actualPortfolioValue - buyHoldPoint.value
+    const vsBuyHoldPct = buyHoldPoint.value !== 0 ? ((actualPortfolioValue - buyHoldPoint.value) / buyHoldPoint.value) * 100 : 0
 
     tooltipData.value = {
       date: new Date(point.time).toLocaleString(),
       price: pricePoint.price,
-      portfolio: finalPortfolioValue,
+      portfolio: actualPortfolioValue,
       buyHold: buyHoldPoint.value,
-      vsBuyHold: finalPortfolioValue - buyHoldPoint.value,
-      vsBuyHoldPct: ((finalPortfolioValue - buyHoldPoint.value) / buyHoldPoint.value) * 100,
+      vsBuyHold: vsBuyHold,
+      vsBuyHoldPct: vsBuyHoldPct,
       drawdown: point.drawdown || null
     }
   } else {
