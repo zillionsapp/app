@@ -1,5 +1,5 @@
 <template>
-  <div class="backtest-chart bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+  <div class="bg-base-200 rounded-lg shadow-md p-6">
     <div class="flex justify-between items-center mb-4">
       <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
         Performance Chart

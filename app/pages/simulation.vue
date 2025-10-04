@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen bg-base-200/60 text-white" data-theme="zillions">
+  <div class="min-h-screen bg-base-200 text-white" data-theme="zillions">
     <div class="container mx-auto px-4 py-8">
       <!-- Header -->
       <div class="mb-8">

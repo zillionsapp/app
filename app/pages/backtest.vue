@@ -1,5 +1,5 @@
 <template>
-  <div class="backtest-page">
+  <div class="bg-base-100 text-white min-h-screen">
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">
         Strategy Backtest
@@ -8,7 +8,7 @@
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Configuration Panel -->
         <div class="lg:col-span-1">
-          <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+          <div class="bg-base-200/60 rounded-lg shadow-md p-6">
             <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
               Strategy Configuration
             </h2>
@@ -203,7 +203,7 @@
 
         <!-- Results Panel -->
         <div class="lg:col-span-2">
-          <div v-if="loading" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center">
+          <div v-if="loading" class="bg-base-200/60 rounded-lg shadow-md p-8 text-center">
             <div class="animate-pulse">
               <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-3/4 mx-auto mb-4"></div>
               <div class="h-4 bg-gray-200 dark:bg-gray-700 rounded w-1/2 mx-auto mb-8"></div>
@@ -222,7 +222,17 @@
             />
 
             <!-- Summary Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-6 gap-4">
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Portfolio Value</div>
+                <div class="text-2xl font-bold text-primary">
+                  ${{ result.result.equity.toFixed(2) }}
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  Final Balance
+                </div>
+              </div>
+
               <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
                 <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Strategy PnL</div>
                 <div class="text-2xl font-bold text-green-600 dark:text-green-400">
@@ -269,7 +279,7 @@
             </div>
 
             <!-- Configuration Summary -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div class="bg-base-200/60 rounded-lg shadow-md p-6">
               <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Configuration Used</h3>
               <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-sm">
                 <div>
@@ -300,7 +310,7 @@
             </div>
 
             <!-- Trades Table -->
-            <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div class="bg-base-200/60 rounded-lg shadow-md p-6">
               <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">
                 Recent Trades ({{ result.trades.length }} of {{ result.result.tradesCount }})
               </h3>
@@ -326,7 +336,7 @@
                       </th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody class="bg-base-200/60 divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-for="trade in result.trades" :key="trade.time" class="hover:bg-gray-50 dark:hover:bg-gray-700">
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
                         {{ formatDate(trade.time) }}
@@ -361,7 +371,7 @@
             </div>
 
             <!-- All Trades (Collapsible) -->
-            <div v-if="showAllTrades && result.result.tradesCount > result.trades.length" class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-6">
+            <div v-if="showAllTrades && result.result.tradesCount > result.trades.length" class="bg-base-200/60 rounded-lg shadow-md p-6">
               <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">All Trades</h3>
               <div class="max-h-96 overflow-y-auto">
                 <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
@@ -374,7 +384,7 @@
                       <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">Note</th>
                     </tr>
                   </thead>
-                  <tbody class="bg-white dark:bg-gray-800 divide-y divide-gray-200 dark:divide-gray-700">
+                  <tbody class="bg-base-200/60 divide-y divide-gray-200 dark:divide-gray-700">
                     <tr v-for="trade in result.allTrades" :key="trade.time">
                       <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">{{ formatDate(trade.time) }}</td>
                       <td class="px-6 py-4 whitespace-nowrap"><span :class="trade.side === 'BUY' ? 'text-green-600' : 'text-red-600'" class="font-medium">{{ trade.side }}</span></td>
@@ -389,7 +399,7 @@
           </div>
 
           <!-- No Results State -->
-          <div v-else class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-8 text-center">
+          <div v-else class="bg-base-200/60 rounded-lg shadow-md p-8 text-center">
             <div class="text-gray-500 dark:text-gray-400">
               <svg class="mx-auto h-12 w-12 mb-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
@@ -528,15 +538,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-.backtest-page {
-  min-height: 100vh;
-  background-color: #f9fafb;
-}
-
-.dark .backtest-page {
-  background-color: #111827;
-}
-
 /* Custom scrollbar for trade tables */
 .overflow-y-auto::-webkit-scrollbar {
   width: 8px;
