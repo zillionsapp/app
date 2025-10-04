@@ -213,6 +213,14 @@
           </div>
 
           <div v-else-if="result" class="space-y-6">
+            <!-- Performance Chart -->
+            <BacktestChart
+              :trades="result.allTrades"
+              :initial-capital="result.config.initialCapital"
+              :price-data="result.priceData"
+              @data-ready="handleChartDataReady"
+            />
+
             <!-- Summary Cards -->
             <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
               <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
@@ -386,6 +394,10 @@ import { ref, reactive } from 'vue'
 const loading = ref(false)
 const result = ref(null)
 const showAllTrades = ref(false)
+
+const handleChartDataReady = (ready) => {
+  console.log('Chart data ready:', ready)
+}
 
 // Default configuration
 const defaultConfig = {

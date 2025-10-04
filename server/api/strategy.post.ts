@@ -580,6 +580,14 @@ export default defineEventHandler(async (event: H3Event) => {
       note: trade.note
     }))
 
+    // Generate price data for charting (daily candles for smoother chart)
+    const priceData = ltf
+      .filter((_, index) => index % Math.ceil(ltf.length / 100) === 0) // Sample for chart
+      .map(candle => ({
+        time: candle.time,
+        price: candle.close
+      }))
+
     return {
       ok: true,
       config: {
@@ -623,6 +631,7 @@ export default defineEventHandler(async (event: H3Event) => {
       },
       trades: formattedTrades.slice(-20), // Last 20 trades for brevity
       allTrades: formattedTrades, // Full trade history
+      priceData: priceData, // Price data for charting
       data: {
         ltfCandles: ltf.length,
         htfCandles: htf.length,
