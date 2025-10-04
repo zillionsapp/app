@@ -243,62 +243,63 @@ const chartHeight = height - margin.top - margin.bottom
 
 // Calculate portfolio value over time
 const portfolioValues = computed(() => {
-  if (!props.trades.length) return []
+  if (!props.trades.length || !props.priceData.length) return []
 
   const values = []
   let cash = props.initialCapital
   let position = 0
   let avgPrice = 0
-  let lastTime = null
 
   // Sort trades by time
   const sortedTrades = [...props.trades].sort((a, b) => new Date(a.time) - new Date(b.time))
 
-  // Create portfolio value timeline
-  sortedTrades.forEach((trade, index) => {
-    const tradeTime = new Date(trade.time).getTime()
+  // Create portfolio value timeline at each price data point
+  props.priceData.forEach((pricePoint, index) => {
+    const currentTime = pricePoint.time
+    let tradeIndex = 0
 
-    // Add point before this trade (if not first trade)
-    if (index === 0 && lastTime) {
-      values.push({
-        time: lastTime,
-        value: cash + (position * (props.priceData.find(p => p.time <= lastTime)?.price || 0)),
-        drawdown: 0
-      })
+    // Find all trades that occurred at or before this time
+    for (let i = 0; i < sortedTrades.length; i++) {
+      if (new Date(sortedTrades[i].time).getTime() <= currentTime) {
+        tradeIndex = i
+      } else {
+        break
+      }
     }
 
-    // Process the trade
-    if (trade.side === 'BUY') {
-      const qty = parseFloat(trade.qty)
-      const price = parseFloat(trade.price)
-      const cost = qty * price * (1 + 0.0005) // Including 0.05% commission
+    // Process all trades up to this point
+    for (let i = 0; i <= tradeIndex; i++) {
+      const trade = sortedTrades[i]
 
-      if (cash >= cost) {
-        cash -= cost
-        const newPosition = position + qty
-        avgPrice = position > 0 ? (avgPrice * position + price * qty) / newPosition : price
-        position = newPosition
+      if (trade.side === 'BUY') {
+        const qty = parseFloat(trade.qty)
+        const price = parseFloat(trade.price)
+        const cost = qty * price * (1 + 0.0005) // Including 0.05% commission
+
+        if (cash >= cost) {
+          cash -= cost
+          const newPosition = position + qty
+          avgPrice = position > 0 ? (avgPrice * position + price * qty) / newPosition : price
+          position = newPosition
+        }
+      } else if (trade.side === 'SELL') {
+        const qty = parseFloat(trade.qty)
+        const price = parseFloat(trade.price)
+        const proceeds = qty * price * (1 - 0.0005) // Including 0.05% commission
+
+        cash += proceeds
+        position -= qty
       }
-    } else if (trade.side === 'SELL') {
-      const qty = parseFloat(trade.qty)
-      const price = parseFloat(trade.price)
-      const proceeds = qty * price * (1 - 0.0005) // Including 0.05% commission
-
-      cash += proceeds
-      position -= qty
     }
 
     // Calculate portfolio value at this point
-    const currentPrice = props.priceData.find(p => p.time <= tradeTime)?.price || 0
-    const portfolioValue = cash + (position * currentPrice)
+    const portfolioValue = cash + (position * pricePoint.price)
 
     values.push({
-      time: tradeTime,
+      time: currentTime,
       value: portfolioValue,
       drawdown: 0
     })
-
-    lastTime = tradeTime
   })
 
   // Calculate drawdown
@@ -381,21 +382,36 @@ const portfolioPath = computed(() => {
   return `M ${points}`
 })
 
-// Axis labels
+// Axis labels - separate scales for price and portfolio
 const yLabels = computed(() => {
   const labels = []
-  const priceRange = Math.max(...props.priceData.map(p => p.price)) - Math.min(...props.priceData.map(p => p.price))
-  const portfolioRange = Math.max(...portfolioValues.value.map(pv => pv.value)) - Math.min(...portfolioValues.value.map(pv => pv.value))
-  const maxRange = Math.max(priceRange, portfolioRange)
 
-  for (let i = 0; i <= 5; i++) {
-    const value = (maxRange * (5 - i)) / 5
-    labels.push({
-      value,
-      y: (i * chartHeight) / 5,
-      text: `$${value.toFixed(0)}`
-    })
+  if (activeView.value === 'price' || activeView.value === 'both') {
+    const priceRange = Math.max(...props.priceData.map(p => p.price)) - Math.min(...props.priceData.map(p => p.price))
+    const priceMin = Math.min(...props.priceData.map(p => p.price))
+
+    for (let i = 0; i <= 5; i++) {
+      const value = priceMin + (priceRange * (5 - i)) / 5
+      labels.push({
+        value,
+        y: (i * chartHeight) / 5,
+        text: `$${value.toFixed(0)}`
+      })
+    }
+  } else if (activeView.value === 'portfolio') {
+    const portfolioRange = Math.max(...portfolioValues.value.map(pv => pv.value)) - Math.min(...portfolioValues.value.map(pv => pv.value))
+    const portfolioMin = Math.min(...portfolioValues.value.map(pv => pv.value))
+
+    for (let i = 0; i <= 5; i++) {
+      const value = portfolioMin + (portfolioRange * (5 - i)) / 5
+      labels.push({
+        value,
+        y: (i * chartHeight) / 5,
+        text: `$${value.toFixed(0)}`
+      })
+    }
   }
+
   return labels
 })
 
