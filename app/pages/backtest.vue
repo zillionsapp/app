@@ -303,21 +303,76 @@ const createMockBacktestResult = (optimalTradesData) => {
   // Calculate proper buy & hold return using original price data
   const properBuyAndHoldReturn = ((originalEndPrice - originalStartPrice) / originalStartPrice) * 100
 
-  // Create properly formatted trades with realistic timestamps
-  const formattedTrades = trades.map((trade, index) => {
-    // Use original price data timestamps if available, otherwise create mock ones
+  // Create properly formatted trades that match the expected structure for round-trip analysis
+  const formattedTrades = []
+
+  // Group optimal trades into entry/exit pairs for proper round-trip calculation
+  let currentPosition = null
+  let entryTrade = null
+
+  trades.forEach((trade, index) => {
     const tradeTime = originalPriceData.length > index ?
-      (typeof originalPriceData[index] === 'object' ? originalPriceData[index].time : Date.now() - (trades.length - index) * 15 * 60 * 1000) :
+      (typeof originalPriceData[index] === 'object' ? originalPriceData[index].time : new Date(Date.now() - (trades.length - index) * 15 * 60 * 1000).toISOString()) :
       new Date(Date.now() - (trades.length - index) * 15 * 60 * 1000).toISOString()
 
-    return {
-      time: tradeTime,
-      side: trade.type,
-      price: trade.price.toFixed(6),
-      qty: (trade.quantity || 1).toFixed(8),
-      note: trade.note
+    if (trade.type === 'BUY') {
+      // This is an entry
+      if (currentPosition) {
+        // Close previous position first
+        formattedTrades.push({
+          time: tradeTime,
+          side: 'SELL',
+          price: trade.price.toFixed(6),
+          qty: currentPosition.qty.toFixed(8),
+          note: 'EOD flatten'
+        })
+      }
+
+      // Open new position
+      currentPosition = {
+        qty: (trade.quantity || 1).toFixed(8),
+        price: trade.price,
+        time: tradeTime
+      }
+
+      formattedTrades.push({
+        time: tradeTime,
+        side: 'BUY',
+        price: trade.price.toFixed(6),
+        qty: currentPosition.qty,
+        note: 'entry'
+      })
+
+    } else if (trade.type === 'SELL' && currentPosition) {
+      // This is an exit
+      formattedTrades.push({
+        time: tradeTime,
+        side: 'SELL',
+        price: trade.price.toFixed(6),
+        qty: currentPosition.qty,
+        note: 'exit'
+      })
+
+      currentPosition = null
     }
   })
+
+  // Close any remaining position
+  if (currentPosition) {
+    const finalTime = originalPriceData.length > 0 ?
+      (typeof originalPriceData[originalPriceData.length - 1] === 'object'
+        ? originalPriceData[originalPriceData.length - 1].time
+        : new Date().toISOString()) :
+      new Date().toISOString()
+
+    formattedTrades.push({
+      time: finalTime,
+      side: 'SELL',
+      price: originalEndPrice.toFixed(6),
+      qty: currentPosition.qty,
+      note: 'EOD flatten'
+    })
+  }
 
   return {
     ok: true,
