@@ -328,45 +328,26 @@ const pricePoints = computed(() => {
   })
 })
 
-// Portfolio data points for chart (resampled to match price data frequency)
+// Portfolio data points for chart
 const portfolioPoints = computed(() => {
   if (!portfolioValues.value.length || !props.priceData.length) return []
-
-  // Create a map of portfolio values by time for quick lookup
-  const portfolioMap = new Map()
-  portfolioValues.value.forEach(pv => {
-    portfolioMap.set(pv.time, pv)
-  })
 
   const portfolioPrices = portfolioValues.value.map(pv => pv.value)
   const minPortfolio = Math.min(...portfolioPrices)
   const maxPortfolio = Math.max(...portfolioPrices)
 
-  return props.priceData
-    .map((point, index) => {
-      // Find the closest portfolio value at or before this time
-      let portfolioValue = null
-      for (let i = portfolioValues.value.length - 1; i >= 0; i--) {
-        if (portfolioValues.value[i].time <= point.time) {
-          portfolioValue = portfolioValues.value[i]
-          break
-        }
-      }
+  return portfolioValues.value.map((portfolioValue, index) => {
+    const x = (index / (props.priceData.length - 1)) * chartWidth
+    const y = chartHeight - ((portfolioValue.value - minPortfolio) / (maxPortfolio - minPortfolio)) * chartHeight
 
-      if (!portfolioValue) return null
-
-      const x = (index / (props.priceData.length - 1)) * chartWidth
-      const y = chartHeight - ((portfolioValue.value - minPortfolio) / (maxPortfolio - minPortfolio)) * chartHeight
-
-      return {
-        x,
-        y,
-        value: portfolioValue.value,
-        time: point.time,
-        drawdown: portfolioValue.drawdown
-      }
-    })
-    .filter(p => p !== null)
+    return {
+      x,
+      y,
+      value: portfolioValue.value,
+      time: portfolioValue.time,
+      drawdown: portfolioValue.drawdown
+    }
+  })
 })
 
 // Chart paths
@@ -386,7 +367,7 @@ const portfolioPath = computed(() => {
 const yLabels = computed(() => {
   const labels = []
 
-  if (activeView.value === 'price' || activeView.value === 'both') {
+  if (activeView.value === 'price') {
     const priceRange = Math.max(...props.priceData.map(p => p.price)) - Math.min(...props.priceData.map(p => p.price))
     const priceMin = Math.min(...props.priceData.map(p => p.price))
 
@@ -399,6 +380,19 @@ const yLabels = computed(() => {
       })
     }
   } else if (activeView.value === 'portfolio') {
+    const portfolioRange = Math.max(...portfolioValues.value.map(pv => pv.value)) - Math.min(...portfolioValues.value.map(pv => pv.value))
+    const portfolioMin = Math.min(...portfolioValues.value.map(pv => pv.value))
+
+    for (let i = 0; i <= 5; i++) {
+      const value = portfolioMin + (portfolioRange * (5 - i)) / 5
+      labels.push({
+        value,
+        y: (i * chartHeight) / 5,
+        text: `$${value.toFixed(0)}`
+      })
+    }
+  } else if (activeView.value === 'both') {
+    // For "both" view, use portfolio scale since that's what matters for performance
     const portfolioRange = Math.max(...portfolioValues.value.map(pv => pv.value)) - Math.min(...portfolioValues.value.map(pv => pv.value))
     const portfolioMin = Math.min(...portfolioValues.value.map(pv => pv.value))
 
@@ -494,25 +488,17 @@ const handleMouseMove = (event) => {
   if (x >= 0 && x <= chartWidth && y >= 0 && y <= chartHeight) {
     tooltip.value = { x: event.clientX - rect.left, y: event.clientY - rect.top }
 
-    // Find closest data point
-    const closestPricePoint = pricePoints.value.reduce((closest, point) => {
-      const distance = Math.abs(point.x - x)
-      return distance < closest.distance ? { point, distance } : closest
-    }, { point: null, distance: Infinity })
+    // Find closest data point index
+    const totalPoints = props.priceData.length
+    const index = Math.round((x / chartWidth) * (totalPoints - 1))
+    const clampedIndex = Math.max(0, Math.min(totalPoints - 1, index))
 
-    if (closestPricePoint.point) {
+    if (props.priceData[clampedIndex] && portfolioValues.value[clampedIndex]) {
       tooltipData.value = {
-        date: new Date(closestPricePoint.point.time).toLocaleString(),
-        price: closestPricePoint.point.price,
-        portfolio: null,
-        drawdown: null
-      }
-
-      // Find corresponding portfolio point
-      const portfolioPoint = portfolioPoints.value.find(p => Math.abs(p.x - closestPricePoint.point.x) < 10)
-      if (portfolioPoint) {
-        tooltipData.value.portfolio = portfolioPoint.value
-        tooltipData.value.drawdown = portfolioPoint.drawdown
+        date: new Date(props.priceData[clampedIndex].time).toLocaleString(),
+        price: props.priceData[clampedIndex].price,
+        portfolio: portfolioValues.value[clampedIndex].value,
+        drawdown: portfolioValues.value[clampedIndex].drawdown
       }
 
       showTooltip.value = true
