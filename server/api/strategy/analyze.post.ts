@@ -22,7 +22,7 @@ interface TradeAnalysisResponse {
   recommendations: string[]
 }
 
-// Helper function to calculate trade statistics
+// Helper function to calculate round-trip trade statistics (same logic as BacktestResults.vue)
 function analyzeTradePerformance(trades: any[]) {
   if (!trades || trades.length === 0) {
     return {
@@ -37,33 +37,101 @@ function analyzeTradePerformance(trades: any[]) {
     }
   }
 
+  // Calculate round-trip trades (same logic as BacktestResults.vue)
+  const roundTrips: any[] = []
+  let currentPosition: string | null = null
+  let entryTrade: any = null
+  let totalQuantity = 0
+  let totalCost = 0
+
+  for (const trade of trades) {
+    if (trade.side === 'BUY' && trade.note === 'entry') {
+      // Starting a new position
+      if (currentPosition) {
+        // Close previous position if exists
+        closeCurrentPosition()
+      }
+      currentPosition = 'long'
+      entryTrade = trade
+      totalQuantity = parseFloat(trade.qty)
+      totalCost = parseFloat(trade.price) * totalQuantity
+    } else if (trade.side === 'SELL' && currentPosition === 'long') {
+      // Exiting or reducing position
+      const sellQuantity = parseFloat(trade.qty)
+      const sellValue = parseFloat(trade.price) * sellQuantity
+
+      if (sellQuantity >= totalQuantity) {
+        // Full exit
+        const pnl = sellValue - (totalCost * (sellQuantity / totalQuantity))
+        const pnlPct = (pnl / (totalCost * (sellQuantity / totalQuantity))) * 100
+
+        roundTrips.push({
+          entryTime: entryTrade.time,
+          exitTime: trade.time,
+          duration: calculateDuration(entryTrade.time, trade.time),
+          entryPrice: parseFloat(entryTrade.price),
+          exitPrice: parseFloat(trade.price),
+          quantity: totalQuantity,
+          pnl: pnl,
+          pnlPct: pnlPct
+        })
+
+        currentPosition = null
+        entryTrade = null
+        totalQuantity = 0
+        totalCost = 0
+      } else {
+        // Partial exit - reduce position
+        const exitRatio = sellQuantity / totalQuantity
+        const exitCost = totalCost * exitRatio
+        const pnl = sellValue - exitCost
+        const pnlPct = (pnl / exitCost) * 100
+
+        roundTrips.push({
+          entryTime: entryTrade.time,
+          exitTime: trade.time,
+          duration: calculateDuration(entryTrade.time, trade.time),
+          entryPrice: parseFloat(entryTrade.price),
+          exitPrice: parseFloat(trade.price),
+          quantity: sellQuantity,
+          pnl: pnl,
+          pnlPct: pnlPct
+        })
+
+        // Reduce remaining position
+        totalQuantity -= sellQuantity
+        totalCost -= exitCost
+      }
+    }
+  }
+
+  // Close any remaining position at EOD
+  if (currentPosition && entryTrade) {
+    closeCurrentPosition()
+  }
+
+  // Calculate statistics from round-trip trades
   let totalWins = 0
   let totalLosses = 0
   let winningTrades = 0
   let losingTrades = 0
 
-  // For this analysis, we'll use a simplified approach
-  // In a real implementation, you'd need to track entry/exit pairs
-  // For now, we'll analyze based on trade notes and patterns
-  trades.forEach(trade => {
-    const note = trade.note.toLowerCase()
-    if (note.includes('tp') || note.includes('trailing stop')) {
-      // This is a winning exit (simplified assumption)
+  roundTrips.forEach(trade => {
+    if (trade.pnl > 0) {
       winningTrades++
-      totalWins += parseFloat(trade.price) * parseFloat(trade.qty)
-    } else if (note.includes('stop') || note.includes('flatten')) {
-      // This is a losing exit (simplified assumption)
+      totalWins += trade.pnl
+    } else if (trade.pnl < 0) {
       losingTrades++
-      totalLosses += parseFloat(trade.price) * parseFloat(trade.qty)
+      totalLosses += Math.abs(trade.pnl)
     }
   })
 
   const avgWin = winningTrades > 0 ? totalWins / winningTrades : 0
-  const avgLoss = losingTrades > 0 ? Math.abs(totalLosses / losingTrades) : 0
+  const avgLoss = losingTrades > 0 ? totalLosses / losingTrades : 0
   const profitFactor = avgLoss > 0 ? avgWin / avgLoss : winningTrades > 0 ? 999 : 0
 
   return {
-    totalTrades: trades.length,
+    totalTrades: roundTrips.length,
     winningTrades,
     losingTrades,
     totalWins,
@@ -71,6 +139,39 @@ function analyzeTradePerformance(trades: any[]) {
     avgWin,
     avgLoss,
     profitFactor
+  }
+
+  function closeCurrentPosition() {
+    // Find the last price for EOD close (use the last trade price as fallback)
+    const lastPrice = trades.length > 0 ? trades[trades.length - 1].price : entryTrade.price
+
+    const pnl = (parseFloat(lastPrice) * totalQuantity) - totalCost
+    const pnlPct = (pnl / totalCost) * 100
+
+    roundTrips.push({
+      entryTime: entryTrade.time,
+      exitTime: trades[trades.length - 1].time,
+      duration: calculateDuration(entryTrade.time, trades[trades.length - 1].time),
+      entryPrice: parseFloat(entryTrade.price),
+      exitPrice: parseFloat(lastPrice),
+      quantity: totalQuantity,
+      pnl: pnl,
+      pnlPct: pnlPct
+    })
+  }
+
+  function calculateDuration(entryTime: string, exitTime: string) {
+    const entry = new Date(entryTime)
+    const exit = new Date(exitTime)
+    const diffMs = exit.getTime() - entry.getTime()
+
+    const days = Math.floor(diffMs / (1000 * 60 * 60 * 24))
+    const hours = Math.floor((diffMs % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60))
+    const minutes = Math.floor((diffMs % (1000 * 60 * 60)) / (1000 * 60))
+
+    if (days > 0) return `${days}d ${hours}h`
+    if (hours > 0) return `${hours}h ${minutes}m`
+    return `${minutes}m`
   }
 }
 
@@ -181,9 +282,9 @@ export default defineEventHandler(async (event: H3Event) => {
     // Analyze trade performance
     const stats = analyzeTradePerformance(body.trades)
 
-    // Calculate win rate
-    const winRate = body.trades.length > 0
-      ? (stats.winningTrades / body.trades.length) * 100
+    // Calculate win rate based on round-trip trades (same as BacktestResults.vue)
+    const winRate = stats.totalTrades > 0
+      ? (stats.winningTrades / stats.totalTrades) * 100
       : 0
 
     // Generate insights and recommendations
