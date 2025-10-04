@@ -84,7 +84,7 @@ const handleChartDataReady = (ready) => {
 const defaultConfig = {
   symbol: 'BTCUSDT',
   tf: '15m',
-  htf: '1d',
+  htf: '1h',
   lookbackDays: 120,
   initialCapital: 1000,
   commissionPct: 0.05,

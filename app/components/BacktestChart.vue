@@ -544,20 +544,23 @@ const tradeMarkers = computed(() => {
   // Sort trades by time
   const sortedTrades = [...props.trades].sort((a, b) => new Date(a.time) - new Date(b.time))
 
-  // Use the exact same price range calculation as pricePoints for consistency
+  // Calculate price range including trade prices to ensure all markers fit
   const prices = props.priceData.map(p => p.price)
-  const minPrice = Math.min(...prices)
-  const maxPrice = Math.max(...prices)
+  const tradePrices = sortedTrades.map(t => parseFloat(t.price))
+  const allPrices = [...prices, ...tradePrices]
+  const minPrice = Math.min(...allPrices)
+  const maxPrice = Math.max(...allPrices)
 
   return sortedTrades.map((trade, index) => {
     // Find the exact position by interpolating between price data points
     let x = 0
     let y = 0
+    const tradePrice = parseFloat(trade.price)
 
     if (props.priceData.length === 1) {
       // Single price point
       x = chartWidth / 2
-      y = chartHeight - ((parseFloat(trade.price) - minPrice) / (maxPrice - minPrice)) * chartHeight
+      y = chartHeight - ((tradePrice - minPrice) / (maxPrice - minPrice)) * chartHeight
     } else {
       // Find the two price points to interpolate between
       const tradeTime = new Date(trade.time).getTime()
@@ -566,11 +569,11 @@ const tradeMarkers = computed(() => {
       if (tradeTime <= props.priceData[0].time) {
         // Trade before first price point
         x = 0
-        y = chartHeight - ((parseFloat(trade.price) - minPrice) / (maxPrice - minPrice)) * chartHeight
+        y = chartHeight - ((tradePrice - minPrice) / (maxPrice - minPrice)) * chartHeight
       } else if (tradeTime >= props.priceData[props.priceData.length - 1].time) {
         // Trade after last price point
         x = chartWidth
-        y = chartHeight - ((parseFloat(trade.price) - minPrice) / (maxPrice - minPrice)) * chartHeight
+        y = chartHeight - ((tradePrice - minPrice) / (maxPrice - minPrice)) * chartHeight
       } else {
         // Trade between price points - interpolate
         for (let i = 0; i < props.priceData.length - 1; i++) {
@@ -581,15 +584,18 @@ const tradeMarkers = computed(() => {
             // Interpolate between these two points
             const timeRange = nextPoint.time - currentPoint.time
             const tradeTimeFromStart = tradeTime - currentPoint.time
-            const ratio = tradeTimeFromStart / timeRange
+            const ratio = timeRange > 0 ? tradeTimeFromStart / timeRange : 0
 
             x = (i / (props.priceData.length - 1)) * chartWidth + (ratio * chartWidth / (props.priceData.length - 1))
-            y = chartHeight - ((parseFloat(trade.price) - minPrice) / (maxPrice - minPrice)) * chartHeight
+            y = chartHeight - ((tradePrice - minPrice) / (maxPrice - minPrice)) * chartHeight
             break
           }
         }
       }
     }
+
+    // Ensure y is within bounds
+    y = Math.max(0, Math.min(chartHeight, y))
 
     return {
       ...trade,
