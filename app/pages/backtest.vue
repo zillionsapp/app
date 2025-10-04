@@ -272,12 +272,12 @@
                       <span>Avg Loss:</span>
                       <span class="text-red-600 font-medium">${{ analysis.avgLoss.toFixed(2) }}</span>
                     </div>
-                    <div class="flex justify-between">
-                      <span>Profit Factor:</span>
-                      <span :class="analysis.profitFactor >= 1.5 ? 'text-green-600' : 'text-red-600'" class="font-medium">
-                        {{ analysis.profitFactor.toFixed(2) }}
-                      </span>
-                    </div>
+                      <div class="flex justify-between">
+                        <span>Profit Factor:</span>
+                        <span :class="(analysis.profitFactor || 0) >= 1.5 ? 'text-green-600' : 'text-red-600'" class="font-medium">
+                          {{ (analysis.profitFactor || 0).toFixed(2) }}
+                        </span>
+                      </div>
                   </div>
                 </div>
                 <div>

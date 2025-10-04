@@ -60,7 +60,7 @@ function analyzeTradePerformance(trades: any[]) {
 
   const avgWin = winningTrades > 0 ? totalWins / winningTrades : 0
   const avgLoss = losingTrades > 0 ? Math.abs(totalLosses / losingTrades) : 0
-  const profitFactor = avgLoss > 0 ? avgWin / avgLoss : winningTrades > 0 ? Infinity : 0
+  const profitFactor = avgLoss > 0 ? avgWin / avgLoss : winningTrades > 0 ? 999 : 0
 
   return {
     totalTrades: trades.length,
