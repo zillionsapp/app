@@ -5,6 +5,7 @@
       :trades="result.allTrades"
       :initial-capital="result.config.initialCapital"
       :price-data="result.priceData"
+      :result="result"
       @data-ready="handleChartDataReady"
     />
 
@@ -225,6 +226,19 @@ const buyHoldPnL = computed(() => {
   return finalValue - initialCapital
 })
 
+// Calculate buy & hold value at the end (for comparison with final portfolio value)
+const buyHoldFinalValue = computed(() => {
+  if (!props.result || !props.result.priceData.length) return props.result.config.initialCapital
+
+  const firstPrice = props.result.priceData[0].price
+  const lastPrice = props.result.priceData[props.result.priceData.length - 1].price
+  const initialCapital = props.result.config.initialCapital
+
+  // Calculate how many units could be bought initially
+  const initialUnits = initialCapital / firstPrice
+  return initialUnits * lastPrice
+})
+
 const buyHoldReturn = computed(() => {
   if (!props.result || !props.result.priceData.length) return 0
 
@@ -236,12 +250,14 @@ const buyHoldReturn = computed(() => {
 
 const strategyVsBuyHold = computed(() => {
   if (!props.result) return 0
-  return props.result.result.equity - props.result.config.initialCapital - buyHoldPnL.value
+  // Compare final portfolio value vs buy&hold final value
+  return props.result.result.equity - buyHoldFinalValue.value
 })
 
 const strategyVsBuyHoldPct = computed(() => {
-  if (!props.result || buyHoldReturn.value === 0) return 0
-  return props.result.result.retPct - buyHoldReturn.value
+  if (!props.result || buyHoldFinalValue.value === 0) return 0
+  // Calculate percentage difference based on final values
+  return ((props.result.result.equity - buyHoldFinalValue.value) / buyHoldFinalValue.value) * 100
 })
 
 const winRate = computed(() => {

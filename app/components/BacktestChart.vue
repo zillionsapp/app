@@ -145,6 +145,35 @@
               @mouseleave="showTooltip = false"
             />
           </g>
+
+          <!-- Trade markers -->
+          <g v-if="tradeMarkers.length > 0">
+            <!-- Buy markers (green triangles pointing up) -->
+            <polygon
+              v-for="marker in tradeMarkers.filter(m => m.side === 'BUY')"
+              :key="`buy-${marker.index}`"
+              :points="`${marker.x},${marker.y - 8} ${marker.x - 6},${marker.y + 4} ${marker.x + 6},${marker.y + 4}`"
+              fill="#10b981"
+              stroke="#065f46"
+              stroke-width="1"
+              class="cursor-pointer hover:stroke-2 transition-all"
+              @mouseenter="showTradeTooltip($event, marker)"
+              @mouseleave="showTooltip = false"
+            />
+
+            <!-- Sell markers (red triangles pointing down) -->
+            <polygon
+              v-for="marker in tradeMarkers.filter(m => m.side === 'SELL')"
+              :key="`sell-${marker.index}`"
+              :points="`${marker.x},${marker.y + 8} ${marker.x - 6},${marker.y - 4} ${marker.x + 6},${marker.y - 4}`"
+              fill="#ef4444"
+              stroke="#dc2626"
+              stroke-width="1"
+              class="cursor-pointer hover:stroke-2 transition-all"
+              @mouseenter="showTradeTooltip($event, marker)"
+              @mouseleave="showTooltip = false"
+            />
+          </g>
         </g>
 
         <!-- Tooltip -->
@@ -237,6 +266,10 @@ const props = defineProps({
   priceData: {
     type: Array,
     default: () => []
+  },
+  result: {
+    type: Object,
+    default: null
   }
 })
 
@@ -504,6 +537,70 @@ const volatility = computed(() => {
 
 const showPoints = ref(true)
 
+// Calculate trade marker positions on chart
+const tradeMarkers = computed(() => {
+  if (!props.trades.length || !props.priceData.length) return []
+
+  // Sort trades by time
+  const sortedTrades = [...props.trades].sort((a, b) => new Date(a.time) - new Date(b.time))
+
+  // Use the exact same price range calculation as pricePoints for consistency
+  const prices = props.priceData.map(p => p.price)
+  const minPrice = Math.min(...prices)
+  const maxPrice = Math.max(...prices)
+
+  return sortedTrades.map((trade, index) => {
+    // Find the exact position by interpolating between price data points
+    let x = 0
+    let y = 0
+
+    if (props.priceData.length === 1) {
+      // Single price point
+      x = chartWidth / 2
+      y = chartHeight - ((parseFloat(trade.price) - minPrice) / (maxPrice - minPrice)) * chartHeight
+    } else {
+      // Find the two price points to interpolate between
+      const tradeTime = new Date(trade.time).getTime()
+
+      // Handle edge cases
+      if (tradeTime <= props.priceData[0].time) {
+        // Trade before first price point
+        x = 0
+        y = chartHeight - ((parseFloat(trade.price) - minPrice) / (maxPrice - minPrice)) * chartHeight
+      } else if (tradeTime >= props.priceData[props.priceData.length - 1].time) {
+        // Trade after last price point
+        x = chartWidth
+        y = chartHeight - ((parseFloat(trade.price) - minPrice) / (maxPrice - minPrice)) * chartHeight
+      } else {
+        // Trade between price points - interpolate
+        for (let i = 0; i < props.priceData.length - 1; i++) {
+          const currentPoint = props.priceData[i]
+          const nextPoint = props.priceData[i + 1]
+
+          if (tradeTime >= currentPoint.time && tradeTime <= nextPoint.time) {
+            // Interpolate between these two points
+            const timeRange = nextPoint.time - currentPoint.time
+            const tradeTimeFromStart = tradeTime - currentPoint.time
+            const ratio = tradeTimeFromStart / timeRange
+
+            x = (i / (props.priceData.length - 1)) * chartWidth + (ratio * chartWidth / (props.priceData.length - 1))
+            y = chartHeight - ((parseFloat(trade.price) - minPrice) / (maxPrice - minPrice)) * chartHeight
+            break
+          }
+        }
+      }
+    }
+
+    return {
+      ...trade,
+      index,
+      x,
+      y,
+      closestIndex: Math.round(x / chartWidth * (props.priceData.length - 1))
+    }
+  })
+})
+
 // Event handlers
 const handleMouseMove = (event) => {
   const rect = chartSvg.value.getBoundingClientRect()
@@ -544,13 +641,17 @@ const handleMouseMove = (event) => {
       const vsBuyHold = portfolioValue - buyHoldValue
       const vsBuyHoldPct = (vsBuyHold / buyHoldValue) * 100
 
+      // Check if this is the final data point and if there are unclosed positions
+      const isFinalPoint = clampedIndex === portfolioValues.value.length - 1
+      const finalPortfolioValue = isFinalPoint ? props.initialCapital + (props.initialCapital * (props.result?.result?.retPct || 0) / 100) : portfolioValue
+
       tooltipData.value = {
         date: new Date(props.priceData[clampedIndex].time).toLocaleString(),
         price: props.priceData[clampedIndex].price,
-        portfolio: portfolioValue,
+        portfolio: finalPortfolioValue,
         buyHold: buyHoldValue,
-        vsBuyHold: vsBuyHold,
-        vsBuyHoldPct: vsBuyHoldPct,
+        vsBuyHold: finalPortfolioValue - buyHoldValue,
+        vsBuyHoldPct: ((finalPortfolioValue - buyHoldValue) / buyHoldValue) * 100,
         drawdown: portfolioValues.value[clampedIndex].drawdown
       }
 
@@ -582,12 +683,71 @@ const showPointTooltip = (event, point, type) => {
     offsetX: offsetX
   }
 
-  tooltipData.value = {
-    date: new Date(point.time).toLocaleString(),
-    price: type === 'price' ? point.price : null,
-    portfolio: type === 'portfolio' ? point.value : null,
-    drawdown: point.drawdown || null
+  // Find the corresponding price data point for this portfolio point
+  const pointIndex = portfolioPoints.value.findIndex(p => p.x === point.x && p.y === point.y)
+  const pricePoint = props.priceData[pointIndex]
+  const buyHoldPoint = buyHoldValues.value[pointIndex]
+
+  if (pricePoint && buyHoldPoint) {
+    // Check if this is the final data point and if there are unclosed positions
+    const isFinalPoint = pointIndex === portfolioValues.value.length - 1
+    const finalPortfolioValue = isFinalPoint ? props.initialCapital + (props.initialCapital * (props.result?.result?.retPct || 0) / 100) : point.value
+
+    tooltipData.value = {
+      date: new Date(point.time).toLocaleString(),
+      price: pricePoint.price,
+      portfolio: finalPortfolioValue,
+      buyHold: buyHoldPoint.value,
+      vsBuyHold: finalPortfolioValue - buyHoldPoint.value,
+      vsBuyHoldPct: ((finalPortfolioValue - buyHoldPoint.value) / buyHoldPoint.value) * 100,
+      drawdown: point.drawdown || null
+    }
+  } else {
+    tooltipData.value = {
+      date: new Date(point.time).toLocaleString(),
+      price: type === 'price' ? point.price : null,
+      portfolio: type === 'portfolio' ? point.value : null,
+      drawdown: point.drawdown || null
+    }
   }
+  showTooltip.value = true
+}
+
+const showTradeTooltip = (event, marker) => {
+  const tooltipWidth = 200
+  const chartRightEdge = width - margin.right
+
+  // Position tooltip to the right by default, but flip to left if it would go off-screen
+  let tooltipX = event.clientX + 10
+  let offsetX = 0
+
+  if (tooltipX + tooltipWidth > chartRightEdge) {
+    // Position tooltip to the left of cursor
+    tooltipX = event.clientX - tooltipWidth - 10
+    offsetX = 0
+  } else {
+    // Position tooltip to the right of cursor
+    offsetX = 0
+  }
+
+  tooltip.value = {
+    x: tooltipX,
+    y: event.clientY,
+    offsetX: offsetX
+  }
+
+  // Get the corresponding price data point for this trade
+  const pricePoint = props.priceData[marker.closestIndex]
+
+  tooltipData.value = {
+    date: new Date(marker.time).toLocaleString(),
+    price: parseFloat(marker.price),
+    side: marker.side,
+    qty: parseFloat(marker.qty),
+    value: parseFloat(marker.qty) * parseFloat(marker.price),
+    note: marker.note || 'No note'
+  }
+
   showTooltip.value = true
 }
 
