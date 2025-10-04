@@ -56,9 +56,16 @@
         </defs>
         <rect width="100%" height="100%" fill="url(#grid)" />
 
-        <!-- Y-axis labels -->
-        <g class="text-xs fill-gray-500 dark:fill-gray-400">
-          <text v-for="label in yLabels" :key="label.value" :x="margin.left - 10" :y="label.y" text-anchor="end" dominant-baseline="middle">
+        <!-- Left Y-axis labels (Price) -->
+        <g class="text-xs fill-blue-500 dark:fill-blue-400">
+          <text v-for="label in leftYLabels" :key="`left-${label.value}`" :x="margin.left - 10" :y="label.y" text-anchor="end" dominant-baseline="middle">
+            {{ label.text }}
+          </text>
+        </g>
+
+        <!-- Right Y-axis labels (Portfolio) -->
+        <g v-if="activeView === 'both'" class="text-xs fill-green-500 dark:fill-green-400">
+          <text v-for="label in rightYLabels" :key="`right-${label.value}`" :x="width - margin.right + 10" :y="label.y" text-anchor="start" dominant-baseline="middle">
             {{ label.text }}
           </text>
         </g>
@@ -363,14 +370,13 @@ const portfolioPath = computed(() => {
   return `M ${points}`
 })
 
-// Axis labels - separate scales for price and portfolio
-const yLabels = computed(() => {
-  const labels = []
-
-  if (activeView.value === 'price') {
+// Left Y-axis labels (Price)
+const leftYLabels = computed(() => {
+  if (activeView.value === 'price' || activeView.value === 'both') {
     const priceRange = Math.max(...props.priceData.map(p => p.price)) - Math.min(...props.priceData.map(p => p.price))
     const priceMin = Math.min(...props.priceData.map(p => p.price))
 
+    const labels = []
     for (let i = 0; i <= 5; i++) {
       const value = priceMin + (priceRange * (5 - i)) / 5
       labels.push({
@@ -379,34 +385,29 @@ const yLabels = computed(() => {
         text: `$${value.toFixed(0)}`
       })
     }
-  } else if (activeView.value === 'portfolio') {
-    const portfolioRange = Math.max(...portfolioValues.value.map(pv => pv.value)) - Math.min(...portfolioValues.value.map(pv => pv.value))
-    const portfolioMin = Math.min(...portfolioValues.value.map(pv => pv.value))
-
-    for (let i = 0; i <= 5; i++) {
-      const value = portfolioMin + (portfolioRange * (5 - i)) / 5
-      labels.push({
-        value,
-        y: (i * chartHeight) / 5,
-        text: `$${value.toFixed(0)}`
-      })
-    }
-  } else if (activeView.value === 'both') {
-    // For "both" view, use portfolio scale since that's what matters for performance
-    const portfolioRange = Math.max(...portfolioValues.value.map(pv => pv.value)) - Math.min(...portfolioValues.value.map(pv => pv.value))
-    const portfolioMin = Math.min(...portfolioValues.value.map(pv => pv.value))
-
-    for (let i = 0; i <= 5; i++) {
-      const value = portfolioMin + (portfolioRange * (5 - i)) / 5
-      labels.push({
-        value,
-        y: (i * chartHeight) / 5,
-        text: `$${value.toFixed(0)}`
-      })
-    }
+    return labels
   }
+  return []
+})
 
-  return labels
+// Right Y-axis labels (Portfolio)
+const rightYLabels = computed(() => {
+  if (activeView.value === 'both') {
+    const portfolioRange = Math.max(...portfolioValues.value.map(pv => pv.value)) - Math.min(...portfolioValues.value.map(pv => pv.value))
+    const portfolioMin = Math.min(...portfolioValues.value.map(pv => pv.value))
+
+    const labels = []
+    for (let i = 0; i <= 5; i++) {
+      const value = portfolioMin + (portfolioRange * (5 - i)) / 5
+      labels.push({
+        value,
+        y: (i * chartHeight) / 5,
+        text: `$${value.toFixed(0)}`
+      })
+    }
+    return labels
+  }
+  return []
 })
 
 const xLabels = computed(() => {
