@@ -151,8 +151,8 @@
           <rect
             :x="0"
             :y="0"
-            width="180"
-            height="80"
+            :width="tooltipData.buyHold !== undefined ? 220 : 180"
+            :height="tooltipData.buyHold !== undefined ? 110 : 80"
             fill="rgba(0,0,0,0.8)"
             rx="4"
             class="text-white"
@@ -166,7 +166,13 @@
           <text v-if="tooltipData.portfolio" x="10" y="50" class="text-xs fill-green-300">
             Portfolio: ${{ tooltipData.portfolio.toFixed(2) }}
           </text>
-          <text v-if="tooltipData.drawdown !== undefined" x="10" y="65" class="text-xs fill-red-300">
+          <text v-if="tooltipData.buyHold !== undefined" x="10" y="65" class="text-xs fill-gray-300">
+            Buy & Hold: ${{ tooltipData.buyHold.toFixed(2) }}
+          </text>
+          <text v-if="tooltipData.vsBuyHold !== undefined" x="10" y="80" :class="tooltipData.vsBuyHold >= 0 ? 'text-xs fill-green-300' : 'text-xs fill-red-300'">
+            vs B&H: {{ tooltipData.vsBuyHold >= 0 ? '+' : '' }}${{ tooltipData.vsBuyHold.toFixed(2) }} ({{ tooltipData.vsBuyHoldPct >= 0 ? '+' : '' }}{{ tooltipData.vsBuyHoldPct.toFixed(2) }}%)
+          </text>
+          <text v-if="tooltipData.drawdown !== undefined" x="10" y="95" class="text-xs fill-red-300">
             Drawdown: {{ tooltipData.drawdown.toFixed(2) }}%
           </text>
         </g>
@@ -318,6 +324,22 @@ const portfolioValues = computed(() => {
   }
 
   return values
+})
+
+// Calculate buy & hold value over time
+const buyHoldValues = computed(() => {
+  if (!props.priceData.length || !props.initialCapital) return []
+
+  const firstPrice = props.priceData[0].price
+  const initialUnits = props.initialCapital / firstPrice
+
+  return props.priceData.map((point, index) => {
+    const buyHoldValue = initialUnits * point.price
+    return {
+      time: point.time,
+      value: buyHoldValue
+    }
+  })
 })
 
 // Price data points for chart
@@ -494,11 +516,19 @@ const handleMouseMove = (event) => {
     const index = Math.round((x / chartWidth) * (totalPoints - 1))
     const clampedIndex = Math.max(0, Math.min(totalPoints - 1, index))
 
-    if (props.priceData[clampedIndex] && portfolioValues.value[clampedIndex]) {
+    if (props.priceData[clampedIndex] && portfolioValues.value[clampedIndex] && buyHoldValues.value[clampedIndex]) {
+      const portfolioValue = portfolioValues.value[clampedIndex].value
+      const buyHoldValue = buyHoldValues.value[clampedIndex].value
+      const vsBuyHold = portfolioValue - buyHoldValue
+      const vsBuyHoldPct = (vsBuyHold / buyHoldValue) * 100
+
       tooltipData.value = {
         date: new Date(props.priceData[clampedIndex].time).toLocaleString(),
         price: props.priceData[clampedIndex].price,
-        portfolio: portfolioValues.value[clampedIndex].value,
+        portfolio: portfolioValue,
+        buyHold: buyHoldValue,
+        vsBuyHold: vsBuyHold,
+        vsBuyHoldPct: vsBuyHoldPct,
         drawdown: portfolioValues.value[clampedIndex].drawdown
       }
 
