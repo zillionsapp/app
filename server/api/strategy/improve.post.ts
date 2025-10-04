@@ -40,8 +40,8 @@ const PARAMETER_RANGES = {
   posPct: { min: 5, max: 25, step: 1 }
 }
 
-// Generate parameter improvements based on analysis
-function generateParameterImprovements(currentConfig: any, analysis: any): ParameterChange[] {
+// Generate parameter improvements based on analysis and price pattern analysis
+function generateParameterImprovements(currentConfig: any, analysis: any, priceAnalysis?: any): ParameterChange[] {
   const changes: ParameterChange[] = []
 
   // Win rate improvements
@@ -72,6 +72,114 @@ function generateParameterImprovements(currentConfig: any, analysis: any): Param
         newValue: currentConfig.upTh - 2,
         reason: 'Lowering trend threshold for more long entries'
       })
+    }
+  }
+
+  // Price pattern based improvements
+  if (priceAnalysis) {
+    // If missing many dips, make entry conditions less strict
+    if (priceAnalysis.dipAnalysis && priceAnalysis.dipAnalysis.missedOpportunities > 0 && priceAnalysis.dipAnalysis.missedOpportunities > priceAnalysis.totalDips * 0.3) {
+      if (currentConfig.needBars > 2) {
+        changes.push({
+          param: 'needBars',
+          oldValue: currentConfig.needBars,
+          newValue: currentConfig.needBars - 1,
+          reason: `Missing ${priceAnalysis.dipAnalysis.missedOpportunities} significant dips - reducing entry requirements for better dip capture`
+        })
+      }
+
+      if (currentConfig.winLen > 18) {
+        changes.push({
+          param: 'winLen',
+          oldValue: currentConfig.winLen,
+          newValue: Math.max(15, currentConfig.winLen - 3),
+          reason: 'Reducing lookback window to be more responsive to dip opportunities'
+        })
+      }
+    }
+
+    // If optimal entry ratio is low, improve entry timing
+    if (priceAnalysis.dipAnalysis && priceAnalysis.dipAnalysis.captureRate < 60) {
+      if (currentConfig.minSpacing > 2) {
+        changes.push({
+          param: 'minSpacing',
+          oldValue: currentConfig.minSpacing,
+          newValue: currentConfig.minSpacing - 1,
+          reason: `Only ${priceAnalysis.dipAnalysis.captureRate.toFixed(1)}% dip capture rate - reducing minimum spacing to allow more frequent dip entries`
+        })
+      }
+
+      if (currentConfig.upTh > 52) {
+        changes.push({
+          param: 'upTh',
+          oldValue: currentConfig.upTh,
+          newValue: currentConfig.upTh - 1,
+          reason: 'Lowering trend threshold to capture more dip buying opportunities'
+        })
+      }
+    }
+
+    // If dips recover quickly, make entries more responsive
+    if (priceAnalysis.dipAnalysis && priceAnalysis.dipAnalysis.avgRecoveryBars < 8 && priceAnalysis.dipAnalysis.avgRecoveryBars > 0) {
+      if (currentConfig.needBars > 3) {
+        changes.push({
+          param: 'needBars',
+          oldValue: currentConfig.needBars,
+          newValue: currentConfig.needBars - 1,
+          reason: `Dips recover quickly (avg ${priceAnalysis.dipAnalysis.avgRecoveryBars.toFixed(1)} bars) - reducing entry delay`
+        })
+      }
+
+      if (currentConfig.winLen > 20) {
+        changes.push({
+          param: 'winLen',
+          oldValue: currentConfig.winLen,
+          newValue: Math.max(15, currentConfig.winLen - 4),
+          reason: 'Shortening lookback window for faster response to quick dip recoveries'
+        })
+      }
+    }
+
+    // If strong dip opportunities exist, be more aggressive
+    if (priceAnalysis.bestDipDrop > 10) {
+      if (currentConfig.posPct < 15) {
+        changes.push({
+          param: 'posPct',
+          oldValue: currentConfig.posPct,
+          newValue: Math.min(20, currentConfig.posPct + 2),
+          reason: `Strong dip opportunities (${priceAnalysis.bestDipDrop.toFixed(1)}% drops) - increasing position size`
+        })
+      }
+
+      if (currentConfig.tpPct < 12) {
+        changes.push({
+          param: 'tpPct',
+          oldValue: currentConfig.tpPct,
+          newValue: currentConfig.tpPct + 1,
+          reason: 'Increasing take profit target to capture full dip recovery potential'
+        })
+      }
+    }
+
+    // If missing peaks, adjust exit parameters
+    if (priceAnalysis.missedPeaks > 0 && priceAnalysis.missedPeaks > priceAnalysis.totalPeaks * 0.4) {
+      if (currentConfig.trailPct < 6) {
+        changes.push({
+          param: 'trailPct',
+          oldValue: currentConfig.trailPct,
+          newValue: currentConfig.trailPct + 0.5,
+          reason: `Missing ${priceAnalysis.missedPeaks} significant peaks - tightening trailing stop for better exits`
+        })
+      }
+
+      if (currentConfig.armTrailPct > 0.8) {
+        changes.push({
+          param: 'armTrailPct',
+          oldValue: currentConfig.armTrailPct,
+          newValue: currentConfig.armTrailPct - 0.2,
+          reason: 'Lowering trail arming threshold for earlier profit protection'
+        })
+      }
     }
   }
 

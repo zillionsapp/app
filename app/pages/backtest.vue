@@ -22,11 +22,14 @@
             :result="result"
             :analysis="analysis"
             :improvements="improvements"
+            :optimalTrades="optimalTrades"
             :analyzing="analyzing"
             :improving="improving"
+            :generatingOptimal="generatingOptimal"
             @analyze-trades="analyzeTrades"
             @improve-strategy="improveStrategy"
             @apply-improvements="applyImprovements"
+            @generate-optimal-trades="generateOptimalTrades"
           />
         </div>
 
@@ -73,8 +76,10 @@ const result = ref(null)
 const showAllTrades = ref(false)
 const analyzing = ref(false)
 const improving = ref(false)
+const generatingOptimal = ref(false)
 const analysis = ref(null)
 const improvements = ref(null)
+const optimalTrades = ref(null)
 
 const handleChartDataReady = (ready) => {
   console.log('Chart data ready:', ready)
@@ -145,6 +150,9 @@ const analyzeTrades = async () => {
 
   analyzing.value = true
   try {
+    // Extract price data from the backtest result for dip/peak analysis
+    const priceData = result.value.priceData || []
+
     const response = await $fetch('/api/strategy/analyze', {
       method: 'POST',
       body: {
@@ -154,7 +162,8 @@ const analyzeTrades = async () => {
           totalReturn: result.value.result.retPct,
           totalTrades: result.value.result.tradesCount,
           finalEquity: result.value.result.equity
-        }
+        },
+        priceData: priceData // Include price data for mathematical dip/peak analysis
       }
     })
     analysis.value = response.analysis
@@ -204,6 +213,57 @@ const applyImprovements = () => {
 
   // Optionally run a new backtest with the improved parameters
   // runBacktest()
+}
+
+const generateOptimalTrades = async () => {
+  if (!result.value) {
+    console.error('No backtest result available')
+    return
+  }
+
+  generatingOptimal.value = true
+  try {
+    // Extract price data from the backtest result
+    const rawPriceData = result.value.priceData || []
+    // Convert price data objects to simple number array
+    const priceData = rawPriceData.map((item) => typeof item === 'number' ? item : item.price)
+
+    console.log('Generating optimal trades with:', {
+      hasPriceData: !!priceData,
+      priceDataLength: priceData.length,
+      firstFewPrices: priceData.slice(0, 5),
+      lastFewPrices: priceData.slice(-5),
+      rawDataSample: rawPriceData.slice(0, 3)
+    })
+
+    if (priceData.length === 0) {
+      console.error('No price data available in backtest result')
+      return
+    }
+
+    const response = await $fetch('/api/strategy/generate-optimal', {
+      method: 'POST',
+      body: {
+        priceData: priceData,
+        initialCapital: 1000,
+        commissionPct: 0.05
+      }
+    })
+
+    console.log('Optimal trades response:', response)
+
+    if (response.ok && response.optimalTrades) {
+      optimalTrades.value = response.optimalTrades
+      console.log('Optimal trades set successfully:', optimalTrades.value)
+    } else {
+      console.error('Invalid response format:', response)
+    }
+  } catch (error) {
+    console.error('Optimal trades generation failed:', error)
+    // You could add a toast notification here
+  } finally {
+    generatingOptimal.value = false
+  }
 }
 
 // Auto-run backtest on mount with default config
