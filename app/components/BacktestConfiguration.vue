@@ -32,9 +32,7 @@
           >
             <option value="BTCUSDT">BTCUSDT</option>
             <option value="ETHUSDT">ETHUSDT</option>
-            <option value="ADAUSDT">ADAUSDT</option>
             <option value="SOLUSDT">SOLUSDT</option>
-            <option value="DOTUSDT">DOTUSDT</option>
           </select>
         </div>
 
