@@ -1,7 +1,7 @@
 import { H3Event, readBody, setHeaders, setResponseStatus } from 'h3'
 
 // Strategy configuration interface
-interface StrategyConfig {
+export interface StrategyConfig {
   // Data
   symbol?: string
   tf?: string
@@ -52,7 +52,7 @@ interface StrategyConfig {
 }
 
 // Default configuration
-const DEFAULT_CONFIG: Required<StrategyConfig> = {
+export const DEFAULT_CONFIG: Required<StrategyConfig> = {
   // Data
   symbol: "BTCUSDT",
   tf: "15m",
@@ -123,7 +123,7 @@ function applySlippagePx(px: number, slippagePct: number, side: string) {
 }
 
 // Market data fetching
-async function fetchKlines(symbol: string, interval: string, startTimeMs: number, endTimeMs: number, limitPerReq = 1000) {
+export async function fetchKlines(symbol: string, interval: string, startTimeMs: number, endTimeMs: number, limitPerReq = 1000) {
   if (!INTERVALS.has(interval)) throw new Error(`Unsupported interval ${interval}`)
 
   const out = []
@@ -366,285 +366,23 @@ function alignHTFtoLTF(ltfTimes: number[], htfCandles: any[], trendLen: number) 
   return out
 }
 
-// Main backtest engine
-function runBacktest(candles: any[], htfCandles: any[], cfg: Required<StrategyConfig>) {
-  const times  = candles.map(c => c.time)
-  const open   = candles.map(c => c.open)
-  const high   = candles.map(c => c.high)
-  const low    = candles.map(c => c.low)
-  const close  = candles.map(c => c.close)
-
-  const trend = trendScore(close, cfg.trendLen)
-  const upTrend = trend.map(x => x > cfg.upTh)
-  const downTrend = trend.map(x => x < cfg.dnTh)
-
-  const htfScore = alignHTFtoLTF(times, htfCandles, cfg.trendLen)
-  const htfOKLong = htfScore.map(x => x > cfg.htfLongTh)
-  const htfOKShrt = htfScore.map(x => x < cfg.htfShortTh)
-
-  const { isOB, isOS } = obosSignals(close, cfg.obosLen, cfg.adaptLen)
-
-  const osBars = rollingCountTrue(isOS, cfg.winLen)
-  const obBars = rollingCountTrue(isOB, cfg.winLen)
-
-  const osCross = osBars.map((v, i) => v >= cfg.needBars && (i > 0 ? osBars[i-1] < cfg.needBars : true))
-  const obCross = obBars.map((v, i) => v >= cfg.needBars && (i > 0 ? obBars[i-1] < cfg.needBars : true))
-
-  const atrSeries = atr(high, low, close, cfg.atrLen)
-
-  // State
-  let cash = cfg.initialCapital
-  let position = 0
-  let avgPrice = NaN
-  let posBars = 0
-  let trailActive = false
-  let trailStop = NaN
-  let trailHighWater = NaN
-  let lastEntryBar = -Infinity
-  const trades = []
-
-  const fee = (notional: number) => notional * (cfg.commissionPct / 100)
-
-  function markToMarket(px: number) {
-    return cash + position * px
-  }
-
-  function enterLong(i: number) {
-    const px = applySlippagePx(close[i], cfg.slippagePct, "buy")
-    const equity = markToMarket(px)
-    const buyNotional = equity * (cfg.posPct / 100)
-    if (buyNotional <= 0) return
-    const qty = buyNotional / px
-    const cost = buyNotional + fee(buyNotional)
-    if (cash < cost) return
-    cash -= cost
-
-    const newQty = position + qty
-    avgPrice = (isFinite(avgPrice) && position !== 0)
-      ? (avgPrice * position + px * qty) / newQty
-      : px
-    position = newQty
-
-    trades.push({ time: times[i], side: "BUY", price: px, qty, note: "entry" })
-    lastEntryBar = i
-  }
-
-  function exitPortionAtTP(i: number, portionPct: number) {
-    if (position <= 0) return
-    const targetPx = avgPrice * (1 + cfg.tpPct / 100)
-    if (high[i] >= targetPx) {
-      const qtyToSell = position * (portionPct / 100)
-      const px = applySlippagePx(targetPx, cfg.slippagePct, "sell")
-      const proceeds = qtyToSell * px
-      cash += applyCommission(proceeds, cfg.commissionPct)
-      position -= qtyToSell
-      trades.push({ time: times[i], side: "SELL", price: px, qty: qtyToSell, note: `partial TP ${portionPct}%` })
-    }
-  }
-
-  function applyATRstop(i: number) {
-    if (!cfg.useATRstop || position <= 0) return
-    const stopPx = close[i] - cfg.atrMult * atrSeries[i]
-    if (low[i] <= stopPx) {
-      const px = applySlippagePx(stopPx, cfg.slippagePct, "sell")
-      const proceeds = position * px
-      cash += applyCommission(proceeds, cfg.commissionPct)
-      trades.push({ time: times[i], side: "SELL", price: px, qty: position, note: "ATR stop" })
-      position = 0; avgPrice = NaN; posBars = 0; trailActive = false; trailStop = NaN; trailHighWater = NaN
-    }
-  }
-
-  function maybeArmTrail(i: number) {
-    if (!cfg.useTrail || trailActive || position <= 0) return
-    const pnlPct = pct(close[i], avgPrice)
-    if (pnlPct >= cfg.armTrailPct && posBars >= cfg.minHoldBars) {
-      trailActive = true
-      trailHighWater = close[i]
-      trailStop = close[i] * (1 - cfg.trailPct / 100)
-      trades.push({ time: times[i], side: "INFO", price: close[i], qty: 0, note: "arm trail" })
-    }
-  }
-
-  function maintainTrail(i: number) {
-    if (!trailActive || position <= 0) return
-    if (high[i] > trailHighWater) {
-      trailHighWater = high[i]
-      trailStop = trailHighWater * (1 - cfg.trailPct / 100)
-    }
-    if (low[i] <= trailStop) {
-      const px = applySlippagePx(trailStop, cfg.slippagePct, "sell")
-      const proceeds = position * px
-      cash += applyCommission(proceeds, cfg.commissionPct)
-      trades.push({ time: times[i], side: "SELL", price: px, qty: position, note: "trailing stop" })
-      position = 0; avgPrice = NaN; posBars = 0; trailActive = false; trailStop = NaN; trailHighWater = NaN
-    }
-  }
-
-  function spacingOK(i: number) {
-    return (i - lastEntryBar) >= cfg.minSpacing
-  }
-
-  for (let i = 0; i < candles.length; i++) {
-    posBars = position !== 0 ? posBars + 1 : 0
-
-    const longGate  = (!cfg.useTrend || upTrend[i]) && (!cfg.useHTF || htfOKLong[i])
-    const shortGate = (!cfg.useTrend || downTrend[i]) && (!cfg.useHTF || htfOKShrt[i])
-
-    exitPortionAtTP(i, cfg.tpPortion)
-    maybeArmTrail(i)
-    maintainTrail(i)
-    applyATRstop(i)
-
-    if (osCross[i] && spacingOK(i) && longGate) {
-      enterLong(i)
-    }
-
-    if (cfg.enableShorts && obCross[i] && spacingOK(i) && shortGate) {
-      // Short path - stub for future implementation
-    }
-  }
-
-  if (position !== 0) {
-    const px = close[close.length - 1]
-    const proceeds = position * px
-    cash += applyCommission(proceeds, cfg.commissionPct)
-    trades.push({ time: times[times.length - 1], side: "SELL", price: px, qty: position, note: "EOD flatten" })
-    position = 0; avgPrice = NaN; trailActive = false
-  }
-
-  const equity = cash
-  const retPct = ((equity / cfg.initialCapital) - 1) * 100
-
-  return {
-    equity,
-    retPct,
-    trades,
-    lastPrice: close[close.length - 1],
-    bars: candles.length,
-  }
+// Export the strategy components for use in backtesting and other APIs
+export {
+  trendScore,
+  obosSignals,
+  rollingCountTrue,
+  alignHTFtoLTF,
+  ema,
+  rma,
+  roc,
+  stdev,
+  rsi,
+  atr,
+  pivotHigh,
+  pivotLow,
+  pct,
+  applyCommission,
+  applySlippagePx,
+  nowMs,
+  days
 }
-
-// API handler
-export default defineEventHandler(async (event: H3Event) => {
-  try {
-    const body = await readBody<StrategyConfig>(event)
-
-    // Merge with defaults
-    const config: Required<StrategyConfig> = { ...DEFAULT_CONFIG, ...body }
-
-    // Validate required fields
-    if (!config.symbol || !config.tf) {
-      setResponseStatus(event, 400)
-      return {
-        ok: false,
-        error: 'Missing required fields: symbol, tf'
-      }
-    }
-
-    setResponseStatus(event, 200)
-
-    // Set loading headers
-    setHeaders(event, {
-      'content-type': 'application/json; charset=utf-8',
-      'cache-control': 'no-cache'
-    })
-
-    // Fetch market data
-    const end = nowMs()
-    const start = end - days(config.lookbackDays)
-
-    const ltfPromise = fetchKlines(config.symbol, config.tf, start, end, config.limitPerReq)
-    const htfPromise = fetchKlines(config.symbol, config.htf, start - days(5), end, config.limitPerReq)
-
-    const [ltf, htf] = await Promise.all([ltfPromise, htfPromise])
-
-    if (ltf.length === 0) {
-      setResponseStatus(event, 502)
-      return { ok: false, error: 'No LTF candles returned from Binance' }
-    }
-
-    if (htf.length === 0) {
-      setResponseStatus(event, 502)
-      return { ok: false, error: 'No HTF candles returned from Binance' }
-    }
-
-    // Run backtest
-    const result = runBacktest(ltf, htf, config)
-
-    // Format trades for response
-    const formattedTrades = result.trades.map(trade => ({
-      time: new Date(trade.time).toISOString(),
-      side: trade.side,
-      price: Number(trade.price).toFixed(6),
-      qty: Number(trade.qty).toFixed(8),
-      note: trade.note
-    }))
-
-    // Generate price data for charting (daily candles for smoother chart)
-    const priceData = ltf
-      .filter((_, index) => index % Math.ceil(ltf.length / 100) === 0) // Sample for chart
-      .map(candle => ({
-        time: candle.time,
-        price: candle.close
-      }))
-
-    return {
-      ok: true,
-      config: {
-        symbol: config.symbol,
-        tf: config.tf,
-        htf: config.htf,
-        lookbackDays: config.lookbackDays,
-        initialCapital: config.initialCapital,
-        commissionPct: config.commissionPct,
-        slippagePct: config.slippagePct,
-        posPct: config.posPct,
-        useTrend: config.useTrend,
-        useHTF: config.useHTF,
-        trendLen: config.trendLen,
-        upTh: config.upTh,
-        dnTh: config.dnTh,
-        htfLongTh: config.htfLongTh,
-        htfShortTh: config.htfShortTh,
-        obosLen: config.obosLen,
-        adaptLen: config.adaptLen,
-        winLen: config.winLen,
-        needBars: config.needBars,
-        minSpacing: config.minSpacing,
-        enableShorts: config.enableShorts,
-        tpPct: config.tpPct,
-        tpPortion: config.tpPortion,
-        useTrail: config.useTrail,
-        trailPct: config.trailPct,
-        armTrailPct: config.armTrailPct,
-        minHoldBars: config.minHoldBars,
-        useATRstop: config.useATRstop,
-        atrLen: config.atrLen,
-        atrMult: config.atrMult
-      },
-      result: {
-        equity: result.equity,
-        retPct: result.retPct,
-        bars: result.bars,
-        lastPrice: result.lastPrice,
-        tradesCount: result.trades.length
-      },
-      trades: formattedTrades.slice(-20), // Last 20 trades for brevity
-      allTrades: formattedTrades, // Full trade history
-      priceData: priceData, // Price data for charting
-      data: {
-        ltfCandles: ltf.length,
-        htfCandles: htf.length,
-        ltfTimeframe: config.tf,
-        htfTimeframe: config.htf
-      }
-    }
-
-  } catch (err: any) {
-    setResponseStatus(event, 500)
-    return {
-      ok: false,
-      error: err?.message ?? 'Strategy execution failed'
-    }
-  }
-})

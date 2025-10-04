@@ -120,7 +120,7 @@ const config = reactive({ ...defaultConfig })
 const runBacktest = async () => {
   loading.value = true
   try {
-    const response = await $fetch('/api/strategy', {
+    const response = await $fetch('/api/backtest', {
       method: 'POST',
       body: config
     })
