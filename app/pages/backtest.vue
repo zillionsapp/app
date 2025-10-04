@@ -80,7 +80,7 @@ const handleChartDataReady = (ready) => {
   console.log('Chart data ready:', ready)
 }
 
-// Default configuration
+// Default configuration - Strategy Analyzer Optimized Settings
 const defaultConfig = {
   symbol: 'BTCUSDT',
   tf: '15m',
@@ -92,27 +92,27 @@ const defaultConfig = {
   posPct: 10,
   useTrend: true,
   useHTF: true,
-  trendLen: 40,
-  upTh: 57.0,
-  dnTh: 43.0,
-  htfLongTh: 53.0,
-  htfShortTh: 47.0,
+  trendLen: 35,
+  upTh: 55,
+  dnTh: 43,
+  htfLongTh: 55,
+  htfShortTh: 47,
   obosLen: 12,
   adaptLen: 14,
   showOBOS: true,
-  winLen: 20,
-  needBars: 4,
+  winLen: 26,
+  needBars: 6,
   minSpacing: 3,
   enableShorts: false,
-  tpPct: 8.0,
-  tpPortion: 50.0,
+  tpPct: 10,
+  tpPortion: 50,
   useTrail: true,
-  trailPct: 4.0,
-  armTrailPct: 0.8,
+  trailPct: 3.4,
+  armTrailPct: 1.2,
   minHoldBars: 2,
   useATRstop: false,
   atrLen: 14,
-  atrMult: 3.0,
+  atrMult: 3
 }
 
 const config = reactive({ ...defaultConfig })

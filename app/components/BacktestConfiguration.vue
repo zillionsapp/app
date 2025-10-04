@@ -4,6 +4,18 @@
       Strategy Configuration
     </h2>
 
+    <!-- Strategy Explanation -->
+    <div class="mb-6 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-lg border border-blue-200 dark:border-blue-800">
+      <h3 class="text-sm font-semibold text-blue-900 dark:text-blue-100 mb-2">How This Strategy Works</h3>
+      <div class="text-sm text-blue-800 dark:text-blue-200 space-y-2">
+        <p><strong>Multi-Timeframe Trend Analysis:</strong> Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.</p>
+        <p><strong>OBOS Signals:</strong> Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.</p>
+        <p><strong>HTF Confirmation:</strong> Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.</p>
+        <p><strong>Risk Management:</strong> Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.</p>
+        <p><strong>Position Sizing:</strong> Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.</p>
+      </div>
+    </div>
+
     <form @submit.prevent="$emit('run-backtest')" class="space-y-4">
       <!-- Basic Settings -->
       <div class="space-y-4">
