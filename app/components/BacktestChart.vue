@@ -166,11 +166,11 @@
           <text v-if="tooltipData.portfolio" x="10" y="50" class="text-xs fill-green-300">
             Portfolio: ${{ tooltipData.portfolio.toFixed(2) }}
           </text>
-          <text v-if="tooltipData.buyHold !== undefined" x="10" y="65" class="text-xs fill-gray-300">
-            Buy & Hold: ${{ tooltipData.buyHold.toFixed(2) }}
-          </text>
           <text v-if="tooltipData.vsBuyHold !== undefined" x="10" y="80" :class="tooltipData.vsBuyHold >= 0 ? 'text-xs fill-green-300' : 'text-xs fill-red-300'">
             vs B&H: {{ tooltipData.vsBuyHold >= 0 ? '+' : '' }}${{ tooltipData.vsBuyHold.toFixed(2) }} ({{ tooltipData.vsBuyHoldPct >= 0 ? '+' : '' }}{{ tooltipData.vsBuyHoldPct.toFixed(2) }}%)
+          </text>
+          <text v-if="tooltipData.buyHold !== undefined" x="10" y="65" class="text-xs fill-gray-300">
+            Buy & Hold: ${{ tooltipData.buyHold.toFixed(2) }}
           </text>
           <text v-if="tooltipData.drawdown !== undefined" x="10" y="95" class="text-xs fill-red-300">
             Drawdown: {{ tooltipData.drawdown.toFixed(2) }}%
