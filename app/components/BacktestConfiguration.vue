@@ -20,7 +20,7 @@
       <!-- Basic Settings -->
       <div class="space-y-4">
         <h3 class="text-lg font-medium text-gray-900 dark:text-white">Basic Settings</h3>
-        <p class="italic">{{ isCustomParameters ? 'Custom Algo Trading Bot Parameters.' : 'Current Algo Trading Bot Parameters.' }}</p>
+        <p class="italic">{{ isCustomParameters ? 'Custom Algo Trading Bot Parameters.' : 'Current Zillions Apps default Algo Trading Bot Parameters.' }}</p>
 
         <div>
           <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
