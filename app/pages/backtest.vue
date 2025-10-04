@@ -222,18 +222,34 @@
             />
 
             <!-- Summary Cards -->
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
               <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Final Equity</div>
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Strategy PnL</div>
                 <div class="text-2xl font-bold text-green-600 dark:text-green-400">
-                  ${{ result.result.equity.toFixed(2) }}
+                  ${{ (result.result.equity - result.config.initialCapital).toFixed(2) }}
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ result.result.retPct.toFixed(2) }}%
                 </div>
               </div>
 
               <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Return</div>
-                <div :class="result.result.retPct >= 0 ? 'text-2xl font-bold text-green-600 dark:text-green-400' : 'text-2xl font-bold text-red-600 dark:text-red-400'">
-                  {{ result.result.retPct.toFixed(2) }}%
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Buy & Hold PnL</div>
+                <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+                  ${{ buyHoldPnL.toFixed(2) }}
+                </div>
+                <div class="text-sm text-gray-500 dark:text-gray-400">
+                  {{ buyHoldReturn.toFixed(2) }}%
+                </div>
+              </div>
+
+              <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">vs Buy & Hold</div>
+                <div :class="strategyVsBuyHold >= 0 ? 'text-2xl font-bold text-green-600 dark:text-green-400' : 'text-2xl font-bold text-red-600 dark:text-red-400'">
+                  {{ strategyVsBuyHold >= 0 ? '+' : '' }}${{ strategyVsBuyHold.toFixed(2) }}
+                </div>
+                <div :class="strategyVsBuyHoldPct >= 0 ? 'text-sm text-green-600 dark:text-green-400' : 'text-sm text-red-600 dark:text-red-400'">
+                  {{ strategyVsBuyHoldPct >= 0 ? '+' : '' }}{{ strategyVsBuyHoldPct.toFixed(2) }}%
                 </div>
               </div>
 
@@ -245,9 +261,9 @@
               </div>
 
               <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
-                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Last Price</div>
-                <div class="text-2xl font-bold text-gray-900 dark:text-white">
-                  ${{ result.result.lastPrice.toFixed(2) }}
+                <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Win Rate</div>
+                <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+                  {{ winRate.toFixed(1) }}%
                 </div>
               </div>
             </div>
@@ -389,7 +405,7 @@
 </template>
 
 <script setup>
-import { ref, reactive } from 'vue'
+import { ref, reactive, computed } from 'vue'
 
 const loading = ref(false)
 const result = ref(null)
@@ -460,6 +476,50 @@ const resetConfig = () => {
 const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
+
+// Buy & Hold Calculations
+const buyHoldPnL = computed(() => {
+  if (!result.value || !result.value.priceData.length) return 0
+
+  const firstPrice = result.value.priceData[0].price
+  const lastPrice = result.value.priceData[result.value.priceData.length - 1].price
+  const initialCapital = result.value.config.initialCapital
+
+  // Calculate how many units could be bought initially
+  const initialUnits = initialCapital / firstPrice
+  const finalValue = initialUnits * lastPrice
+
+  return finalValue - initialCapital
+})
+
+const buyHoldReturn = computed(() => {
+  if (!result.value || !result.value.priceData.length) return 0
+
+  const firstPrice = result.value.priceData[0].price
+  const lastPrice = result.value.priceData[result.value.priceData.length - 1].price
+
+  return ((lastPrice - firstPrice) / firstPrice) * 100
+})
+
+const strategyVsBuyHold = computed(() => {
+  if (!result.value) return 0
+  return result.value.result.equity - result.value.config.initialCapital - buyHoldPnL.value
+})
+
+const strategyVsBuyHoldPct = computed(() => {
+  if (!result.value || buyHoldReturn.value === 0) return 0
+  return result.value.result.retPct - buyHoldReturn.value
+})
+
+const winRate = computed(() => {
+  if (!result.value || !result.value.allTrades.length) return 0
+
+  const winningTrades = result.value.allTrades.filter(trade =>
+    trade.note.includes('TP') || trade.note.includes('trailing stop')
+  ).length
+
+  return (winningTrades / result.value.allTrades.length) * 100
+})
 
 // Auto-run backtest on mount with default config
 onMounted(() => {
