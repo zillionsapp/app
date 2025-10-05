@@ -9,7 +9,12 @@ export default defineNuxtConfig({
   },
   ssr: true,
   // Make Nitro target Vercel Node functions (not edge)
-  nitro: { preset: 'vercel' },
+  nitro: {
+    preset: 'vercel',
+    experimental: {
+      tasks: true
+    }
+  },
   // Optional: make sure this route is always dynamic and never cached/prerendered
   routeRules: {
     '/api/series': { swr: false, cache: false, isr: false }
@@ -17,5 +22,17 @@ export default defineNuxtConfig({
   vite: {
     plugins: [tailwindcss()],
   },
-  css: ["~/assets/app.css"]
+  css: ["~/assets/app.css"],
+  modules: [
+    '@clerk/nuxt'
+  ],
+  runtimeConfig: {
+    public: {
+      clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY,
+      clerkSecretKey: process.env.CLERK_SECRET_KEY
+    }
+  },
+  router: {
+    middleware: ['auth']
+  }
 })

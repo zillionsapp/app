@@ -10,6 +10,7 @@
     "postinstall": "nuxt prepare"
   },
   "dependencies": {
+    "@clerk/nuxt": "^1.9.3",
     "@tailwindcss/vite": "^4.1.12",
     "@types/chart.js": "^2.9.41",
     "airtable": "^0.12.2",

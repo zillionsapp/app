@@ -73,6 +73,11 @@
 <script setup>
 import { ref, reactive, onMounted } from 'vue'
 
+// Protect this page with authentication
+definePageMeta({
+  middleware: 'auth'
+})
+
 const loading = ref(false)
 const result = ref(null)
 const showAllTrades = ref(false)

@@ -39,7 +39,7 @@
         />
       </div>
       
-      <div class="flex-1">
+      <!-- <div class="flex-1">
         <TradingStrategySelector
           :strategies="tradingStrategies"
           :selected-strategies="selectedStrategies"
@@ -48,13 +48,13 @@
           @update-allocation="updateAllocation"
           @get-max-allocation="getMaxAllocation"
         />
-      </div>
+      </div> -->
     </main>
 
     <!-- Action bar -->
     <div class="w-full">
       <div class="max-w-3xl mx-auto px-4 lg:px-6">
-        <div class="grid grid-cols-4 gap-3 py-4">
+        <div class="grid grid-cols-3 gap-3 py-4">
           <button class="flex-1 btn btn-lg rounded-2xl btn-primary gap-2" @click="handleDeposit">
             Deposit
           </button>
@@ -74,8 +74,13 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue'
+import { computed, ref, onMounted } from 'vue'
 import { useSeries, PERIODS, type Period } from '@/composables/useSeries'
+
+// Protect this page with authentication
+definePageMeta({
+  middleware: 'auth'
+})
 
 type Point = { x: number; y: number }
 
@@ -198,7 +203,7 @@ const currency = computed(() => props.currency)
 const deposited = computed(() => props.deposited)
 const depositAt = computed(() => props.depositAt)
 const displayBalance = computed(() => {
-  return currentValueUsd.value > 0 ? currentValueUsd.value : deposited.value
+  return (currentValueUsd.value ?? 0) > 0 ? (currentValueUsd.value ?? 0) : deposited.value
 })
 
 /* Chart geometry (unchanged) */
