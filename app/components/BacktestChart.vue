@@ -1,208 +1,240 @@
 <template>
-  <div class="bg-base-200 rounded-lg shadow-md p-6">
-    <div class="flex justify-between items-center mb-4">
-      <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+  <div class="bg-base-200 rounded-lg shadow-lg p-6">
+    <!-- Header with view toggle -->
+    <div class="flex justify-between items-center mb-6">
+      <h3 class="text-xl font-bold text-white">
         Performance Chart
       </h3>
-      <div class="flex space-x-2">
+      <div class="flex rounded-lg p-1">
         <button
           @click="activeView = 'both'"
-          :class="activeView === 'both' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
-          class="px-3 py-1 rounded text-sm font-medium"
+          :class="activeView === 'both' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
         >
-          Both
+          Combined
         </button>
         <button
           @click="activeView = 'price'"
-          :class="activeView === 'price' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
-          class="px-3 py-1 rounded text-sm font-medium"
+          :class="activeView === 'price' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
         >
-          Price
+          Price Only
         </button>
         <button
           @click="activeView = 'portfolio'"
-          :class="activeView === 'portfolio' ? 'bg-blue-600 text-white' : 'bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300'"
-          class="px-3 py-1 rounded text-sm font-medium"
+          :class="activeView === 'portfolio' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
+          class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
         >
-          Portfolio
+          Portfolio Only
         </button>
       </div>
     </div>
 
-    <div v-if="!dataReady" class="h-64 flex items-center justify-center text-gray-500 dark:text-gray-400">
-      <div class="animate-pulse">Loading chart data...</div>
+    <!-- Loading state -->
+    <div v-if="!dataReady" class="h-80 flex items-center justify-center">
+      <div class="flex items-center space-x-3 text-gray-500 dark:text-gray-400">
+        <div class="animate-spin rounded-full h-8 w-8 border-b-2 border-blue-600"></div>
+        <span class="text-lg">Loading chart data...</span>
+      </div>
     </div>
 
-    <div v-else class="relative w-full">
+    <!-- Chart container -->
+    <div v-else class="relative w-full rounded-lg border-gray-200 dark:border-gray-700 overflow-hidden">
       <svg
         ref="chartSvg"
-        width="100%"
-        height="100%"
-        viewBox="0 0 800 400"
-        class="w-full h-auto"
+        :width="svgWidth"
+        :height="svgHeight"
+        :viewBox="`0 0 ${svgWidth} ${svgHeight}`"
+        class="w-full h-auto cursor-crosshair"
         @mousemove="handleMouseMove"
-        @mouseleave="showTooltip = false"
+        @mouseleave="handleMouseLeave"
       >
-        <!-- Grid lines -->
+        <!-- Grid and background -->
         <defs>
-          <pattern id="grid" width="20" height="20" patternUnits="userSpaceOnUse">
+          <!-- Grid pattern -->
+          <pattern id="chartGrid" :width="gridSize" :height="gridSize" patternUnits="userSpaceOnUse">
             <path
-              d="M 20 0 L 0 0 0 20"
+              :d="`M ${gridSize} 0 L 0 0 0 ${gridSize}`"
               fill="none"
               stroke="currentColor"
-              stroke-width="0.5"
-              class="text-gray-200 dark:text-gray-700"
+              stroke-width="0.8"
+              class="text-gray-100 dark:text-gray-800"
             />
           </pattern>
-        </defs>
-        <rect width="100%" height="100%" fill="url(#grid)" />
 
-        <!-- Left Y-axis labels (Price) -->
-        <g class="text-xs fill-blue-500 dark:fill-blue-400">
-          <text v-for="label in leftYLabels" :key="`left-${label.value}`" :x="margin.left - 10" :y="label.y" text-anchor="end" dominant-baseline="middle">
+          <!-- Gradient for area fill -->
+          <linearGradient id="portfolioGradient" x1="0%" y1="0%" x2="0%" y2="100%">
+            <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.2" />
+            <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.05" />
+          </linearGradient>
+        </defs>
+
+        <!-- Background -->
+        <rect width="100%" height="100%" fill="url(#chartGrid)" />
+
+        <!-- Chart area -->
+        <g :transform="`translate(${margin.left}, ${margin.top})`">
+          <!-- Portfolio area fill (when showing both) -->
+          <path
+            v-if="activeView === 'both' && portfolioAreaPath"
+            :d="portfolioAreaPath"
+            fill="url(#portfolioGradient)"
+          />
+
+          <!-- Price line -->
+          <path
+            v-if="activeView === 'price' || activeView === 'both'"
+            :d="pricePath"
+            fill="none"
+            stroke="#2563eb"
+            stroke-width="2.5"
+            class="drop-shadow-sm"
+          />
+
+          <!-- Portfolio line -->
+          <path
+            v-if="activeView === 'portfolio' || activeView === 'both'"
+            :d="portfolioPath"
+            fill="none"
+            stroke="#059669"
+            stroke-width="2.5"
+            class="drop-shadow-sm"
+          />
+
+          <!-- Vertical line on hover -->
+          <line
+            v-if="hoverLine.x !== null"
+            :x1="hoverLine.x"
+            :y1="0"
+            :x2="hoverLine.x"
+            :y2="chartHeight"
+            stroke="#6b7280"
+            stroke-width="1"
+            stroke-dasharray="2,2"
+            opacity="0.7"
+          />
+
+          <!-- Trade markers -->
+          <g v-if="tradeMarkers.length > 0">
+            <!-- Buy markers (green triangles pointing up) -->
+            <g v-for="marker in tradeMarkers.filter(m => m.side === 'BUY')"
+               :key="`buy-${marker.id}`"
+               class="cursor-pointer transition-all duration-200"
+               @mouseenter="showTradeTooltip($event, marker)"
+               @mouseleave="showTooltip = false">
+              <polygon
+                :points="`${marker.x},${marker.y - 8} ${marker.x - 6},${marker.y + 4} ${marker.x + 6},${marker.y + 4}`"
+                fill="#059669"
+                stroke="#047857"
+                stroke-width="1.5"
+                class="hover:stroke-2"
+              />
+              <circle
+                :cx="marker.x"
+                :cy="marker.y"
+                r="2"
+                fill="#059669"
+                class="opacity-0 hover:opacity-100 transition-opacity"
+              />
+            </g>
+
+            <!-- Sell markers (red triangles pointing down) -->
+            <g v-for="marker in tradeMarkers.filter(m => m.side === 'SELL')"
+               :key="`sell-${marker.id}`"
+               class="cursor-pointer transition-all duration-200"
+               @mouseenter="showTradeTooltip($event, marker)"
+               @mouseleave="showTooltip = false">
+              <polygon
+                :points="`${marker.x},${marker.y + 8} ${marker.x - 6},${marker.y - 4} ${marker.x + 6},${marker.y - 4}`"
+                fill="#dc2626"
+                stroke="#b91c1c"
+                stroke-width="1.5"
+                class="hover:stroke-2"
+              />
+              <circle
+                :cx="marker.x"
+                :cy="marker.y"
+                r="2"
+                fill="#dc2626"
+                class="opacity-0 hover:opacity-100 transition-opacity"
+              />
+            </g>
+          </g>
+        </g>
+
+        <!-- Y-axis labels (Left - Price) -->
+        <g v-if="activeView === 'price' || activeView === 'both'" class="text-xs font-medium">
+          <text
+            v-for="label in leftYLabels"
+            :key="`left-${label.value}`"
+            :x="margin.left - 8"
+            :y="margin.top + label.y"
+            text-anchor="end"
+            dominant-baseline="middle"
+            class="fill-blue-600 dark:fill-blue-400"
+          >
             {{ label.text }}
           </text>
         </g>
 
-        <!-- Right Y-axis labels (Portfolio) -->
-        <g v-if="activeView === 'both' || activeView === 'portfolio'" class="text-xs fill-green-500 dark:fill-green-400">
-          <text v-for="label in rightYLabels" :key="`right-${label.value}`" :x="width - margin.right + 10" :y="label.y" text-anchor="start" dominant-baseline="middle">
+        <!-- Y-axis labels (Right - Portfolio) -->
+        <g v-if="activeView === 'portfolio' || activeView === 'both'" class="text-xs font-medium">
+          <text
+            v-for="label in rightYLabels"
+            :key="`right-${label.value}`"
+            :x="svgWidth - margin.right + 8"
+            :y="margin.top + label.y"
+            text-anchor="start"
+            dominant-baseline="middle"
+            class="fill-green-600 dark:fill-green-400"
+          >
             {{ label.text }}
           </text>
         </g>
 
         <!-- X-axis labels -->
-        <g class="text-xs fill-gray-500 dark:fill-gray-400" :transform="`translate(0, ${height - margin.bottom + 30})`">
-          <text v-for="label in xLabels" :key="label.date" :x="label.x" y="20" text-anchor="middle">
+        <g class="text-xs font-medium fill-gray-600 dark:fill-gray-400">
+          <text
+            v-for="label in xLabels"
+            :key="label.date"
+            :x="margin.left + label.x"
+            :y="svgHeight - margin.bottom + 20"
+            text-anchor="middle"
+          >
             {{ label.text }}
           </text>
         </g>
 
-        <!-- Chart area -->
-        <g :transform="`translate(${margin.left}, ${margin.top})`">
-          <!-- Price line (blue) -->
-          <path
-            v-if="activeView === 'price' || activeView === 'both'"
-            :d="pricePath"
-            fill="none"
-            stroke="#3b82f6"
-            stroke-width="2"
-            class="drop-shadow-sm"
-          />
-
-          <!-- Portfolio line (green) -->
-          <path
-            v-if="activeView === 'portfolio' || activeView === 'both'"
-            :d="portfolioPath"
-            fill="none"
-            stroke="#10b981"
-            stroke-width="2"
-            class="drop-shadow-sm"
-          />
-
-          <!-- Area fill for portfolio vs price -->
-          <defs v-if="activeView === 'both'">
-            <linearGradient id="portfolioGradient" x1="0%" y1="0%" x2="0%" y2="100%">
-              <stop offset="0%" style="stop-color:#10b981;stop-opacity:0.3" />
-              <stop offset="100%" style="stop-color:#10b981;stop-opacity:0.05" />
-            </linearGradient>
-          </defs>
-
-          <!-- Portfolio area fill -->
-          <path
-            v-if="activeView === 'both' && portfolioPoints.length > 0"
-            :d="`${portfolioPath} L ${chartWidth},${chartHeight} L 0,${chartHeight} Z`"
-            fill="url(#portfolioGradient)"
-          />
-
-          <!-- Data points -->
-          <g v-if="showPoints">
-            <!-- Price points -->
-            <circle
-              v-for="(point, index) in pricePoints"
-              v-if="activeView === 'price' || activeView === 'both'"
-              :key="`price-${index}`"
-              :cx="point.x"
-              :cy="point.y"
-              r="3"
-              fill="#3b82f6"
-              class="cursor-pointer hover:r-5 transition-all"
-              @mouseenter="showPointTooltip($event, point, 'price')"
-              @mouseleave="showTooltip = false"
-            />
-
-            <!-- Portfolio points -->
-            <circle
-              v-for="(point, index) in portfolioPoints"
-              v-if="activeView === 'portfolio' || activeView === 'both'"
-              :key="`portfolio-${index}`"
-              :cx="point.x"
-              :cy="point.y"
-              r="3"
-              fill="#10b981"
-              class="cursor-pointer hover:r-5 transition-all"
-              @mouseenter="showPointTooltip($event, point, 'portfolio')"
-              @mouseleave="showTooltip = false"
-            />
-          </g>
-
-          <!-- Trade markers -->
-          <g v-if="tradeMarkers.length > 0">
-            <!-- Buy markers (green triangles pointing up) -->
-            <polygon
-              v-for="marker in tradeMarkers.filter(m => m.side === 'BUY')"
-              :key="`buy-${marker.index}`"
-              :points="`${marker.x},${marker.y - 8} ${marker.x - 6},${marker.y + 4} ${marker.x + 6},${marker.y + 4}`"
-              fill="#10b981"
-              stroke="#065f46"
-              stroke-width="1"
-              class="cursor-pointer hover:stroke-2 transition-all"
-              @mouseenter="showTradeTooltip($event, marker)"
-              @mouseleave="showTooltip = false"
-            />
-
-            <!-- Sell markers (red triangles pointing down) -->
-            <polygon
-              v-for="marker in tradeMarkers.filter(m => m.side === 'SELL')"
-              :key="`sell-${marker.index}`"
-              :points="`${marker.x},${marker.y + 8} ${marker.x - 6},${marker.y - 4} ${marker.x + 6},${marker.y - 4}`"
-              fill="#ef4444"
-              stroke="#dc2626"
-              stroke-width="1"
-              class="cursor-pointer hover:stroke-2 transition-all"
-              @mouseenter="showTradeTooltip($event, marker)"
-              @mouseleave="showTooltip = false"
-            />
-          </g>
-        </g>
-
         <!-- Tooltip -->
-        <g v-if="showTooltip && tooltipData" :transform="`translate(${tooltip.x}, ${tooltip.y - 10})`">
+        <g v-if="showTooltip && tooltipData" :transform="`translate(${tooltip.x}, ${tooltip.y})`">
           <rect
-            :x="tooltip.offsetX"
+            :x="0"
             :y="0"
-            :width="tooltipData.buyHold !== undefined ? 220 : 180"
-            :height="tooltipData.buyHold !== undefined ? 110 : 80"
-            fill="rgba(0,0,0,0.8)"
-            rx="4"
+            :width="tooltip.width"
+            :height="tooltip.height"
+            fill="rgba(0,0,0,0.9)"
+            rx="8"
             class="text-white"
           />
-          <text x="10" y="20" class="text-xs fill-white font-medium">
+          <!-- Tooltip content -->
+          <text x="12" y="20" class="text-sm font-semibold fill-white">
             {{ tooltipData.date }}
           </text>
-          <text v-if="tooltipData.price" x="10" y="35" class="text-xs fill-blue-300">
+          <text v-if="tooltipData.price" x="12" y="38" class="text-sm fill-blue-300">
             Price: ${{ tooltipData.price.toFixed(2) }}
           </text>
-          <text v-if="tooltipData.portfolio" x="10" y="50" class="text-xs fill-green-300">
+          <text v-if="tooltipData.portfolio" x="12" y="56" class="text-sm fill-green-300">
             Portfolio: ${{ tooltipData.portfolio.toFixed(2) }}
           </text>
-          <text v-if="tooltipData.vsBuyHold !== undefined" x="10" y="80" :class="tooltipData.vsBuyHold >= 0 ? 'text-xs fill-green-300' : 'text-xs fill-red-300'">
-            vs B&H: {{ tooltipData.vsBuyHold >= 0 ? '+' : '' }}${{ tooltipData.vsBuyHold.toFixed(2) }} ({{ tooltipData.vsBuyHoldPct >= 0 ? '+' : '' }}{{ tooltipData.vsBuyHoldPct.toFixed(2) }}%)
-          </text>
-          <text v-if="tooltipData.buyHold !== undefined" x="10" y="65" class="text-xs fill-gray-300">
+          <text v-if="tooltipData.buyHold !== undefined" x="12" y="74" class="text-sm fill-gray-300">
             Buy & Hold: ${{ tooltipData.buyHold.toFixed(2) }}
           </text>
-          <text v-if="tooltipData.drawdown !== undefined" x="10" y="95" class="text-xs fill-red-300">
+          <text v-if="tooltipData.vsBuyHold !== undefined" x="12" y="92"
+                :class="tooltipData.vsBuyHold >= 0 ? 'text-sm fill-green-300' : 'text-sm fill-red-300'">
+            vs B&H: {{ tooltipData.vsBuyHold >= 0 ? '+' : '' }}${{ tooltipData.vsBuyHold.toFixed(2) }}
+            ({{ tooltipData.vsBuyHoldPct >= 0 ? '+' : '' }}{{ tooltipData.vsBuyHoldPct.toFixed(2) }}%)
+          </text>
+          <text v-if="tooltipData.drawdown !== undefined" x="12" y="110" class="text-sm fill-red-300">
             Drawdown: {{ tooltipData.drawdown.toFixed(2) }}%
           </text>
         </g>
@@ -211,40 +243,12 @@
       <!-- Legend -->
       <div class="flex justify-center mt-4 space-x-6 text-sm">
         <div v-if="activeView === 'price' || activeView === 'both'" class="flex items-center">
-          <div class="w-4 h-4 bg-blue-500 rounded-full mr-2"></div>
-          <span class="text-gray-700 dark:text-gray-300">Asset Price</span>
+          <div class="w-4 h-4 bg-blue-600 rounded-full mr-2 shadow-sm"></div>
+          <span class="text-gray-700 dark:text-gray-300 font-medium">Asset Price</span>
         </div>
         <div v-if="activeView === 'portfolio' || activeView === 'both'" class="flex items-center">
-          <div class="w-4 h-4 bg-green-500 rounded-full mr-2"></div>
-          <span class="text-gray-700 dark:text-gray-300">Portfolio Value</span>
-        </div>
-      </div>
-
-      <!-- Stats -->
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mt-4 pt-4 border-t border-gray-200 dark:border-gray-700">
-        <div class="text-center">
-          <div class="text-xs text-gray-500 dark:text-gray-400">Max Drawdown</div>
-          <div :class="maxDrawdown >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'" class="font-semibold">
-            {{ maxDrawdown.toFixed(2) }}%
-          </div>
-        </div>
-        <div class="text-center">
-          <div class="text-xs text-gray-500 dark:text-gray-400">Win Rate</div>
-          <div class="text-green-600 dark:text-green-400 font-semibold">
-            {{ winRate.toFixed(1) }}%
-          </div>
-        </div>
-        <div class="text-center">
-          <div class="text-xs text-gray-500 dark:text-gray-400">Sharpe Ratio</div>
-          <div class="text-blue-600 dark:text-blue-400 font-semibold">
-            {{ sharpeRatio.toFixed(2) }}
-          </div>
-        </div>
-        <div class="text-center">
-          <div class="text-xs text-gray-500 dark:text-gray-400">Volatility</div>
-          <div class="text-gray-700 dark:text-gray-300 font-semibold">
-            {{ volatility.toFixed(2) }}%
-          </div>
+          <div class="w-4 h-4 bg-green-600 rounded-full mr-2 shadow-sm"></div>
+          <span class="text-gray-700 dark:text-gray-300 font-medium">Portfolio Value</span>
         </div>
       </div>
     </div>
@@ -277,100 +281,126 @@ const emit = defineEmits(['data-ready'])
 
 const chartSvg = ref(null)
 const showTooltip = ref(false)
-const tooltip = ref({ x: 0, y: 0 })
+const tooltip = ref({ x: 0, y: 0, width: 200, height: 120 })
 const tooltipData = ref(null)
 const activeView = ref('both')
 const dataReady = ref(false)
+const hoverLine = ref({ x: null })
 
-// Fixed dimensions for consistent rendering
-const width = 800
-const height = 400
-const margin = { top: 20, right: 60, bottom: 40, left: 60 }
-const chartWidth = width - margin.left - margin.right
-const chartHeight = height - margin.top - margin.bottom
+// Chart dimensions and styling
+const svgWidth = 900
+const svgHeight = 500
+const margin = { top: 30, right: 80, bottom: 60, left: 80 }
+const chartWidth = svgWidth - margin.left - margin.right
+const chartHeight = svgHeight - margin.top - margin.bottom
+const gridSize = 25
 
-// Calculate portfolio value over time - SIMPLE FIX
+// Calculate portfolio values with proper backtesting simulation
 const portfolioValues = computed(() => {
-  if (!props.result?.result?.equity || !props.priceData.length) return []
+  if (!props.priceData.length || !props.trades.length) return []
 
-  const backendFinalValue = props.result.result.equity
   const values = []
+  let cash = props.initialCapital
+  let position = 0
+  let peakValue = props.initialCapital
 
-  // Simple approach: scale buy & hold by the ratio of backend result to buy & hold result
-  const firstPrice = props.priceData[0].price
-  const lastPrice = props.priceData[props.priceData.length - 1].price
-  const buyHoldFinal = (props.initialCapital / firstPrice) * lastPrice
-  const scalingFactor = backendFinalValue / buyHoldFinal
+  // Sort trades chronologically
+  const sortedTrades = [...props.trades].sort((a, b) => new Date(a.time) - new Date(b.time))
 
   props.priceData.forEach((pricePoint, index) => {
-    const buyHoldAtPoint = (props.initialCapital / firstPrice) * pricePoint.price
-    const portfolioValue = buyHoldAtPoint * scalingFactor
+    const currentTime = new Date(pricePoint.time).getTime()
+    const currentPrice = pricePoint.price
+
+    // Process trades that occurred at or before this price point
+    while (sortedTrades.length > 0 && new Date(sortedTrades[0].time).getTime() <= currentTime) {
+      const trade = sortedTrades.shift()
+      const tradePrice = parseFloat(trade.price)
+      const quantity = parseFloat(trade.qty)
+
+      if (trade.side === 'BUY') {
+        const cost = quantity * tradePrice
+        const commission = cost * 0.001 // 0.1% commission
+        const totalCost = cost + commission
+
+        if (cash >= totalCost) {
+          const unitsBought = (cost) / tradePrice
+          position += unitsBought
+          cash -= totalCost
+        }
+      } else if (trade.side === 'SELL') {
+        const sellValue = quantity * tradePrice
+        const commission = sellValue * 0.001
+        const netProceeds = sellValue - commission
+
+        if (position >= quantity) {
+          position -= quantity
+          cash += netProceeds
+        }
+      }
+    }
+
+    // Calculate current portfolio value
+    const portfolioValue = cash + (position * currentPrice)
+
+    // Calculate drawdown
+    if (portfolioValue > peakValue) {
+      peakValue = portfolioValue
+    }
+    const drawdown = peakValue > 0 ? ((peakValue - portfolioValue) / peakValue) * 100 : 0
 
     values.push({
       time: pricePoint.time,
       value: portfolioValue,
-      drawdown: 0
+      drawdown: drawdown,
+      cash: cash,
+      position: position,
+      price: currentPrice
     })
-  })
-
-  // Force exact final value match
-  if (values.length > 0) {
-    values[values.length - 1].value = backendFinalValue
-  }
-
-  console.log('Simple Fix Debug:', {
-    backendFinalValue: backendFinalValue,
-    chartFinalValue: values.length > 0 ? values[values.length - 1].value : 0,
-    scalingFactor: scalingFactor,
-    buyHoldFinal: buyHoldFinal
   })
 
   return values
 })
 
-// Calculate buy & hold value over time
+// Calculate buy & hold baseline
 const buyHoldValues = computed(() => {
   if (!props.priceData.length || !props.initialCapital) return []
 
   const firstPrice = props.priceData[0].price
-  const initialUnits = props.initialCapital / firstPrice
+  const units = props.initialCapital / firstPrice
 
-  return props.priceData.map((point, index) => {
-    const buyHoldValue = initialUnits * point.price
-    return {
-      time: point.time,
-      value: buyHoldValue
-    }
-  })
+  return props.priceData.map(point => ({
+    time: point.time,
+    value: units * point.price
+  }))
 })
 
-// Price data points for chart
+// Chart data points
 const pricePoints = computed(() => {
   if (!props.priceData.length) return []
 
   const prices = props.priceData.map(p => p.price)
   const minPrice = Math.min(...prices)
   const maxPrice = Math.max(...prices)
+  const priceRange = maxPrice - minPrice || 1
 
   return props.priceData.map((point, index) => {
     const x = (index / (props.priceData.length - 1)) * chartWidth
-    const y = chartHeight - ((point.price - minPrice) / (maxPrice - minPrice)) * chartHeight
+    const y = chartHeight - ((point.price - minPrice) / priceRange) * chartHeight
     return { x, y, price: point.price, time: point.time }
   })
 })
 
-// Portfolio data points for chart
 const portfolioPoints = computed(() => {
-  if (!portfolioValues.value.length || !props.priceData.length) return []
+  if (!portfolioValues.value.length) return []
 
-  const portfolioPrices = portfolioValues.value.map(pv => pv.value)
-  const minPortfolio = Math.min(...portfolioPrices)
-  const maxPortfolio = Math.max(...portfolioPrices)
+  const values = portfolioValues.value.map(p => p.value)
+  const minValue = Math.min(...values)
+  const maxValue = Math.max(...values)
+  const valueRange = maxValue - minValue || 1
 
   return portfolioValues.value.map((portfolioValue, index) => {
     const x = (index / (props.priceData.length - 1)) * chartWidth
-    const y = chartHeight - ((portfolioValue.value - minPortfolio) / (maxPortfolio - minPortfolio)) * chartHeight
-
+    const y = chartHeight - ((portfolioValue.value - minValue) / valueRange) * chartHeight
     return {
       x,
       y,
@@ -394,63 +424,124 @@ const portfolioPath = computed(() => {
   return `M ${points}`
 })
 
-// Left Y-axis labels (Price)
-const leftYLabels = computed(() => {
-  if (activeView.value === 'price' || activeView.value === 'both') {
-    const priceRange = Math.max(...props.priceData.map(p => p.price)) - Math.min(...props.priceData.map(p => p.price))
-    const priceMin = Math.min(...props.priceData.map(p => p.price))
+const portfolioAreaPath = computed(() => {
+  if (!portfolioPoints.value.length || activeView.value !== 'both') return ''
 
-    const labels = []
-    for (let i = 0; i <= 5; i++) {
-      const value = priceMin + (priceRange * (5 - i)) / 5
-      labels.push({
-        value,
-        y: (i * chartHeight) / 5,
-        text: `$${value.toFixed(0)}`
-      })
-    }
-    return labels
-  }
-  return []
+  const portfolioPointsList = portfolioPoints.value
+  const firstPoint = portfolioPointsList[0]
+  const lastPoint = portfolioPointsList[portfolioPointsList.length - 1]
+
+  // Create area path: portfolio line + bottom line + back to start
+  const portfolioLine = portfolioPointsList.map(p => `${p.x},${p.y}`).join(' L ')
+  return `M ${portfolioLine} L ${lastPoint.x},${chartHeight} L ${firstPoint.x},${chartHeight} Z`
 })
 
-// Right Y-axis labels (Portfolio)
-const rightYLabels = computed(() => {
-  if (activeView.value === 'both' || activeView.value === 'portfolio') {
-    // Use the same portfolio values that are actually displayed in the chart
-    const portfolioPrices = portfolioValues.value.map(pv => pv.value)
-    const portfolioMin = Math.min(...portfolioPrices)
-    const portfolioMax = Math.max(...portfolioPrices)
+// Y-axis labels
+const leftYLabels = computed(() => {
+  if (!props.priceData.length || (activeView.value !== 'price' && activeView.value !== 'both')) return []
 
-    const labels = []
-    for (let i = 0; i <= 5; i++) {
-      const value = portfolioMin + ((portfolioMax - portfolioMin) * (5 - i)) / 5
-      labels.push({
-        value,
-        y: (i * chartHeight) / 5,
-        text: `$${value.toFixed(0)}`
-      })
-    }
-    return labels
+  const prices = props.priceData.map(p => p.price)
+  const minPrice = Math.min(...prices)
+  const maxPrice = Math.max(...prices)
+  const labels = []
+
+  for (let i = 0; i <= 5; i++) {
+    const value = minPrice + ((maxPrice - minPrice) * (5 - i)) / 5
+    labels.push({
+      value,
+      y: (i * chartHeight) / 5,
+      text: `$${value.toFixed(0)}`
+    })
   }
-  return []
+  return labels
+})
+
+const rightYLabels = computed(() => {
+  if (!portfolioValues.value.length || (activeView.value !== 'portfolio' && activeView.value !== 'both')) return []
+
+  const values = portfolioValues.value.map(p => p.value)
+  const minValue = Math.min(...values)
+  const maxValue = Math.max(...values)
+  const labels = []
+
+  for (let i = 0; i <= 5; i++) {
+    const value = minValue + ((maxValue - minValue) * (5 - i)) / 5
+    labels.push({
+      value,
+      y: (i * chartHeight) / 5,
+      text: `$${value.toFixed(0)}`
+    })
+  }
+  return labels
 })
 
 const xLabels = computed(() => {
   if (!props.priceData.length) return []
 
   const labels = []
-  const step = Math.floor(props.priceData.length / 6)
+  const numLabels = 6
+  const step = Math.floor(props.priceData.length / (numLabels - 1))
 
-  for (let i = 0; i < props.priceData.length; i += step) {
+  for (let i = 0; i < props.priceData.length && labels.length < numLabels; i += step) {
     const date = new Date(props.priceData[i].time)
     labels.push({
       date: props.priceData[i].time,
       x: (i / (props.priceData.length - 1)) * chartWidth,
-      text: date.toLocaleDateString()
+      text: date.toLocaleDateString('en-US', { month: 'short', day: 'numeric' })
     })
   }
   return labels
+})
+
+// Trade markers with correct positioning
+const tradeMarkers = computed(() => {
+  if (!props.trades.length || !props.priceData.length) return []
+
+  return props.trades.map((trade, index) => {
+    const tradeTime = new Date(trade.time).getTime()
+    const tradePrice = parseFloat(trade.price)
+
+    // Find the closest price data points for interpolation
+    let x = 0
+    let y = 0
+
+    // Find where this trade fits in the price timeline
+    for (let i = 0; i < props.priceData.length - 1; i++) {
+      const currentTime = new Date(props.priceData[i].time).getTime()
+      const nextTime = new Date(props.priceData[i + 1].time).getTime()
+
+      if (tradeTime >= currentTime && tradeTime <= nextTime) {
+        // Interpolate between these two points
+        const timeRatio = (tradeTime - currentTime) / (nextTime - currentTime)
+        x = ((i + timeRatio) / (props.priceData.length - 1)) * chartWidth
+        break
+      }
+    }
+
+    // Handle edge cases
+    if (x === 0) {
+      if (tradeTime <= new Date(props.priceData[0].time).getTime()) {
+        x = 0
+      } else if (tradeTime >= new Date(props.priceData[props.priceData.length - 1].time).getTime()) {
+        x = chartWidth
+      }
+    }
+
+    // Calculate Y position based on price
+    const prices = props.priceData.map(p => p.price)
+    const minPrice = Math.min(...prices)
+    const maxPrice = Math.max(...prices)
+    const priceRange = maxPrice - minPrice || 1
+    y = chartHeight - ((tradePrice - minPrice) / priceRange) * chartHeight
+
+    return {
+      id: `trade-${index}`,
+      ...trade,
+      x,
+      y,
+      price: tradePrice
+    }
+  })
 })
 
 // Performance metrics
@@ -460,13 +551,21 @@ const maxDrawdown = computed(() => {
 })
 
 const winRate = computed(() => {
-  if (!props.trades.length) return 0
+  if (!props.result?.allTrades?.length) return 0
 
-  const winningTrades = props.trades.filter(trade =>
-    trade.note.includes('TP') || trade.note.includes('trailing stop')
-  ).length
+  const trades = props.result.allTrades
+  let wins = 0
+  let total = 0
 
-  return (winningTrades / props.trades.length) * 100
+  // Simple win rate calculation based on profitable trades
+  trades.forEach(trade => {
+    if (trade.pnl !== undefined) {
+      total++
+      if (trade.pnl > 0) wins++
+    }
+  })
+
+  return total > 0 ? (wins / total) * 100 : 0
 })
 
 const sharpeRatio = computed(() => {
@@ -483,7 +582,7 @@ const sharpeRatio = computed(() => {
   const avgReturn = returns.reduce((sum, ret) => sum + ret, 0) / returns.length
   const stdDev = Math.sqrt(returns.reduce((sum, ret) => sum + Math.pow(ret - avgReturn, 2), 0) / returns.length)
 
-  return stdDev === 0 ? 0 : (avgReturn / stdDev) * Math.sqrt(252) // Annualized
+  return stdDev === 0 ? 0 : (avgReturn / stdDev) * Math.sqrt(252)
 })
 
 const volatility = computed(() => {
@@ -501,242 +600,124 @@ const volatility = computed(() => {
   const variance = returns.reduce((sum, ret) => sum + Math.pow(ret - mean, 2), 0) / returns.length
   const stdDev = Math.sqrt(variance)
 
-  return stdDev * Math.sqrt(252) * 100 // Annualized percentage
+  return stdDev * Math.sqrt(252) * 100
 })
 
-const showPoints = ref(true)
-
-// Calculate trade marker positions on chart
-const tradeMarkers = computed(() => {
-  if (!props.trades.length || !props.priceData.length) return []
-
-  // Sort trades by time
-  const sortedTrades = [...props.trades].sort((a, b) => new Date(a.time) - new Date(b.time))
-
-  // Calculate price range including trade prices to ensure all markers fit
-  const prices = props.priceData.map(p => p.price)
-  const tradePrices = sortedTrades.map(t => parseFloat(t.price))
-  const allPrices = [...prices, ...tradePrices]
-  const minPrice = Math.min(...allPrices)
-  const maxPrice = Math.max(...allPrices)
-
-  return sortedTrades.map((trade, index) => {
-    // Find the exact position by interpolating between price data points
-    let x = 0
-    let y = 0
-    const tradePrice = parseFloat(trade.price)
-
-    if (props.priceData.length === 1) {
-      // Single price point
-      x = chartWidth / 2
-      y = chartHeight - ((tradePrice - minPrice) / (maxPrice - minPrice)) * chartHeight
-    } else {
-      // Find the two price points to interpolate between
-      const tradeTime = new Date(trade.time).getTime()
-
-      // Handle edge cases
-      if (tradeTime <= props.priceData[0].time) {
-        // Trade before first price point
-        x = 0
-        y = chartHeight - ((tradePrice - minPrice) / (maxPrice - minPrice)) * chartHeight
-      } else if (tradeTime >= props.priceData[props.priceData.length - 1].time) {
-        // Trade after last price point
-        x = chartWidth
-        y = chartHeight - ((tradePrice - minPrice) / (maxPrice - minPrice)) * chartHeight
-      } else {
-        // Trade between price points - interpolate
-        for (let i = 0; i < props.priceData.length - 1; i++) {
-          const currentPoint = props.priceData[i]
-          const nextPoint = props.priceData[i + 1]
-
-          if (tradeTime >= currentPoint.time && tradeTime <= nextPoint.time) {
-            // Interpolate between these two points
-            const timeRange = nextPoint.time - currentPoint.time
-            const tradeTimeFromStart = tradeTime - currentPoint.time
-            const ratio = timeRange > 0 ? tradeTimeFromStart / timeRange : 0
-
-            x = (i / (props.priceData.length - 1)) * chartWidth + (ratio * chartWidth / (props.priceData.length - 1))
-            y = chartHeight - ((tradePrice - minPrice) / (maxPrice - minPrice)) * chartHeight
-            break
-          }
-        }
-      }
-    }
-
-    // Ensure y is within bounds
-    y = Math.max(0, Math.min(chartHeight, y))
-
-    return {
-      ...trade,
-      index,
-      x,
-      y,
-      closestIndex: Math.round(x / chartWidth * (props.priceData.length - 1))
-    }
-  })
-})
-
-// Event handlers
+// Mouse event handlers
 const handleMouseMove = (event) => {
   const rect = chartSvg.value.getBoundingClientRect()
-  const x = event.clientX - rect.left - margin.left
-  const y = event.clientY - rect.top - margin.top
+  const mouseX = event.clientX - rect.left
+  const mouseY = event.clientY - rect.top
 
-  if (x >= 0 && x <= chartWidth && y >= 0 && y <= chartHeight) {
-    const tooltipWidth = tooltipData.value?.buyHold !== undefined ? 220 : 180
-    const chartRightEdge = width - margin.right
+  // Check if mouse is within chart area
+  if (mouseX >= margin.left && mouseX <= svgWidth - margin.right &&
+      mouseY >= margin.top && mouseY <= svgHeight - margin.bottom) {
 
-    // Position tooltip to the right by default, but flip to left if it would go off-screen
-    let tooltipX = event.clientX - rect.left + 10
-    let offsetX = 0
+    const chartX = mouseX - margin.left
+    hoverLine.value = { x: chartX }
 
-    if (tooltipX + tooltipWidth > chartRightEdge) {
-      // Position tooltip to the left of cursor
-      tooltipX = event.clientX - rect.left - tooltipWidth - 10
-      offsetX = 0
-    } else {
-      // Position tooltip to the right of cursor
-      offsetX = 0
-    }
-
-    tooltip.value = {
-      x: tooltipX,
-      y: event.clientY - rect.top,
-      offsetX: offsetX
-    }
-
-    // Find closest data point index
+    // Find closest data point
     const totalPoints = props.priceData.length
-    const index = Math.round((x / chartWidth) * (totalPoints - 1))
+    const index = Math.round((chartX / chartWidth) * (totalPoints - 1))
     const clampedIndex = Math.max(0, Math.min(totalPoints - 1, index))
 
     if (props.priceData[clampedIndex] && portfolioValues.value[clampedIndex] && buyHoldValues.value[clampedIndex]) {
-      const currentPrice = props.priceData[clampedIndex].price
-      const portfolioValue = portfolioValues.value[clampedIndex].value
-      const buyHoldValue = buyHoldValues.value[clampedIndex].value
-      const vsBuyHold = portfolioValue - buyHoldValue
-      const vsBuyHoldPct = buyHoldValue !== 0 ? (vsBuyHold / buyHoldValue) * 100 : 0
+      const priceData = props.priceData[clampedIndex]
+      const portfolioData = portfolioValues.value[clampedIndex]
+      const buyHoldData = buyHoldValues.value[clampedIndex]
 
-      // For tooltip, show the actual portfolio value at this point in time
-      const actualPortfolioValue = portfolioValue
+      const vsBuyHold = portfolioData.value - buyHoldData.value
+      const vsBuyHoldPct = buyHoldData.value !== 0 ? (vsBuyHold / buyHoldData.value) * 100 : 0
 
       tooltipData.value = {
-        date: new Date(props.priceData[clampedIndex].time).toLocaleString(),
-        price: currentPrice,
-        portfolio: actualPortfolioValue,
-        buyHold: buyHoldValue,
+        date: new Date(priceData.time).toLocaleString(),
+        price: priceData.price,
+        portfolio: portfolioData.value,
+        buyHold: buyHoldData.value,
         vsBuyHold: vsBuyHold,
         vsBuyHoldPct: vsBuyHoldPct,
-        drawdown: portfolioValues.value[clampedIndex].drawdown
+        drawdown: portfolioData.drawdown
+      }
+
+      // Position tooltip
+      const tooltipWidth = 220
+      const tooltipHeight = 130
+      let tooltipX = mouseX + 10
+      let tooltipY = mouseY - 10
+
+      // Adjust if tooltip would go off-screen
+      if (tooltipX + tooltipWidth > svgWidth) {
+        tooltipX = mouseX - tooltipWidth - 10
+      }
+      if (tooltipY + tooltipHeight > svgHeight) {
+        tooltipY = mouseY - tooltipHeight + 20
+      }
+
+      tooltip.value = {
+        x: tooltipX,
+        y: tooltipY,
+        width: tooltipWidth,
+        height: tooltipHeight
       }
 
       showTooltip.value = true
     }
+  } else {
+    hoverLine.value = { x: null }
+    showTooltip.value = false
   }
 }
 
-const showPointTooltip = (event, point, type) => {
-  const tooltipWidth = tooltipData.value?.buyHold !== undefined ? 220 : 180
-  const chartRightEdge = width - margin.right
-
-  // Position tooltip to the right by default, but flip to left if it would go off-screen
-  let tooltipX = event.clientX + 10
-  let offsetX = 0
-
-  if (tooltipX + tooltipWidth > chartRightEdge) {
-    // Position tooltip to the left of cursor
-    tooltipX = event.clientX - tooltipWidth - 10
-    offsetX = 0
-  } else {
-    // Position tooltip to the right of cursor
-    offsetX = 0
-  }
-
-  tooltip.value = {
-    x: tooltipX,
-    y: event.clientY,
-    offsetX: offsetX
-  }
-
-  // Find the corresponding price data point for this portfolio point
-  const pointIndex = portfolioPoints.value.findIndex(p => p.x === point.x && p.y === point.y)
-  const pricePoint = props.priceData[pointIndex]
-  const buyHoldPoint = buyHoldValues.value[pointIndex]
-
-  if (pricePoint && buyHoldPoint) {
-    // Use the actual calculated portfolio value for consistency
-    const actualPortfolioValue = point.value
-    const vsBuyHold = actualPortfolioValue - buyHoldPoint.value
-    const vsBuyHoldPct = buyHoldPoint.value !== 0 ? ((actualPortfolioValue - buyHoldPoint.value) / buyHoldPoint.value) * 100 : 0
-
-    tooltipData.value = {
-      date: new Date(point.time).toLocaleString(),
-      price: pricePoint.price,
-      portfolio: actualPortfolioValue,
-      buyHold: buyHoldPoint.value,
-      vsBuyHold: vsBuyHold,
-      vsBuyHoldPct: vsBuyHoldPct,
-      drawdown: point.drawdown || null
-    }
-  } else {
-    tooltipData.value = {
-      date: new Date(point.time).toLocaleString(),
-      price: type === 'price' ? point.price : null,
-      portfolio: type === 'portfolio' ? point.value : null,
-      drawdown: point.drawdown || null
-    }
-  }
-  showTooltip.value = true
+const handleMouseLeave = () => {
+  hoverLine.value = { x: null }
+  showTooltip.value = false
 }
 
 const showTradeTooltip = (event, marker) => {
+  const rect = chartSvg.value.getBoundingClientRect()
+  const mouseX = event.clientX - rect.left
+  const mouseY = event.clientY - rect.top
+
+  tooltipData.value = {
+    date: new Date(marker.time).toLocaleString(),
+    price: marker.price,
+    side: marker.side,
+    qty: parseFloat(marker.qty),
+    value: parseFloat(marker.qty) * marker.price,
+    note: marker.note || 'Trade execution'
+  }
+
+  // Position tooltip
   const tooltipWidth = 200
-  const chartRightEdge = width - margin.right
+  const tooltipHeight = 100
+  let tooltipX = mouseX + 10
+  let tooltipY = mouseY - 10
 
-  // Position tooltip to the right by default, but flip to left if it would go off-screen
-  let tooltipX = event.clientX + 10
-  let offsetX = 0
-
-  if (tooltipX + tooltipWidth > chartRightEdge) {
-    // Position tooltip to the left of cursor
-    tooltipX = event.clientX - tooltipWidth - 10
-    offsetX = 0
-  } else {
-    // Position tooltip to the right of cursor
-    offsetX = 0
+  if (tooltipX + tooltipWidth > svgWidth) {
+    tooltipX = mouseX - tooltipWidth - 10
+  }
+  if (tooltipY + tooltipHeight > svgHeight) {
+    tooltipY = mouseY - tooltipHeight + 20
   }
 
   tooltip.value = {
     x: tooltipX,
-    y: event.clientY,
-    offsetX: offsetX
-  }
-
-  // Get the corresponding price data point for this trade
-  const pricePoint = props.priceData[marker.closestIndex]
-
-  tooltipData.value = {
-    date: new Date(marker.time).toLocaleString(),
-    price: parseFloat(marker.price),
-    side: marker.side,
-    qty: parseFloat(marker.qty),
-    value: parseFloat(marker.qty) * parseFloat(marker.price),
-    note: marker.note || 'No note'
+    y: tooltipY,
+    width: tooltipWidth,
+    height: tooltipHeight
   }
 
   showTooltip.value = true
 }
 
 // Watch for data changes
-watch([() => props.trades, () => props.priceData], () => {
+watch([() => props.trades, () => props.priceData, () => props.result], () => {
   dataReady.value = false
   nextTick(() => {
     dataReady.value = true
     emit('data-ready', true)
   })
 }, { deep: true })
-
-
 
 onMounted(() => {
   dataReady.value = true

@@ -1,6 +1,6 @@
 <template>
   <div class="bg-base-200/60 rounded-lg shadow-md p-6">
-    <h2 class="text-xl font-semibold mb-4 text-gray-900 dark:text-white">
+    <h2 class="text-xl font-semibold mb-4 text-white">
       Strategy Configuration
     </h2>
 
@@ -19,7 +19,7 @@
     <form @submit.prevent="$emit('run-backtest')" class="space-y-4">
       <!-- Basic Settings -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Basic Settings</h3>
+        <h3 class="text-lg font-medium text-white">Basic Settings</h3>
         <p class="italic">{{ isCustomParameters ? 'Custom Algo Trading Bot Parameters.' : 'Current Zillions Apps default Algo Trading Bot Parameters.' }}</p>
 
         <div>
@@ -112,7 +112,7 @@
 
       <!-- Advanced Settings -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-gray-900 dark:text-white">Advanced Settings</h3>
+        <h3 class="text-lg font-medium text-white">Advanced Settings</h3>
 
         <div class="flex items-center">
           <input

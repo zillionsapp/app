@@ -64,8 +64,8 @@
           <button class="flex-1 btn btn-lg rounded-2xl btn-ghost gap-2" @click="handleSend">
             Send
           </button>
-          <NuxtLink to="/simulation" class="flex-1 btn btn-lg rounded-2xl btn-secondary gap-2">
-            Simulation
+          <NuxtLink to="/backtest" class="flex-1 btn btn-lg rounded-2xl btn-secondary gap-2">
+            Backtest
           </NuxtLink>
         </div>
       </div>

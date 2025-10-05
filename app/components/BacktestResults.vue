@@ -11,7 +11,7 @@
 
     <!-- Summary Cards -->
     <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+      <div class="bg-base-200 rounded-lg shadow-md p-4">
         <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Portfolio Value</div>
         <div class="text-2xl font-bold text-primary">
           ${{ result.result.equity.toFixed(2) }}
@@ -21,7 +21,7 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+      <div class="bg-base-200 rounded-lg shadow-md p-4">
         <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Strategy PnL</div>
         <div class="text-2xl font-bold text-green-600 dark:text-green-400">
           ${{ (result.result.equity - result.config.initialCapital).toFixed(2) }}
@@ -31,7 +31,7 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+      <div class="bg-base-200 rounded-lg shadow-md p-4">
         <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Buy & Hold PnL</div>
         <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
           ${{ buyHoldPnL.toFixed(2) }}
@@ -41,7 +41,7 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+      <div class="bg-base-200 rounded-lg shadow-md p-4">
         <div class="text-sm font-medium text-gray-500 dark:text-gray-400">vs Buy & Hold</div>
         <div :class="strategyVsBuyHold >= 0 ? 'text-2xl font-bold text-green-600 dark:text-green-400' : 'text-2xl font-bold text-red-600 dark:text-red-400'">
           {{ strategyVsBuyHold >= 0 ? '+' : '' }}${{ strategyVsBuyHold.toFixed(2) }}
@@ -51,7 +51,7 @@
         </div>
       </div>
 
-      <div class="bg-white dark:bg-gray-800 rounded-lg shadow-md p-4">
+      <div class="bg-base-200 rounded-lg shadow-md p-4">
         <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Win Rate</div>
         <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
           {{ winRate.toFixed(1) }}%
@@ -61,12 +61,12 @@
 
     <!-- Trades Analyzer -->
     <div class="bg-base-200/60 rounded-lg shadow-md p-6">
-      <h3 class="text-lg font-semibold mb-4 text-gray-900 dark:text-white">Trades Analyzer</h3>
+      <h3 class="text-lg font-semibold mb-4 text-white">Trades Analyzer</h3>
       <!-- Summary Stats -->
       <div class="my-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-        <div class="bg-gray-50 dark:bg-gray-800 rounded-lg p-3">
+        <div class="bg-base-200 rounded-lg p-3">
           <div class="text-gray-500 dark:text-gray-400">Total Trades</div>
-          <div class="text-lg font-semibold text-gray-900 dark:text-white">{{ roundTripTrades.length }}</div>
+          <div class="text-lg font-semibold text-white">{{ roundTripTrades.length }}</div>
         </div>
         <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
           <div class="text-gray-500 dark:text-gray-400">Winning Trades</div>
@@ -85,7 +85,7 @@
       <!-- Trades Table -->
       <div class="overflow-x-auto">
         <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
-          <thead class="bg-gray-50 dark:bg-gray-700">
+          <thead class="bg-base-200">
             <tr>
               <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
                 Trade #
@@ -121,25 +121,25 @@
           </thead>
           <tbody class="bg-base-200/60 divide-y divide-gray-200 dark:divide-gray-700">
             <tr v-for="(roundTrip, index) in roundTripTrades" :key="index" :class="roundTrip.pnl >= 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900 dark:text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                 {{ index + 1 }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                 {{ formatDate(roundTrip.entryTime) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                 {{ formatDate(roundTrip.exitTime) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                 {{ roundTrip.duration }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                 ${{ roundTrip.entryPrice }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                 ${{ roundTrip.exitPrice }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900 dark:text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                 {{ roundTrip.quantity }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="roundTrip.pnl >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
@@ -185,7 +185,7 @@ const formatDate = (dateString) => {
   return new Date(dateString).toLocaleString()
 }
 
-// Buy & Hold Calculations
+// Buy & Hold Calculations - FIXED to match chart calculations
 const buyHoldPnL = computed(() => {
   if (!props.result || !props.result.priceData.length) return 0
 
@@ -193,7 +193,7 @@ const buyHoldPnL = computed(() => {
   const lastPrice = props.result.priceData[props.result.priceData.length - 1].price
   const initialCapital = props.result.config.initialCapital
 
-  // Calculate how many units could be bought initially
+  // Calculate how many units could be bought initially (no commission for buy & hold)
   const initialUnits = initialCapital / firstPrice
   const finalValue = initialUnits * lastPrice
 
@@ -208,7 +208,7 @@ const buyHoldFinalValue = computed(() => {
   const lastPrice = props.result.priceData[props.result.priceData.length - 1].price
   const initialCapital = props.result.config.initialCapital
 
-  // Calculate how many units could be bought initially
+  // Calculate how many units could be bought initially (no commission for buy & hold)
   const initialUnits = initialCapital / firstPrice
   return initialUnits * lastPrice
 })
