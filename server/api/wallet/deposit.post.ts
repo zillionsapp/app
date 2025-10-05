@@ -1,0 +1,88 @@
+// server/api/wallet/deposit.post.ts
+import Airtable from 'airtable'
+
+interface DepositRequest {
+  amount: number
+  email: string
+}
+
+export default defineEventHandler(async (event) => {
+  try {
+    const body = await readBody<DepositRequest>(event)
+    const { amount, email } = body
+
+    // Validate input
+    if (!amount || amount <= 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Amount must be greater than 0'
+      })
+    }
+
+    if (!email) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Email is required'
+      })
+    }
+
+    // Initialize Airtable
+    const base = new Airtable({
+      apiKey: process.env.AIRTABLE_API_KEY
+    }).base(process.env.AIRTABLE_BASE_ID || '')
+
+    const tableName = process.env.AIRTABLE_WALLET_TABLE || 'Wallets'
+
+    // Check if user already has a wallet record
+    const existingRecords = await base(tableName)
+      .select({
+        filterByFormula: `{email} = '${email}'`,
+        maxRecords: 1
+      })
+      .all()
+
+    const now = new Date().toISOString()
+
+    if (existingRecords.length > 0) {
+      // Update existing record
+      const existingRecord = existingRecords[0]
+      if (existingRecord) {
+        const currentAmount = existingRecord.fields.amount as number || 0
+        const newAmount = currentAmount + amount
+
+        await base(tableName).update(existingRecord.id, {
+          amount: newAmount,
+          updated_at: now
+        })
+
+        return {
+          success: true,
+          action: 'updated',
+          newBalance: newAmount,
+          email
+        }
+      }
+    } else {
+      // Create new record
+      await base(tableName).create({
+        email,
+        amount,
+        created_at: now,
+        updated_at: now
+      })
+
+      return {
+        success: true,
+        action: 'created',
+        newBalance: amount,
+        email
+      }
+    }
+  } catch (error: any) {
+    console.error('Deposit API error:', error)
+    throw createError({
+      statusCode: 500,
+      statusMessage: error.message || 'Failed to deposit funds'
+    })
+  }
+})

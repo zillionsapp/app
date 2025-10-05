@@ -1,0 +1,117 @@
+// server/api/wallet/send.post.ts
+import Airtable from 'airtable'
+
+interface SendRequest {
+  amount: number
+  fromEmail: string
+  toEmail: string
+}
+
+export default defineEventHandler(async (event) => {
+  try {
+    const body = await readBody<SendRequest>(event)
+    const { amount, fromEmail, toEmail } = body
+
+    // Validate input
+    if (!amount || amount <= 0) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Amount must be greater than 0'
+      })
+    }
+
+    if (!fromEmail || !toEmail) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Both sender and recipient emails are required'
+      })
+    }
+
+    if (fromEmail === toEmail) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Cannot send money to yourself'
+      })
+    }
+
+    // Initialize Airtable
+    const base = new Airtable({
+      apiKey: process.env.AIRTABLE_API_KEY
+    }).base(process.env.AIRTABLE_BASE_ID || '')
+
+    const tableName = process.env.AIRTABLE_WALLET_TABLE || 'Wallets'
+
+    // Get current wallet records for both users
+    const [fromRecords, toRecords] = await Promise.all([
+      base(tableName)
+        .select({
+          filterByFormula: `{email} = '${fromEmail}'`,
+          maxRecords: 1
+        })
+        .all(),
+      base(tableName)
+        .select({
+          filterByFormula: `{email} = '${toEmail}'`,
+          maxRecords: 1
+        })
+        .all()
+    ])
+
+    const fromRecord = fromRecords[0]
+    const toRecord = toRecords[0]
+
+    // Check if sender has sufficient funds
+    const fromCurrentAmount = fromRecord ? (fromRecord.fields.amount as number || 0) : 0
+    if (fromCurrentAmount < amount) {
+      throw createError({
+        statusCode: 400,
+        statusMessage: 'Insufficient funds'
+      })
+    }
+
+    const now = new Date().toISOString()
+
+    // Update sender's amount (subtract)
+    const fromNewAmount = fromCurrentAmount - amount
+    if (fromRecord && fromRecord.id) {
+      await base(tableName).update(fromRecord.id, {
+        amount: fromNewAmount,
+        updated_at: now
+      })
+    }
+
+    // Update or create receiver's amount (add)
+    if (toRecord) {
+      const toCurrentAmount = toRecord.fields.amount as number || 0
+      const toNewAmount = toCurrentAmount + amount
+      await base(tableName).update(toRecord.id, {
+        amount: toNewAmount,
+        updated_at: now
+      })
+    } else {
+      await base(tableName).create({
+        email: toEmail,
+        amount,
+        created_at: now,
+        updated_at: now
+      })
+    }
+
+    return {
+      success: true,
+      fromEmail,
+      toEmail,
+      amount,
+      fromNewBalance: fromNewAmount,
+      toNewBalance: toRecord
+        ? (toRecord.fields.amount as number || 0) + amount
+        : amount
+    }
+  } catch (error: any) {
+    console.error('Send API error:', error)
+    throw createError({
+      statusCode: 500,
+      statusMessage: error.message || 'Failed to send funds'
+    })
+  }
+})

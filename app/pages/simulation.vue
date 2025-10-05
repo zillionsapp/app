@@ -7,7 +7,7 @@
           ← Back to Wallet
         </NuxtLink>
         <h1 class="text-3xl font-bold mb-2">Trading Rules – Mini Simulation</h1>
-        <p class="text-base-content/70">
+        <p class="text-white/70">
           Goal: Interactively test how <b>"sell only in profit"</b> + <b>Stop-Loss</b> + <b>Position Sizing</b> with a high hit rate protects capital.
         </p>
       </div>
@@ -136,7 +136,7 @@
                 What is being simulated?
               </summary>
               <div class="collapse-content">
-                <p class="text-sm text-base-content/70">
+                <p class="text-sm text-white/70">
                   Position size = (Risk% × Capital) ÷ SL%. Winning trades take TP%, losing trades take SL%.<br>
                   "Sell only in profit" ⇒ There is <i>no</i> voluntary exit in the negative, only SL.
                   This way a single crash cannot wipe out the account as long as position sizing remains disciplined.
@@ -165,19 +165,19 @@
             <!-- KPIs -->
             <div class="grid grid-cols-3 gap-4 mt-6">
               <div class="bg-base-200 p-4 rounded-lg">
-                <div class="text-xs text-base-content/60 uppercase tracking-wide">Final Capital</div>
+                <div class="text-xs text-white/60 uppercase tracking-wide">Final Capital</div>
                 <div class="text-lg font-bold" :class="kpiClass(finalCapital)">
                   {{ formatCurrency(finalCapital) }}
                 </div>
               </div>
               <div class="bg-base-200 p-4 rounded-lg">
-                <div class="text-xs text-base-content/60 uppercase tracking-wide">Max Drawdown</div>
+                <div class="text-xs text-white/60 uppercase tracking-wide">Max Drawdown</div>
                 <div class="text-lg font-bold text-warning">
                   {{ formatPercent(maxDrawdown) }}
                 </div>
               </div>
               <div class="bg-base-200 p-4 rounded-lg">
-                <div class="text-xs text-base-content/60 uppercase tracking-wide">Win Rate (Realized)</div>
+                <div class="text-xs text-white/60 uppercase tracking-wide">Win Rate (Realized)</div>
                 <div class="text-lg font-bold" :class="kpiClass(winRate)">
                   {{ formatPercent(winRate) }}
                 </div>
@@ -191,7 +191,7 @@
           <div class="card-body">
             <div class="flex items-center gap-2 mb-4">
               <div class="w-3 h-3 bg-primary rounded-full"></div>
-              <span class="text-sm text-base-content/70">Equity Curve</span>
+              <span class="text-sm text-white/70">Equity Curve</span>
             </div>
 
             <div class="relative">
@@ -205,7 +205,7 @@
               ></canvas>
               <div
                 v-if="tooltip.show"
-                class="absolute bg-base-300 text-base-content text-xs p-2 rounded shadow-lg pointer-events-none z-10"
+                class="absolute bg-base-300 text-white text-xs p-2 rounded shadow-lg pointer-events-none z-10"
                 :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px' }"
               >
                 <div>Trade #{{ tooltip.index }}</div>
@@ -223,8 +223,8 @@
                 :height="histHeight"
                 class="w-full border border-base-300 rounded-lg"
               ></canvas>
-              <p v-if="mcSummary" class="text-sm text-base-content/70 mt-2" v-html="mcSummary"></p>
-              <p class="text-xs text-base-content/50 mt-4">
+              <p v-if="mcSummary" class="text-sm text-white/70 mt-2" v-html="mcSummary"></p>
+              <p class="text-xs text-white/50 mt-4">
                 Note: This simplified simulation is not financial advice. It serves to mechanically visualize the interplay of <b>Stop-Loss</b>,
                 <b>Position Sizing</b> and <b>sell only in profit</b>.
               </p>
@@ -291,7 +291,7 @@ const winRate = computed(() => {
 const kpiClass = (value: number) => {
   if (value > state.capital) return 'text-success'
   if (value < state.capital) return 'text-error'
-  return 'text-base-content'
+  return 'text-white'
 }
 
 // Core simulation (single path)

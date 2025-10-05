@@ -70,12 +70,30 @@
         </div>
       </div>
     </div>
+
+    <!-- Modals -->
+    <DepositModal
+      :show="showDepositModal"
+      :user-email="currentUserEmail"
+      @close="showDepositModal = false"
+      @success="handleDepositSuccess"
+    />
+
+    <SendModal
+      :show="showSendModal"
+      :from-email="currentUserEmail"
+      @close="showSendModal = false"
+      @success="handleSendSuccess"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { computed, ref, onMounted } from 'vue'
 import { useSeries, PERIODS, type Period } from '@/composables/useSeries'
+import { useWallet } from '@/composables/useWallet'
+import DepositModal from '@/components/DepositModal.vue'
+import SendModal from '@/components/SendModal.vue'
 
 // Protect this page with authentication
 definePageMeta({
@@ -198,6 +216,36 @@ const {
 
 const periods = periodsArr as unknown as string[]
 
+/* Wallet composable */
+const {
+  loading: walletLoading,
+  error: walletError,
+  deposit: walletDeposit,
+  send: walletSend,
+  getBalance,
+  clearError: clearWalletError
+} = useWallet()
+
+/* Modal state */
+const showDepositModal = ref(false)
+const showSendModal = ref(false)
+const currentUserEmail = ref<string>('')
+
+/* Get current user email for modals */
+const getCurrentUserEmail = async (): Promise<string> => {
+  try {
+    const { user } = useUser()
+    return user.value?.primaryEmailAddress?.emailAddress ?? ''
+  } catch {
+    return ''
+  }
+}
+
+/* Initialize current user email on component mount */
+onMounted(async () => {
+  currentUserEmail.value = await getCurrentUserEmail()
+})
+
 /* Balance headline uses live current value if available */
 const currency = computed(() => props.currency)
 const deposited = computed(() => props.deposited)
@@ -245,20 +293,37 @@ const areaPath = computed(() => {
   ].join(' ')
 })
 
-/* Action handlers */
+/* Modal handlers */
 const handleDeposit = () => {
-  console.log('Deposit clicked from main component')
-  emit('deposit')
-}
+  // Check if user is authenticated and get email
+  const email = currentUserEmail.value || ''
+  if (!email) {
+    alert('Please sign in to deposit funds')
+    return
+  }
 
-const handleWithdraw = () => {
-  console.log('Withdraw clicked from main component')
-  emit('withdraw')
+  showDepositModal.value = true
 }
 
 const handleSend = () => {
-  console.log('Send clicked from main component')
-  emit('send')
+  // Check if user is authenticated and get email
+  const email = currentUserEmail.value || ''
+  if (!email) {
+    alert('Please sign in to send funds')
+    return
+  }
+
+  showSendModal.value = true
+}
+
+const handleDepositSuccess = () => {
+  alert('Deposit successful!')
+  clearWalletError()
+}
+
+const handleSendSuccess = () => {
+  alert('Send successful!')
+  clearWalletError()
 }
 
 /* Utils */
