@@ -20,6 +20,8 @@ export default defineEventHandler(async (event) => {
       id: record.id,
       email: record.fields.email as string,
       amount: record.fields.amount as number || 0,
+      sentTo: (record.fields.sentTo as string[]) || [],
+      receivedFrom: (record.fields.receivedFrom as string[]) || [],
       created_at: record.fields.created_at as string,
       updated_at: record.fields.updated_at as string
     }))

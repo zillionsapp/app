@@ -71,27 +71,36 @@ export default defineEventHandler(async (event) => {
 
     const now = new Date().toISOString()
 
-    // Update sender's amount (subtract)
+    // Update sender's amount (subtract) and add transaction history
     const fromNewAmount = fromCurrentAmount - amount
     if (fromRecord && fromRecord.id) {
+      // Get current sentTo history or initialize empty array
+      const currentSentTo = (fromRecord.fields.sentTo as string[]) || []
+
       await base(tableName).update(fromRecord.id, {
         amount: fromNewAmount,
+        sentTo: [...currentSentTo, toEmail],
         updated_at: now
       })
     }
 
-    // Update or create receiver's amount (add)
+    // Update or create receiver's amount (add) and add transaction history
     if (toRecord) {
       const toCurrentAmount = toRecord.fields.amount as number || 0
       const toNewAmount = toCurrentAmount + amount
+      // Get current receivedFrom history or initialize empty array
+      const currentReceivedFrom = (toRecord.fields.receivedFrom as string[]) || []
+
       await base(tableName).update(toRecord.id, {
         amount: toNewAmount,
+        receivedFrom: [...currentReceivedFrom, fromEmail],
         updated_at: now
       })
     } else {
       await base(tableName).create({
         email: toEmail,
         amount,
+        receivedFrom: [fromEmail],
         created_at: now,
         updated_at: now
       })

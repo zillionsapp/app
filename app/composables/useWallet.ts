@@ -5,6 +5,8 @@ interface WalletRecord {
   id?: string
   email: string
   amount: number
+  sentTo?: string[]
+  receivedFrom?: string[]
   created_at?: string
   updated_at?: string
 }
@@ -41,6 +43,10 @@ interface BalanceResponse {
   email: string
   balance: number
   exists: boolean
+  sentTo?: string[]
+  receivedFrom?: string[]
+  created_at?: string
+  updated_at?: string
 }
 
 interface AllWalletsResponse {

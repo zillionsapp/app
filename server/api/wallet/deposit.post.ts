@@ -6,6 +6,18 @@ interface DepositRequest {
   email: string
 }
 
+interface TransactionRecord {
+  id?: string
+  email: string
+  amount: number
+  type: 'deposit' | 'send' | 'receive'
+  sentTo?: string
+  receivedFrom?: string
+  relatedEmail?: string
+  created_at: string
+  updated_at: string
+}
+
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody<DepositRequest>(event)
@@ -63,7 +75,7 @@ export default defineEventHandler(async (event) => {
         }
       }
     } else {
-      // Create new record
+      // Create new wallet record
       await base(tableName).create({
         email,
         amount,

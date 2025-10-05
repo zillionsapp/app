@@ -32,12 +32,17 @@ export default defineEventHandler(async (event) => {
       .all()
 
     if (records.length > 0) {
-      const balance = records[0].fields.amount as number || 0
+      const record = records[0]
+      const balance = record.fields.amount as number || 0
       return {
         success: true,
         email,
         balance,
-        exists: true
+        exists: true,
+        sentTo: (record.fields.sentTo as string[]) || [],
+        receivedFrom: (record.fields.receivedFrom as string[]) || [],
+        created_at: record.fields.created_at as string,
+        updated_at: record.fields.updated_at as string
       }
     }
 
@@ -45,7 +50,9 @@ export default defineEventHandler(async (event) => {
       success: true,
       email,
       balance: 0,
-      exists: false
+      exists: false,
+      sentTo: [],
+      receivedFrom: []
     }
   } catch (error: any) {
     console.error('Get balance API error:', error)
