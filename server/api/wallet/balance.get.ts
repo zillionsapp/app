@@ -26,14 +26,14 @@ export default defineEventHandler(async (event) => {
 
     const records = await base(tableName)
       .select({
-        filterByFormula: `{email} = '${email}'`,
+        filterByFormula: `{Email} = '${email}'`,
         maxRecords: 1
       })
       .all()
 
     if (records.length > 0) {
       const record = records[0]
-      const balance = record.fields.amount as number || 0
+      const balance = record.fields.Amount as number || 0
       return {
         success: true,
         email,
@@ -41,8 +41,8 @@ export default defineEventHandler(async (event) => {
         exists: true,
         sentTo: (record.fields.sentTo as string[]) || [],
         receivedFrom: (record.fields.receivedFrom as string[]) || [],
-        created_at: record.fields.created_at as string,
-        updated_at: record.fields.updated_at as string
+        created_at: record.fields['Created At'] as string,
+        updated_at: record.fields['Updated At'] as string
       }
     }
 

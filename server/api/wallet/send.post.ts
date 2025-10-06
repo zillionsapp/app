@@ -45,13 +45,13 @@ export default defineEventHandler(async (event) => {
     const [fromRecords, toRecords] = await Promise.all([
       base(tableName)
         .select({
-          filterByFormula: `{email} = '${fromEmail}'`,
+          filterByFormula: `{Email} = '${fromEmail}'`,
           maxRecords: 1
         })
         .all(),
       base(tableName)
         .select({
-          filterByFormula: `{email} = '${toEmail}'`,
+          filterByFormula: `{Email} = '${toEmail}'`,
           maxRecords: 1
         })
         .all()
@@ -61,7 +61,7 @@ export default defineEventHandler(async (event) => {
     const toRecord = toRecords[0]
 
     // Check if sender has sufficient funds
-    const fromCurrentAmount = fromRecord ? (fromRecord.fields.amount as number || 0) : 0
+    const fromCurrentAmount = fromRecord ? (fromRecord.fields.Amount as number || 0) : 0
     if (fromCurrentAmount < amount) {
       throw createError({
         statusCode: 400,
@@ -78,31 +78,31 @@ export default defineEventHandler(async (event) => {
       const currentSentTo = (fromRecord.fields.sentTo as string[]) || []
 
       await base(tableName).update(fromRecord.id, {
-        amount: fromNewAmount,
+        Amount: fromNewAmount,
         sentTo: [...currentSentTo, toEmail],
-        updated_at: now
+        'Updated At': now
       })
     }
 
     // Update or create receiver's amount (add) and add transaction history
     if (toRecord) {
-      const toCurrentAmount = toRecord.fields.amount as number || 0
+      const toCurrentAmount = toRecord.fields.Amount as number || 0
       const toNewAmount = toCurrentAmount + amount
       // Get current receivedFrom history or initialize empty array
       const currentReceivedFrom = (toRecord.fields.receivedFrom as string[]) || []
 
       await base(tableName).update(toRecord.id, {
-        amount: toNewAmount,
+        Amount: toNewAmount,
         receivedFrom: [...currentReceivedFrom, fromEmail],
-        updated_at: now
+        'Updated At': now
       })
     } else {
       await base(tableName).create({
-        email: toEmail,
-        amount,
+        Email: toEmail,
+        Amount: amount,
         receivedFrom: [fromEmail],
-        created_at: now,
-        updated_at: now
+        'Created At': now,
+        'Updated At': now
       })
     }
 
@@ -113,7 +113,7 @@ export default defineEventHandler(async (event) => {
       amount,
       fromNewBalance: fromNewAmount,
       toNewBalance: toRecord
-        ? (toRecord.fields.amount as number || 0) + amount
+        ? (toRecord.fields.Amount as number || 0) + amount
         : amount
     }
   } catch (error: any) {

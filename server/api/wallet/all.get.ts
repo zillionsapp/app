@@ -3,6 +3,8 @@ import Airtable from 'airtable'
 
 export default defineEventHandler(async (event) => {
   try {
+    console.log(AIRTABLE_API_KEY);
+    
     // Initialize Airtable
     const base = new Airtable({
       apiKey: process.env.AIRTABLE_API_KEY
@@ -12,18 +14,18 @@ export default defineEventHandler(async (event) => {
 
     const records = await base(tableName)
       .select({
-        sort: [{ field: 'updated_at', direction: 'desc' }]
+        sort: [{ field: 'Updated At', direction: 'desc' }]
       })
       .all()
 
     const wallets = records.map(record => ({
       id: record.id,
-      email: record.fields.email as string,
-      amount: record.fields.amount as number || 0,
+      email: record.fields.Email as string,
+      amount: record.fields.Amount as number || 0,
       sentTo: (record.fields.sentTo as string[]) || [],
       receivedFrom: (record.fields.receivedFrom as string[]) || [],
-      created_at: record.fields.created_at as string,
-      updated_at: record.fields.updated_at as string
+      created_at: record.fields['Created At'] as string,
+      updated_at: record.fields['Updated At'] as string
     }))
 
     return {

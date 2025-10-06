@@ -37,7 +37,7 @@ export default defineEventHandler(async (event) => {
         statusMessage: 'Email is required'
       })
     }
-
+    
     // Initialize Airtable
     const base = new Airtable({
       apiKey: process.env.AIRTABLE_API_KEY
@@ -48,7 +48,7 @@ export default defineEventHandler(async (event) => {
     // Check if user already has a wallet record
     const existingRecords = await base(tableName)
       .select({
-        filterByFormula: `{email} = '${email}'`,
+        filterByFormula: `{Email} = '${email}'`,
         maxRecords: 1
       })
       .all()
@@ -59,12 +59,11 @@ export default defineEventHandler(async (event) => {
       // Update existing record
       const existingRecord = existingRecords[0]
       if (existingRecord) {
-        const currentAmount = existingRecord.fields.amount as number || 0
+        const currentAmount = existingRecord.fields.Amount as number || 0
         const newAmount = currentAmount + amount
 
         await base(tableName).update(existingRecord.id, {
-          amount: newAmount,
-          updated_at: now
+          Amount: newAmount,
         })
 
         return {
@@ -77,10 +76,8 @@ export default defineEventHandler(async (event) => {
     } else {
       // Create new wallet record
       await base(tableName).create({
-        email,
-        amount,
-        created_at: now,
-        updated_at: now
+        Email: email,
+        Amount: amount,
       })
 
       return {

@@ -27,6 +27,12 @@ export default defineNuxtConfig({
     '@clerk/nuxt'
   ],
   runtimeConfig: {
+    // Private keys (only available on server-side)
+    airtableApiKey: process.env.AIRTABLE_API_KEY,
+    airtableBaseId: process.env.AIRTABLE_BASE_ID,
+    airtableWalletTable: process.env.AIRTABLE_WALLET_TABLE,
+
+    // Public keys (available on both client and server)
     public: {
       clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY,
       clerkSecretKey: process.env.CLERK_SECRET_KEY
