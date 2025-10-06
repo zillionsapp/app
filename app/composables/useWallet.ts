@@ -136,6 +136,19 @@ export function useWallet() {
   }
 
   /**
+   * Get wallet balance details for a specific email (includes created_at)
+   */
+  const getBalanceDetails = async (email: string): Promise<BalanceResponse | null> => {
+    try {
+      const response = await $fetch<BalanceResponse>(`/api/wallet/balance?email=${encodeURIComponent(email)}`)
+      return response
+    } catch (err: any) {
+      console.error('Get balance details error:', err)
+      return null
+    }
+  }
+
+  /**
    * Get all wallet records (admin function)
    */
   const getAllWallets = async (): Promise<WalletRecord[]> => {
@@ -170,6 +183,7 @@ export function useWallet() {
     deposit,
     send,
     getBalance,
+    getBalanceDetails,
     getAllWallets,
     hasWallet,
 

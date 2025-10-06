@@ -2,7 +2,7 @@
 <template>
   <div class="flex flex-col justify-between bg-base-200/60 text-white min-h-screen" data-theme="zillions">
     <!-- Top bar -->
-    <!-- <WalletHeader /> -->
+    <WalletHeader />
 
     <!-- Balance + Chart -->
     <main class="mx-auto w-full px-4 lg:px-6 flex-1 flex flex-wrap">
@@ -220,6 +220,7 @@ const {
   deposit: walletDeposit,
   send: walletSend,
   getBalance,
+  getBalanceDetails,
   clearError: clearWalletError
 } = useWallet()
 
@@ -229,6 +230,7 @@ const showSendModal = ref(false)
 const currentUserEmail = ref<string>('')
 const walletBalance = ref<number>(0)
 const walletBalanceLoading = ref<boolean>(false)
+const walletDetails = ref<any>(null)
 
 /* Get current user email for modals */
 const getCurrentUserEmail = async (): Promise<string> => {
@@ -247,9 +249,11 @@ const fetchWalletBalance = async (email: string) => {
   walletBalanceLoading.value = true
   try {
     walletBalance.value = await getBalance(email)
+    walletDetails.value = await getBalanceDetails(email)
   } catch (error) {
     console.error('Failed to fetch wallet balance:', error)
     walletBalance.value = 0
+    walletDetails.value = null
   } finally {
     walletBalanceLoading.value = false
   }
@@ -266,7 +270,9 @@ onMounted(async () => {
 /* Balance headline uses live current value if available */
 const currency = computed(() => props.currency)
 const deposited = computed(() => walletBalance.value || props.deposited)
-const depositAt = computed(() => props.depositAt)
+const depositAt = computed(() => {
+  return walletDetails.value?.created_at || props.depositAt || ''
+})
 const displayBalance = computed(() => {
   return (currentValueUsd.value ?? 0) > 0 ? (currentValueUsd.value ?? 0) : deposited.value
 })
