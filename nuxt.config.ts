@@ -13,6 +13,10 @@ export default defineNuxtConfig({
     preset: 'vercel',
     experimental: {
       tasks: true
+    },
+    scheduledTasks: {
+      // Run paper trading every 5 minutes
+      '0,5,10,15,20,25,30,35,40,45,50,55 * * * *': 'paper-trading'
     }
   },
   // Optional: make sure this route is always dynamic and never cached/prerendered

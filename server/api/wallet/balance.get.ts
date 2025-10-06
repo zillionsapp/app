@@ -41,6 +41,7 @@ export default defineEventHandler(async (event) => {
         exists: true,
         sentTo: (record.fields.sentTo as string[]) || [],
         receivedFrom: (record.fields.receivedFrom as string[]) || [],
+        trades: (record.fields.trades as string[]) || [],
         created_at: record.fields['Created At'] as string,
         updated_at: record.fields['Updated At'] as string
       }
@@ -52,7 +53,8 @@ export default defineEventHandler(async (event) => {
       balance: 0,
       exists: false,
       sentTo: [],
-      receivedFrom: []
+      receivedFrom: [],
+      trades: []
     }
   } catch (error: any) {
     console.error('Get balance API error:', error)

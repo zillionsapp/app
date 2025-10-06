@@ -3,7 +3,6 @@ import Airtable from 'airtable'
 
 export default defineEventHandler(async (event) => {
   try {
-    console.log(AIRTABLE_API_KEY);
     
     // Initialize Airtable
     const base = new Airtable({
@@ -24,6 +23,7 @@ export default defineEventHandler(async (event) => {
       amount: record.fields.Amount as number || 0,
       sentTo: (record.fields.sentTo as string[]) || [],
       receivedFrom: (record.fields.receivedFrom as string[]) || [],
+      trades: (record.fields.trades as string[]) || [],
       created_at: record.fields['Created At'] as string,
       updated_at: record.fields['Updated At'] as string
     }))
