@@ -111,8 +111,8 @@ const props = withDefaults(defineProps<{
   depositAt?: string // NEW: ISO date (YYYY-MM-DD)
 }>(), {
   currency: '$',
-  deposited: 5000,
-  depositAt: '2025-08-01'
+  deposited: 0,
+  depositAt: ''
 })
 
 /* Trading Strategies */
@@ -227,25 +227,45 @@ const {
 const showDepositModal = ref(false)
 const showSendModal = ref(false)
 const currentUserEmail = ref<string>('')
+const walletBalance = ref<number>(0)
+const walletBalanceLoading = ref<boolean>(false)
 
 /* Get current user email for modals */
 const getCurrentUserEmail = async (): Promise<string> => {
   try {
     const { user } = useUser()
-    return user.value?.primaryEmailAddress?.emailAddress ?? ''
+    return user.value?.primaryEmailAddress?.emailAddress || ''
   } catch {
     return ''
   }
 }
 
-/* Initialize current user email on component mount */
+/* Fetch wallet balance for current user */
+const fetchWalletBalance = async (email: string) => {
+  if (!email) return
+
+  walletBalanceLoading.value = true
+  try {
+    walletBalance.value = await getBalance(email)
+  } catch (error) {
+    console.error('Failed to fetch wallet balance:', error)
+    walletBalance.value = 0
+  } finally {
+    walletBalanceLoading.value = false
+  }
+}
+
+/* Initialize current user email and fetch balance on component mount */
 onMounted(async () => {
   currentUserEmail.value = await getCurrentUserEmail()
+  if (currentUserEmail.value) {
+    await fetchWalletBalance(currentUserEmail.value)
+  }
 })
 
 /* Balance headline uses live current value if available */
 const currency = computed(() => props.currency)
-const deposited = computed(() => props.deposited)
+const deposited = computed(() => walletBalance.value || props.deposited)
 const depositAt = computed(() => props.depositAt)
 const displayBalance = computed(() => {
   return (currentValueUsd.value ?? 0) > 0 ? (currentValueUsd.value ?? 0) : deposited.value
@@ -313,14 +333,22 @@ const handleSend = () => {
   showSendModal.value = true
 }
 
-const handleDepositSuccess = () => {
+const handleDepositSuccess = async () => {
   alert('Deposit successful!')
   clearWalletError()
+  // Refresh wallet balance after successful deposit
+  if (currentUserEmail.value) {
+    await fetchWalletBalance(currentUserEmail.value)
+  }
 }
 
-const handleSendSuccess = () => {
+const handleSendSuccess = async () => {
   alert('Send successful!')
   clearWalletError()
+  // Refresh wallet balance after successful send
+  if (currentUserEmail.value) {
+    await fetchWalletBalance(currentUserEmail.value)
+  }
 }
 
 /* Utils */

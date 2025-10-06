@@ -9,7 +9,7 @@
             {{ currency }}{{ formatMoney(displayBalance) }}
           </h1>
           <p v-if="latestPrice" class="text-xs opacity-70 mt-1">
-            SOL last: ${{ formatMoney(latestPrice!) }} ({{ period }}) • Bought on {{ depositAt }}
+            BTC last: ${{ formatMoney(latestPrice!) }} • Bought on {{ depositAt }}
           </p>
         </div>
         <div class="text-right">

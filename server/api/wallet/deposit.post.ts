@@ -64,6 +64,7 @@ export default defineEventHandler(async (event) => {
 
         await base(tableName).update(existingRecord.id, {
           Amount: newAmount,
+          'Updated At': now
         })
 
         return {
@@ -78,6 +79,8 @@ export default defineEventHandler(async (event) => {
       await base(tableName).create({
         Email: email,
         Amount: amount,
+        'Created At': now,
+        'Updated At': now
       })
 
       return {
