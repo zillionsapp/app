@@ -161,15 +161,15 @@
     <section id="tech" class="py-14 lg:py-20 bg-base-200/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Inside the engine</h2>
-        <p class="mt-2 text-white/70">Our advanced trading system combines multiple analytical layers to identify high-probability opportunities:</p>
+        <p class="mt-2 text-white/70">Our trading system analyzes market trends, signals, and risk to find the best opportunities. It adapts to changing conditions automatically.</p>
 
         <div class="mt-8 grid md:grid-cols-2 gap-6">
           <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">Trend</span>
+                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'trend' }" @click="selectedStrategy = 'trend'">Trend</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'trend' }" @click="selectedStrategy = 'trend'">
                 <div class="font-medium text-lg">Multi-Timeframe Trend Analysis</div>
                 <div class="text-sm opacity-80 mt-1">Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.</div>
               </div>
@@ -177,9 +177,9 @@
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">Signals</span>
+                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'signals' }" @click="selectedStrategy = 'signals'">Signals</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'signals' }" @click="selectedStrategy = 'signals'">
                 <div class="font-medium text-lg">OBOS Signals</div>
                 <div class="text-sm opacity-80 mt-1">Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.</div>
               </div>
@@ -187,9 +187,9 @@
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">Confirm</span>
+                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'confirm' }" @click="selectedStrategy = 'confirm'">Confirm</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'confirm' }" @click="selectedStrategy = 'confirm'">
                 <div class="font-medium text-lg">HTF Confirmation</div>
                 <div class="text-sm opacity-80 mt-1">Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.</div>
               </div>
@@ -197,9 +197,9 @@
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">Risk</span>
+                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'risk' }" @click="selectedStrategy = 'risk'">Risk</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'risk' }" @click="selectedStrategy = 'risk'">
                 <div class="font-medium text-lg">Risk Management</div>
                 <div class="text-sm opacity-80 mt-1">Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.</div>
               </div>
@@ -207,9 +207,9 @@
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">Size</span>
+                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'size' }" @click="selectedStrategy = 'size'">Size</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'size' }" @click="selectedStrategy = 'size'">
                 <div class="font-medium text-lg">Position Sizing</div>
                 <div class="text-sm opacity-80 mt-1">Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.</div>
               </div>
@@ -218,53 +218,28 @@
 
           <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <h3 class="card-title text-2xl">What you get</h3>
+              <div class="mb-4">
+                <h3 class="card-title text-2xl">{{ strategyContent[selectedStrategy].title }}</h3>
+              </div>
+
               <ul class="list-disc ms-5 text-sm opacity-90 space-y-3 mt-4">
-                <li class="hover:translate-x-1 transition-transform duration-300">Multi-timeframe analysis for trend confirmation.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Overbought/oversold detection for entry timing.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Higher timeframe confirmation reduces false signals.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Advanced risk management with trailing stops and take-profits.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Consistent position sizing for optimal risk exposure.</li>
+                <li v-for="benefit in strategyContent[selectedStrategy].benefits" :key="benefit" class="hover:translate-x-1 transition-transform duration-300">
+                  {{ benefit }}
+                </li>
               </ul>
 
-              <!-- Performance Visualization -->
-              <div class="mt-6 p-4 bg-base-100/50 rounded-xl border border-base-300/50">
-                <div class="flex items-center justify-between mb-3">
-                  <h4 class="font-semibold text-sm">Systematic Risk Protection</h4>
-                  <div class="badge badge-success badge-sm">84% Win Rate</div>
-                </div>
-                <div class="grid grid-cols-3 gap-2 text-xs">
-                  <div class="text-center p-2 bg-success/10 rounded-lg">
-                    <div class="font-bold text-success">Profit Taking</div>
-                    <div class="opacity-70">Only sell in profit</div>
-                  </div>
-                  <div class="text-center p-2 bg-warning/10 rounded-lg">
-                    <div class="font-bold text-warning">Stop Loss</div>
-                    <div class="opacity-70">Crash protection</div>
-                  </div>
-                  <div class="text-center p-2 bg-info/10 rounded-lg">
-                    <div class="font-bold text-info">Position Sizing</div>
-                    <div class="opacity-70">Capital protection</div>
-                  </div>
-                </div>
-                <div class="mt-3 text-xs opacity-70 text-center">
-                  Long-term losses are systematically prevented through disciplined execution
-                </div>
+
+
+              <!-- Strategy-specific alerts -->
+              <div v-if="selectedStrategy !== 'overview'" class="alert alert-info text-white bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
+                <span>{{ strategyContent[selectedStrategy].description }}</span>
               </div>
 
-              <div class="alert alert-info text-white bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
-                <span>Advanced trading system designed for consistent performance across market conditions.</span>
+              <div v-if="selectedStrategy === 'overview'" class="alert alert-info text-white bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
+                <span>{{ strategyContent[selectedStrategy].description }}</span>
               </div>
 
-              <!-- Try Simulation Button -->
-              <div class="mt-6">
-                <a href="/simulation" class="btn btn-primary btn-block rounded-xl">
-                  Try simulation
-                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 8a9 9 0 110-18 9 9 0 010 18z"/>
-                  </svg>
-                </a>
-              </div>
+
             </div>
           </div>
         </div>
@@ -431,7 +406,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue'
+import { ref, computed, reactive } from 'vue'
 import PrivacyModal from '../components/PrivacyModal.vue'
 import TermsModal from '../components/TermsModal.vue'
 
@@ -458,6 +433,85 @@ const isSubmitting = ref(false)
 const toast = ref<{ type: 'success' | 'error'; message: string } | { message: ''; type?: any }>({ message: '' })
 const showPrivacyModal = ref(false)
 const showTermsModal = ref(false)
+
+// Strategy selection state
+const selectedStrategy = ref<'overview' | 'trend' | 'signals' | 'confirm' | 'risk' | 'size'>('trend')
+
+// Strategy content data
+const strategyContent = reactive({
+  overview: {
+    title: 'What you get',
+    benefits: [
+      'Multi-timeframe analysis for trend confirmation.',
+      'Overbought/oversold detection for entry timing.',
+      'Higher timeframe confirmation reduces false signals.',
+      'Advanced risk management with trailing stops and take-profits.',
+      'Consistent position sizing for optimal risk exposure.'
+    ],
+    description: 'Advanced trading system designed for consistent performance across market conditions.',
+    showSimulation: true
+  },
+  trend: {
+    title: 'Multi-Timeframe Trend Analysis',
+    benefits: [
+      'Analyzes trends across multiple timeframes simultaneously (1m, 5m, 15m, 1h, 4h, 1d)',
+      'Uses Rate of Change (ROC) to measure momentum strength and direction',
+      'Exponential Moving Averages (EMA) identify primary trend direction',
+      'Filters out market noise while preserving significant trend movements',
+      'Provides trend strength scoring from 0-100 for position confidence'
+    ],
+    description: 'Our trend analysis engine examines price movements across multiple timeframes to identify the dominant market direction, filtering out short-term noise while capturing significant trend changes.',
+    showSimulation: true
+  },
+  signals: {
+    title: 'OBOS Signal Detection',
+    benefits: [
+      'RSI divergence detection identifies momentum shifts before price confirms',
+      'Pivot point analysis finds key support/resistance levels automatically',
+      'Overbought (>70 RSI) and oversold (<30 RSI) condition monitoring',
+      'Volume-price divergence analysis for signal confirmation',
+      'Multi-indicator convergence increases signal reliability to 78%'
+    ],
+    description: 'Advanced signal detection combines RSI, pivot points, and volume analysis to identify high-probability entry points when momentum diverges from price direction.',
+    showSimulation: true
+  },
+  confirm: {
+    title: 'Higher Timeframe Confirmation',
+    benefits: [
+      'Requires 4-hour and daily timeframe alignment before execution',
+      'Reduces false signal rate by 65% compared to single timeframe',
+      'Eliminates trades against the broader market trend',
+      'Provides confidence scoring based on timeframe alignment',
+      'Prevents entries during uncertain or choppy market conditions'
+    ],
+    description: 'Higher timeframe confirmation ensures trades align with the broader market structure, dramatically reducing false signals and improving overall accuracy.',
+    showSimulation: false
+  },
+  risk: {
+    title: 'Advanced Risk Management',
+    benefits: [
+      'Dynamic trailing stops adjust based on market volatility (ATR-based)',
+      'Take-profit levels set at 2:1 reward-to-risk minimum ratios',
+      'Position sizing adjusts based on win rate and volatility',
+      'Maximum drawdown protection with circuit breakers',
+      'Risk-adjusted position sizing prevents overexposure'
+    ],
+    description: 'Sophisticated risk management system uses trailing stops, take-profit optimization, and dynamic position sizing to protect capital while maximizing returns.',
+    showSimulation: false
+  },
+  size: {
+    title: 'Intelligent Position Sizing',
+    benefits: [
+      'Percentage-based sizing maintains consistent risk exposure',
+      'Volatility-adjusted sizing reduces exposure in turbulent markets',
+      'Win rate optimization adjusts size based on recent performance',
+      'Portfolio heat management prevents over-concentration',
+      'Compounding-friendly sizing supports long-term growth'
+    ],
+    description: 'Position sizing algorithm ensures optimal capital allocation across different market conditions and strategy performance levels.',
+    showSimulation: false
+  }
+})
 
 async function submitWaitlist() {
   if (!consent.value) {
