@@ -226,8 +226,44 @@
                 <li class="hover:translate-x-1 transition-transform duration-300">Advanced risk management with trailing stops and take-profits.</li>
                 <li class="hover:translate-x-1 transition-transform duration-300">Consistent position sizing for optimal risk exposure.</li>
               </ul>
+
+              <!-- Performance Visualization -->
+              <div class="mt-6 p-4 bg-base-100/50 rounded-xl border border-base-300/50">
+                <div class="flex items-center justify-between mb-3">
+                  <h4 class="font-semibold text-sm">Systematic Risk Protection</h4>
+                  <div class="badge badge-success badge-sm">84% Win Rate</div>
+                </div>
+                <div class="grid grid-cols-3 gap-2 text-xs">
+                  <div class="text-center p-2 bg-success/10 rounded-lg">
+                    <div class="font-bold text-success">Profit Taking</div>
+                    <div class="opacity-70">Only sell in profit</div>
+                  </div>
+                  <div class="text-center p-2 bg-warning/10 rounded-lg">
+                    <div class="font-bold text-warning">Stop Loss</div>
+                    <div class="opacity-70">Crash protection</div>
+                  </div>
+                  <div class="text-center p-2 bg-info/10 rounded-lg">
+                    <div class="font-bold text-info">Position Sizing</div>
+                    <div class="opacity-70">Capital protection</div>
+                  </div>
+                </div>
+                <div class="mt-3 text-xs opacity-70 text-center">
+                  Long-term losses are systematically prevented through disciplined execution
+                </div>
+              </div>
+
               <div class="alert alert-info text-white bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
                 <span>Advanced trading system designed for consistent performance across market conditions.</span>
+              </div>
+
+              <!-- Try Simulation Button -->
+              <div class="mt-6">
+                <a href="/simulation" class="btn btn-primary btn-block rounded-xl">
+                  Try simulation
+                  <svg class="w-4 h-4 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h1m4 0h1m-6 8a9 9 0 110-18 9 9 0 010 18z"/>
+                  </svg>
+                </a>
               </div>
             </div>
           </div>

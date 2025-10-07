@@ -3,7 +3,7 @@
     <div class="container mx-auto px-4 py-8">
       <!-- Header -->
       <div class="mb-8">
-        <NuxtLink to="/Wallet" class="btn btn-ghost btn-sm mb-4">
+        <NuxtLink to="/" class="btn btn-ghost btn-sm mb-4">
           ← Back to Home
         </NuxtLink>
         <h1 class="text-3xl font-bold mb-2">Trading Rules – Mini Simulation</h1>
