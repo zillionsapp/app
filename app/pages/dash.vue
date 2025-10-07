@@ -1,108 +1,199 @@
 <template>
-  <div class="p-4 md:p-6 space-y-6 text-white">
+  <div class="p-4 md:p-6 space-y-6 text-white min-h-screen">
     <!-- Header -->
     <div class="flex items-center justify-between">
       <div>
-        <h1 class="text-2xl font-bold">Trading Performance Dashboard</h1>
-        <p class="opacity-70">Network: {{ report.meta?.network || "n/a" }} • Day {{ report.meta?.dayStartDate || "n/a" }}</p>
+        <h1 class="text-3xl font-bold">Trading Dashboard</h1>
+        <p class="opacity-70">Performance Overview</p>
       </div>
-      <div class="badge badge-outline">SOL-PERP</div>
-    </div>
-
-    <!-- Integrity warning (solution-oriented) -->
-    <div v-if="dataIntegrityWarning" class="alert alert-warning">
-      <span>
-        Heads up: <code>realizedPnL</code> from the report ({{ fmtNumber(realizedPnLField) }}) doesn't reconcile with cash & fees.
-        This widget recomputes PnL as <em>cash − deposit</em> for accuracy. If your backend emits realized PnL, consider fixing its sign/aggregation.
-      </span>
-    </div>
-
-    <!-- Stat cards -->
-    <div class="stats stats-vertical lg:stats-horizontal shadow">
-      <div class="stat bg-base-200">
-        <div class="stat-title text-white/60">Equity</div>
-        <div class="stat-value">{{ fmtCurrency(equity) }}</div>
-        <div class="stat-desc text-white/60">Deposit: {{ fmtCurrency(report.deposit) }}</div>
-      </div>
-
-      <div class="stat bg-base-200">
-        <div class="stat-title text-white/60">Cash</div>
-        <div class="stat-value">{{ fmtCurrency(report.cash) }}</div>
-        <div class="stat-desc text-white/60">Fees: {{ fmtCurrency(totalFees) }} (≈ {{ feeBpsOfTurnover.toFixed(2) }} bps of turnover)</div>
-      </div>
-
-      <div class="stat bg-base-200">
-        <div class="stat-title text-white/60">Net PnL</div>
-        <div :class="['stat-value', netPnl >= 0 ? 'text-success' : 'text-error']">{{ fmtCurrency(netPnl) }}</div>
-        <div class="stat-desc text-white/60">Return: {{ netReturnBps.toFixed(3) }} bps ({{ netReturnPct.toFixed(5) }}%)</div>
-      </div>
-
-      <div class="stat bg-base-200">
-        <div class="stat-title text-white/60">Turnover</div>
-        <div class="stat-value">{{ (turnoverRatio*100).toFixed(2) }}%</div>
-        <div class="stat-desc text-white/60">{{ trades.length }} legs • avg ${{ avgAbsNotional.toFixed(2) }} • session {{ sessionMins.toFixed(1) }}m</div>
-      </div>
-
-      <div class="stat bg-base-200">
-        <div class="stat-title text-white/60">Router</div>
-        <div class="stat-value text-white">{{ router?.lastStrategyKey || 'n/a' }}</div>
-        <div class="stat-desc text-white/60">Regime: <span class="badge badge-sm text-warning">{{ router?.lastRegime || 'n/a' }}</span></div>
+      <div class="flex items-center gap-4">
+        <div class="badge badge-outline badge-lg">Live</div>
+        <select class="select select-bordered select-sm">
+          <option>Last 30 Days</option>
+          <option>Last 7 Days</option>
+          <option>Last 90 Days</option>
+        </select>
       </div>
     </div>
 
-    <!-- Charts -->
-    <div class="grid grid-cols-1 xl:grid-cols-4 gap-6">
-      <!-- Equity / Cashflow -->
-      <div class="card bg-base-200 shadow col-span-1 xl:col-span-2">
-        <div class="card-body">
-          <h2 class="card-title">Cashflow & PnL (intra-day)</h2>
-          <canvas ref="equityCanvas"></canvas>
-          <div class="opacity-70 text-xs">Gross = cumulative trade cashflow; Net = Gross − fees (pro‑rated).</div>
+    <!-- Top Stats Cards -->
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+      <!-- Net P&L -->
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full bg-blue-500"></div>
+            <span class="text-sm opacity-70">Net P&L</span>
+            <div class="ml-auto">
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
+                <div class="dropdown-content z-[1] card card-compact p-2 shadow bg-base-100 text-xs">
+                  <div class="card-body p-2">
+                    <p>Total profit and loss</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-2xl font-bold text-success">$248.78</div>
         </div>
       </div>
 
-      <!-- Price with markers -->
-      <div class="card bg-base-200 shadow col-span-1 xl:col-span-2">
-        <div class="card-body">
-          <h2 class="card-title">Execution Price Trace</h2>
-          <canvas ref="priceCanvas"></canvas>
-          <div class="opacity-70 text-xs">Markers: buy • sell. Mid: {{ fmtNumber(rangeMid) }} • Last: {{ fmtNumber(rangeLastMark) }}</div>
+      <!-- Trade Expectancy -->
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full bg-green-500"></div>
+            <span class="text-sm opacity-70">Trade Expectancy</span>
+            <div class="ml-auto">
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
+              </div>
+            </div>
+          </div>
+          <div class="text-2xl font-bold">$248.78</div>
         </div>
       </div>
 
-      <!-- Volume / Notional bars -->
-      <div class="card bg-base-200 shadow">
-        <div class="card-body">
-          <h2 class="card-title">Trade Notional by Leg</h2>
-          <canvas ref="volCanvas"></canvas>
-          <div class="opacity-70 text-xs">Total turnover: {{ fmtCurrency(totalAbsNotional) }}</div>
+      <!-- Profit Factor -->
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full bg-purple-500"></div>
+            <span class="text-sm opacity-70">Profit Factor</span>
+            <div class="ml-auto">
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
+              </div>
+            </div>
+          </div>
+          <div class="text-2xl font-bold">1.24</div>
         </div>
       </div>
 
-      <!-- Recent trades table -->
-      <div class="card bg-base-200 shadow xl:col-span-2">
+      <!-- Win % -->
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full bg-orange-500"></div>
+            <span class="text-sm opacity-70">Win %</span>
+            <div class="ml-auto">
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
+              </div>
+            </div>
+          </div>
+          <div class="text-2xl font-bold text-info">39.02%</div>
+        </div>
+      </div>
+
+      <!-- Avg win/loss trade -->
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <div class="w-3 h-3 rounded-full bg-red-500"></div>
+            <span class="text-sm opacity-70">Avg win/loss trade</span>
+            <div class="ml-auto">
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
+              </div>
+            </div>
+          </div>
+          <div class="text-2xl font-bold">
+            <span class="text-success">$34.82</span>
+            <span class="text-error ml-2">$51.32</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Main Charts Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <!-- Zella Score -->
+      <div class="card bg-base-200 shadow-lg">
         <div class="card-body">
-          <h2 class="card-title">Recent Trades</h2>
+          <h2 class="card-title mb-4">Zella Score</h2>
+          <div class="flex items-center justify-center mb-4">
+            <div class="relative w-32 h-32">
+              <canvas ref="zellaScoreCanvas" class="w-full h-full"></canvas>
+              <div class="absolute inset-0 flex items-center justify-center">
+                <div class="text-center">
+                  <div class="text-2xl font-bold">81</div>
+                  <div class="text-xs opacity-70">+1</div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="text-center text-sm opacity-70">
+            <div>Avg win/loss</div>
+            <div>Profit factor</div>
+            <div class="mt-2 text-xs">Your Zella Score: 81 +1</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Daily Net Cumulative P&L -->
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title">Daily Net Cumulative P&L</h2>
+          <canvas ref="cumulativePnLCanvas" class="h-48"></canvas>
+        </div>
+      </div>
+
+      <!-- Net Daily P&L -->
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+          <h2 class="card-title">Net Daily P&L</h2>
+          <canvas ref="dailyPnLCanvas" class="h-48"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Section -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+      <!-- Open Positions -->
+      <div class="card bg-base-200 shadow-lg">
+        <div class="card-body">
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="card-title">Open Positions</h2>
+            <div class="tabs tabs-boxed">
+              <a class="tab tab-active">Recent Trades</a>
+            </div>
+          </div>
           <div class="overflow-x-auto">
             <table class="table table-zebra">
               <thead>
                 <tr>
-                  <th>Time</th>
-                  <th>Side</th>
-                  <th class="text-right">Qty</th>
-                  <th class="text-right">Price</th>
-                  <th class="text-right">Notional</th>
+                  <th>Open Date</th>
+                  <th>Symbol</th>
+                  <th class="text-right">Net P&L</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="t in trades.slice(-10)" :key="t.t + t.px">
-                  <td>{{ toHms(t.t) }}</td>
-                  <td>
-                    <span :class="['badge', t.side === 'buy' ? 'badge-success' : 'badge-error']">{{ t.side }}</span>
-                  </td>
-                  <td class="text-right">{{ fmtNumber(t.qty) }}</td>
-                  <td class="text-right">{{ fmtNumber(t.px) }}</td>
-                  <td class="text-right">{{ fmtCurrency(t.notional) }}</td>
+                <tr>
+                  <td>11-12-2023</td>
+                  <td>MRD</td>
+                  <td class="text-right text-success">$21.21</td>
+                </tr>
+                <tr>
+                  <td>11-12-2023</td>
+                  <td>MRD</td>
+                  <td class="text-right text-success">$134.21</td>
+                </tr>
+                <tr>
+                  <td>11-12-2023</td>
+                  <td>MRD</td>
+                  <td class="text-right text-success">$134.21</td>
+                </tr>
+                <tr>
+                  <td>11-12-2023</td>
+                  <td>MRD</td>
+                  <td class="text-right text-success">$523.21</td>
+                </tr>
+                <tr>
+                  <td>11-12-2023</td>
+                  <td>MRD</td>
+                  <td class="text-right text-success">$523.21</td>
                 </tr>
               </tbody>
             </table>
@@ -110,19 +201,87 @@
         </div>
       </div>
 
-      <!-- Strategy / diagnostics -->
-      <div class="card bg-base-200 shadow">
+      <!-- Calendar -->
+      <div class="card bg-base-200 shadow-lg">
         <div class="card-body">
-          <h2 class="card-title">Strategy Diagnostics</h2>
-          <ul class="list-disc list-inside space-y-1 text-sm">
-            <li>Range mid: <b>{{ fmtNumber(rangeMid) }}</b>, last mark: <b>{{ fmtNumber(rangeLastMark) }}</b></li>
-            <li>Vol EWMA: <b>{{ fmtNumber(rangeVolBps) }}</b> bps</li>
-            <li>Ticks: <b>{{ strategies?.range?.ticks || 0 }}</b> (warm {{ strategies?.range?.warmTicks || 0 }})</li>
-          </ul>
-          <div class="divider my-2"></div>
-          <p class="text-xs opacity-70">
-            Tip: If you want win‑rate and per‑round‑trip alpha, supply fills grouped by order or include realized PnL per fill; we'll compute it on‑chain‑accurate.
-          </p>
+          <div class="flex items-center justify-between mb-4">
+            <h2 class="card-title">December 2023</h2>
+            <div class="flex gap-2">
+              <button class="btn btn-ghost btn-sm">‹</button>
+              <button class="btn btn-ghost btn-sm">›</button>
+              <div class="dropdown dropdown-end">
+                <div tabindex="0" role="button" class="btn btn-ghost btn-sm">ⓘ</div>
+              </div>
+            </div>
+          </div>
+          <div class="grid grid-cols-7 gap-1 text-center text-sm mb-2">
+            <div class="font-semibold opacity-70">Sun</div>
+            <div class="font-semibold opacity-70">Mon</div>
+            <div class="font-semibold opacity-70">Tue</div>
+            <div class="font-semibold opacity-70">Wed</div>
+            <div class="font-semibold opacity-70">Thu</div>
+            <div class="font-semibold opacity-70">Fri</div>
+            <div class="font-semibold opacity-70">Sat</div>
+          </div>
+          <div class="grid grid-cols-7 gap-1">
+            <!-- Empty cells for days before month starts -->
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div class="btn btn-ghost btn-sm">01</div>
+            <div class="btn btn-ghost btn-sm">02</div>
+          </div>
+          <div class="grid grid-cols-7 gap-1">
+            <div class="btn btn-ghost btn-sm">03</div>
+            <div class="btn btn-ghost btn-sm">04</div>
+            <div class="btn btn-ghost btn-sm">05</div>
+            <div class="btn btn-ghost btn-sm bg-success text-success-content">06</div>
+            <div class="btn btn-ghost btn-sm">07</div>
+            <div class="btn btn-ghost btn-sm">08</div>
+            <div class="btn btn-ghost btn-sm">09</div>
+          </div>
+          <div class="grid grid-cols-7 gap-1">
+            <div class="btn btn-ghost btn-sm">10</div>
+            <div class="btn btn-ghost btn-sm bg-success text-success-content">
+              <div>11</div>
+              <div class="text-xs">28</div>
+              <div class="text-xs">$62.9K</div>
+            </div>
+            <div class="btn btn-ghost btn-sm">12</div>
+            <div class="btn btn-ghost btn-sm">13</div>
+            <div class="btn btn-ghost btn-sm">14</div>
+            <div class="btn btn-ghost btn-sm">15</div>
+            <div class="btn btn-ghost btn-sm">16</div>
+          </div>
+          <div class="grid grid-cols-7 gap-1">
+            <div class="btn btn-ghost btn-sm">17</div>
+            <div class="btn btn-ghost btn-sm">18</div>
+            <div class="btn btn-ghost btn-sm">19</div>
+            <div class="btn btn-ghost btn-sm">20</div>
+            <div class="btn btn-ghost btn-sm">21</div>
+            <div class="btn btn-ghost btn-sm">22</div>
+            <div class="btn btn-ghost btn-sm">23</div>
+          </div>
+          <div class="grid grid-cols-7 gap-1">
+            <div class="btn btn-ghost btn-sm">24</div>
+            <div class="btn btn-ghost btn-sm">25</div>
+            <div class="btn btn-ghost btn-sm">26</div>
+            <div class="btn btn-ghost btn-sm">27</div>
+            <div class="btn btn-ghost btn-sm">28</div>
+            <div class="btn btn-ghost btn-sm">29</div>
+            <div class="btn btn-ghost btn-sm">30</div>
+          </div>
+          <div class="grid grid-cols-7 gap-1">
+            <div class="btn btn-ghost btn-sm">31</div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+            <div></div>
+          </div>
         </div>
       </div>
     </div>
@@ -210,12 +369,12 @@ const rangeLastMark = computed(() => strategies.value?.range?.lastMark ?? null)
 const rangeVolBps = computed(() => strategies.value?.range?.volEwmaBps ?? null)
 
 // Chart refs and instances
-const equityCanvas = ref<HTMLCanvasElement | null>(null)
-const priceCanvas = ref<HTMLCanvasElement | null>(null)
-const volCanvas = ref<HTMLCanvasElement | null>(null)
-let equityChart: Chart | null = null
-let priceChart: Chart | null = null
-let volChart: Chart | null = null
+const zellaScoreCanvas = ref<HTMLCanvasElement | null>(null)
+const cumulativePnLCanvas = ref<HTMLCanvasElement | null>(null)
+const dailyPnLCanvas = ref<HTMLCanvasElement | null>(null)
+let zellaScoreChart: Chart | null = null
+let cumulativePnLChart: Chart | null = null
+let dailyPnLChart: Chart | null = null
 
 // Chart data series
 const labels = computed(() => trades.value.map((t: Trade) => toHms(t.t)))
@@ -239,9 +398,9 @@ onMounted(() => {
 })
 
 onBeforeUnmount(() => {
-  equityChart?.destroy?.()
-  priceChart?.destroy?.()
-  volChart?.destroy?.()
+  zellaScoreChart?.destroy?.()
+  cumulativePnLChart?.destroy?.()
+  dailyPnLChart?.destroy?.()
 })
 
 watch([trades, totalFees], () => {
@@ -250,107 +409,110 @@ watch([trades, totalFees], () => {
 
 // Chart building
 function rebuildCharts() {
-  equityChart?.destroy?.()
-  priceChart?.destroy?.()
-  volChart?.destroy?.()
+  zellaScoreChart?.destroy?.()
+  cumulativePnLChart?.destroy?.()
+  dailyPnLChart?.destroy?.()
   buildCharts()
 }
 
 function buildCharts() {
-  if (equityCanvas.value) {
-    equityChart = new Chart(equityCanvas.value.getContext('2d')!, {
-      type: 'line',
+  // Zella Score Gauge Chart
+  if (zellaScoreCanvas.value) {
+    zellaScoreChart = new Chart(zellaScoreCanvas.value.getContext('2d')!, {
+      type: 'doughnut',
       data: {
-        labels: labels.value,
         datasets: [
           {
-            label: 'Gross cashflow',
-            data: grossCashflow.value,
-            borderWidth: 2,
-            fill: false,
-            tension: 0.2,
-            borderColor: '#FFFFFF',
+            data: [81, 19], // Score and remaining
+            backgroundColor: [
+              '#10B981', // Green for score
+              '#374151', // Gray for background
+            ],
+            borderWidth: 0,
           },
-          {
-            label: 'Fees (cum.)',
-            data: feesCum.value.map(v => -v), // show fees as negative area
-            borderWidth: 1,
-            borderDash: [4,4],
-            pointRadius: 0,
-            tension: 0,
-          },
-          {
-            label: 'Net PnL',
-            data: netSeries.value,
-            borderWidth: 2,
-            pointRadius: 0,
-            fill: false,
-            tension: 0.2,
-            borderColor: '#FFFFFF',
-          },
-        ]
+        ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
-        aspectRatio: 2,
-        plugins: { legend: { position: 'bottom' }, tooltip: { intersect: false } },
+        maintainAspectRatio: false,
+        cutout: '70%',
+        plugins: {
+          legend: { display: false },
+          tooltip: { enabled: false },
+        },
+      },
+    })
+  }
+
+  // Cumulative P&L Chart
+  if (cumulativePnLCanvas.value) {
+    cumulativePnLChart = new Chart(cumulativePnLCanvas.value.getContext('2d')!, {
+      type: 'line',
+      data: {
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        datasets: [
+          {
+            label: 'Cumulative P&L',
+            data: [100, 150, 200, 180, 250, 300, 280, 350, 400, 380, 450, 500],
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
         scales: {
-          x: { display: true, grid: { display: false } },
-          y: { display: true, ticks: { callback: v => `$${Number(v).toFixed(2)}` } },
-        }
-      }
-    })
-  }
-
-  if (priceCanvas.value) {
-    priceChart = new Chart(priceCanvas.value.getContext('2d')!, {
-      type: 'line',
-      data: {
-        labels: labels.value,
-        datasets: [
-          {
-            label: 'Price',
-            data: priceSeries.value,
-            borderWidth: 2,
-            tension: 0.2,
-            pointRadius: 4,
-            pointHoverRadius: 5,
-            pointBackgroundColor: sideColors.value,
-            borderColor: '#FFFFFF',
-          }
-        ]
+          x: {
+            grid: { display: false },
+          },
+          y: {
+            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+            ticks: { callback: (v) => `$${Number(v)}` },
+          },
+        },
       },
-      options: {
-        responsive: true,
-        maintainAspectRatio: true,
-        aspectRatio: 2,
-        plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => `Price $${Number(ctx.parsed.y).toFixed(4)}` } } },
-        scales: { x: { grid: { display: false } }, y: { ticks: { callback: v => Number(v).toFixed(2) } } }
-      }
     })
   }
 
-  if (volCanvas.value) {
-    volChart = new Chart(volCanvas.value.getContext('2d')!, {
+  // Daily P&L Chart
+  if (dailyPnLCanvas.value) {
+    dailyPnLChart = new Chart(dailyPnLCanvas.value.getContext('2d')!, {
       type: 'bar',
       data: {
-        labels: labels.value,
+        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
         datasets: [
           {
-            label: 'Abs notional',
-            data: volSeries.value,
-            borderWidth: 0,
-          }
-        ]
+            label: 'Daily P&L',
+            data: [10, 15, -5, 20, 18, -8, 25, 12, -3, 22, 30, 8],
+            backgroundColor: (context) => {
+              const value = context.parsed.y
+              return value >= 0 ? '#10B981' : '#EF4444'
+            },
+          },
+        ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: true,
-        aspectRatio: 2,
-        plugins: { legend: { display: false } },
-        scales: { x: { grid: { display: false } }, y: { ticks: { callback: v => `$${Number(v).toFixed(0)}` } } }
-      }
+        maintainAspectRatio: false,
+        plugins: {
+          legend: { display: false },
+        },
+        scales: {
+          x: {
+            grid: { display: false },
+          },
+          y: {
+            grid: { color: 'rgba(255, 255, 255, 0.1)' },
+            ticks: { callback: (v) => `$${Number(v)}` },
+          },
+        },
+      },
     })
   }
 }
