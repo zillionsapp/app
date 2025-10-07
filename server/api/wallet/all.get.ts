@@ -1,6 +1,12 @@
 // server/api/wallet/all.get.ts
 import Airtable from 'airtable'
 
+interface TransactionDetail {
+  email: string
+  amount: number
+  timestamp: string
+}
+
 export default defineEventHandler(async (event) => {
   try {
     
@@ -17,16 +23,54 @@ export default defineEventHandler(async (event) => {
       })
       .all()
 
-    const wallets = records.map(record => ({
-      id: record.id,
-      email: record.fields.Email as string,
-      amount: record.fields.Amount as number || 0,
-      sentTo: (record.fields.sentTo as string[]) || [],
-      receivedFrom: (record.fields.receivedFrom as string[]) || [],
-      trades: (record.fields.trades as string[]) || [],
-      created_at: record.fields['Created At'] as string,
-      updated_at: record.fields['Updated At'] as string
-    }))
+    const wallets = records.map(record => {
+      // Parse sentTo field
+      let sentTo: TransactionDetail[] = []
+      try {
+        const sentToField = record.fields.sentTo as string
+        if (sentToField) {
+          sentTo = JSON.parse(sentToField)
+        }
+      } catch (parseError) {
+        console.error(`Error parsing sentTo for ${record.fields.Email}:`, parseError)
+        sentTo = []
+      }
+
+      // Parse receivedFrom field
+      let receivedFrom: TransactionDetail[] = []
+      try {
+        const receivedFromField = record.fields.receivedFrom as string
+        if (receivedFromField) {
+          receivedFrom = JSON.parse(receivedFromField)
+        }
+      } catch (parseError) {
+        console.error(`Error parsing receivedFrom for ${record.fields.Email}:`, parseError)
+        receivedFrom = []
+      }
+
+      // Parse trades field
+      let trades: string[] = []
+      try {
+        const tradesField = record.fields.trades as string
+        if (tradesField) {
+          trades = JSON.parse(tradesField)
+        }
+      } catch (parseError) {
+        console.error(`Error parsing trades for ${record.fields.Email}:`, parseError)
+        trades = []
+      }
+
+      return {
+        id: record.id,
+        email: record.fields.Email as string,
+        amount: record.fields.Amount as number || 0,
+        sentTo,
+        receivedFrom,
+        trades,
+        created_at: record.fields['Created At'] as string,
+        updated_at: record.fields['Updated At'] as string
+      }
+    })
 
     return {
       success: true,

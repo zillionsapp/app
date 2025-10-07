@@ -7,6 +7,12 @@ interface SendRequest {
   toEmail: string
 }
 
+interface TransactionDetail {
+  email: string
+  amount: number
+  timestamp: string
+}
+
 export default defineEventHandler(async (event) => {
   try {
     const body = await readBody<SendRequest>(event)
@@ -75,11 +81,27 @@ export default defineEventHandler(async (event) => {
     const fromNewAmount = fromCurrentAmount - amount
     if (fromRecord && fromRecord.id) {
       // Get current sentTo history or initialize empty array
-      const currentSentTo = (fromRecord.fields.sentTo as string[]) || []
+      let currentSentTo: TransactionDetail[] = []
+      try {
+        const sentToField = fromRecord.fields.sentTo as string
+        if (sentToField) {
+          currentSentTo = JSON.parse(sentToField)
+        }
+      } catch (parseError) {
+        console.error(`Error parsing sentTo for ${fromEmail}:`, parseError)
+        currentSentTo = []
+      }
+
+      // Add new transaction with email, amount, and timestamp
+      const newTransaction: TransactionDetail = {
+        email: toEmail,
+        amount: amount,
+        timestamp: now
+      }
 
       await base(tableName).update(fromRecord.id, {
         Amount: fromNewAmount,
-        sentTo: [...currentSentTo, toEmail],
+        sentTo: JSON.stringify([...currentSentTo, newTransaction]),
         'Updated At': now
       })
     }
@@ -89,18 +111,41 @@ export default defineEventHandler(async (event) => {
       const toCurrentAmount = toRecord.fields.Amount as number || 0
       const toNewAmount = toCurrentAmount + amount
       // Get current receivedFrom history or initialize empty array
-      const currentReceivedFrom = (toRecord.fields.receivedFrom as string[]) || []
+      let currentReceivedFrom: TransactionDetail[] = []
+      try {
+        const receivedFromField = toRecord.fields.receivedFrom as string
+        if (receivedFromField) {
+          currentReceivedFrom = JSON.parse(receivedFromField)
+        }
+      } catch (parseError) {
+        console.error(`Error parsing receivedFrom for ${toEmail}:`, parseError)
+        currentReceivedFrom = []
+      }
+
+      // Add new transaction with email, amount, and timestamp
+      const newReceivedTransaction: TransactionDetail = {
+        email: fromEmail,
+        amount: amount,
+        timestamp: now
+      }
 
       await base(tableName).update(toRecord.id, {
         Amount: toNewAmount,
-        receivedFrom: [...currentReceivedFrom, fromEmail],
+        receivedFrom: JSON.stringify([...currentReceivedFrom, newReceivedTransaction]),
         'Updated At': now
       })
     } else {
+      // Add new transaction with email, amount, and timestamp for new wallet
+      const newReceivedTransaction: TransactionDetail = {
+        email: fromEmail,
+        amount: amount,
+        timestamp: now
+      }
+
       await base(tableName).create({
         Email: toEmail,
         Amount: amount,
-        receivedFrom: [fromEmail],
+        receivedFrom: JSON.stringify([newReceivedTransaction]),
         'Created At': now,
         'Updated At': now
       })

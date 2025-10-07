@@ -65,12 +65,26 @@ export class PaperTradingBot {
         })
         .all()
 
-      return records.map(record => ({
-        id: record.id,
-        email: record.fields.Email as string,
-        amount: record.fields.Amount as number || 0,
-        trades: (record.fields.trades as string[]) || []
-      }))
+      return records.map(record => {
+        let trades: string[] = []
+        try {
+          // Parse the JSON string from Airtable
+          const tradesField = record.fields.Trades as string
+          if (tradesField) {
+            trades = JSON.parse(tradesField)
+          }
+        } catch (parseError) {
+          console.error(`Error parsing trades for wallet ${record.id}:`, parseError)
+          trades = []
+        }
+
+        return {
+          id: record.id,
+          email: record.fields.Email as string,
+          amount: record.fields.Amount as number || 0,
+          trades: trades
+        }
+      })
     } catch (error) {
       console.error('Error fetching wallets:', error)
       return []
@@ -80,7 +94,7 @@ export class PaperTradingBot {
   async updateWalletTrades(walletId: string, trades: string[]): Promise<void> {
     try {
       await this.base(this.tableName).update(walletId, {
-        trades: trades,
+        'Trades': JSON.stringify(trades),
         'Updated At': new Date().toISOString()
       })
     } catch (error) {
