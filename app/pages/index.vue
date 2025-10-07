@@ -222,11 +222,18 @@
                 <h3 class="card-title text-2xl">{{ strategyContent[selectedStrategy].title }}</h3>
               </div>
 
-              <ul class="list-disc ms-5 text-sm opacity-90 space-y-3 mt-4">
-                <li v-for="benefit in strategyContent[selectedStrategy].benefits" :key="benefit" class="hover:translate-x-1 transition-transform duration-300">
-                  {{ benefit }}
-                </li>
-              </ul>
+              <div class="mt-6 space-y-4">
+                <div v-for="(benefit, index) in strategyContent[selectedStrategy].benefits" :key="benefit" class="group">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                    <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
+                      <div class="w-3 h-3 bg-primary rounded-full"></div>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-white/90 leading-relaxed">{{ benefit }}</p>
+                    </div>
+                  </div>
+                </div>
+              </div>
 
 
 
