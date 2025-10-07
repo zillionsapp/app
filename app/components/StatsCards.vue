@@ -1,5 +1,5 @@
 <template>
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 pt-4">
     <!-- Net P&L -->
     <div class="card bg-base-200 shadow-lg">
       <div class="card-body p-4">
@@ -8,7 +8,7 @@
           <span class="text-sm opacity-70">Net P&L</span>
           <div class="ml-auto">
             <div class="dropdown dropdown-end">
-              <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
+              <!-- <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div> -->
               <div class="dropdown-content z-[1] card card-compact p-2 shadow bg-base-100 text-xs">
                 <div class="card-body p-2">
                   <p>Total profit and loss</p>
@@ -18,10 +18,10 @@
           </div>
         </div>
         <div class="flex items-center justify-between">
-          <div class="text-2xl font-bold text-success">${{ fmtCurrency(netPnl) }}</div>
-          <div class="w-16 h-8">
+          <div class="text-2xl font-bold text-success">{{ fmtCurrency(netPnl) }}</div>
+          <!-- <div class="w-16 h-8">
             <canvas ref="netPnLChart" class="w-full h-full"></canvas>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -32,17 +32,17 @@
         <div class="flex items-center gap-2 mb-2">
           <div class="w-3 h-3 rounded-full bg-green-500"></div>
           <span class="text-sm opacity-70">Trade Expectancy</span>
-          <div class="ml-auto">
+          <!-- <div class="ml-auto">
             <div class="dropdown dropdown-end">
               <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="flex items-center justify-between">
           <div class="text-2xl font-bold">${{ fmtNumber(tradeExpectancy) }}</div>
-          <div class="w-16 h-8">
+          <!-- <div class="w-16 h-8">
             <canvas ref="tradeExpectancyChart" class="w-full h-full"></canvas>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -53,17 +53,17 @@
         <div class="flex items-center gap-2 mb-2">
           <div class="w-3 h-3 rounded-full bg-purple-500"></div>
           <span class="text-sm opacity-70">Profit Factor</span>
-          <div class="ml-auto">
+          <!-- <div class="ml-auto">
             <div class="dropdown dropdown-end">
               <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="flex items-center justify-between">
           <div class="text-2xl font-bold">{{ fmtNumber(profitFactor) }}</div>
-          <div class="w-16 h-8">
+          <!-- <div class="w-16 h-8">
             <canvas ref="profitFactorChart" class="w-full h-full"></canvas>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -74,17 +74,17 @@
         <div class="flex items-center gap-2 mb-2">
           <div class="w-3 h-3 rounded-full bg-orange-500"></div>
           <span class="text-sm opacity-70">Win %</span>
-          <div class="ml-auto">
+          <!-- <div class="ml-auto">
             <div class="dropdown dropdown-end">
               <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="flex items-center justify-between">
           <div class="text-2xl font-bold text-info">{{ fmtNumber(winRate) }}%</div>
-          <div class="w-16 h-8">
+          <!-- <div class="w-16 h-8">
             <canvas ref="winRateChart" class="w-full h-full"></canvas>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -95,20 +95,20 @@
         <div class="flex items-center gap-2 mb-2">
           <div class="w-3 h-3 rounded-full bg-red-500"></div>
           <span class="text-sm opacity-70">Avg win/loss trade</span>
-          <div class="ml-auto">
+          <!-- <div class="ml-auto">
             <div class="dropdown dropdown-end">
               <div tabindex="0" role="button" class="btn btn-ghost btn-xs">ⓘ</div>
             </div>
-          </div>
+          </div> -->
         </div>
         <div class="flex items-center justify-between">
           <div class="text-2xl font-bold">
             <span class="text-success">${{ fmtNumber(avgWin) }}</span>
             <span class="text-error ml-2">${{ fmtNumber(avgLoss) }}</span>
           </div>
-          <div class="w-16 h-8">
+          <!-- <div class="w-16 h-8">
             <canvas ref="avgWinLossChart" class="w-full h-full"></canvas>
-          </div>
+          </div> -->
         </div>
       </div>
     </div>
@@ -166,18 +166,27 @@ function rebuildCharts() {
 }
 
 function buildCharts() {
+  // Generate sample data based on current metrics
+  const generateTrendData = (baseValue: number, variance: number = 0.3) => {
+    return Array.from({ length: 5 }, (_, i) => {
+      const randomFactor = 1 + (Math.random() - 0.5) * variance
+      return Math.max(0, baseValue * randomFactor)
+    })
+  }
+
   // Net P&L Mini Chart
   if (netPnLChart.value) {
     const ctx = netPnLChart.value.getContext('2d')!
+    const pnlData = generateTrendData(Math.abs(props.netPnl) || 100)
     netPnLMiniChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: ['', '', '', '', ''],
         datasets: [
           {
-            data: [10, 25, 15, 30, 20],
-            borderColor: '#3B82F6',
-            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            data: pnlData,
+            borderColor: props.netPnl >= 0 ? '#10B981' : '#EF4444',
+            backgroundColor: props.netPnl >= 0 ? 'rgba(16, 185, 129, 0.1)' : 'rgba(239, 68, 68, 0.1)',
             fill: true,
             tension: 0.4,
             pointRadius: 0,
@@ -200,13 +209,14 @@ function buildCharts() {
   // Trade Expectancy Mini Chart
   if (tradeExpectancyChart.value) {
     const ctx = tradeExpectancyChart.value.getContext('2d')!
+    const expectancyData = generateTrendData(Math.abs(props.tradeExpectancy) || 50)
     tradeExpectancyMiniChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: ['', '', '', '', ''],
         datasets: [
           {
-            data: [20, 35, 25, 40, 30],
+            data: expectancyData,
             borderColor: '#10B981',
             backgroundColor: 'rgba(16, 185, 129, 0.1)',
             fill: true,
@@ -231,13 +241,14 @@ function buildCharts() {
   // Profit Factor Mini Chart
   if (profitFactorChart.value) {
     const ctx = profitFactorChart.value.getContext('2d')!
+    const pfData = generateTrendData(props.profitFactor || 1.5, 0.5)
     profitFactorMiniChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: ['', '', '', '', ''],
         datasets: [
           {
-            data: [1.2, 1.8, 1.4, 2.0, 1.6],
+            data: pfData,
             borderColor: '#8B5CF6',
             backgroundColor: 'rgba(139, 92, 246, 0.1)',
             fill: true,
@@ -262,13 +273,14 @@ function buildCharts() {
   // Win Rate Mini Chart
   if (winRateChart.value) {
     const ctx = winRateChart.value.getContext('2d')!
+    const winRateData = generateTrendData(props.winRate || 40, 0.2)
     winRateMiniChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: ['', '', '', '', ''],
         datasets: [
           {
-            data: [35, 45, 40, 50, 42],
+            data: winRateData,
             borderColor: '#F97316',
             backgroundColor: 'rgba(249, 115, 22, 0.1)',
             fill: true,
@@ -293,16 +305,29 @@ function buildCharts() {
   // Avg Win/Loss Mini Chart
   if (avgWinLossChart.value) {
     const ctx = avgWinLossChart.value.getContext('2d')!
+    const winData = generateTrendData(props.avgWin || 100, 0.3)
+    const lossData = generateTrendData(Math.abs(props.avgLoss) || 80, 0.3)
+
     avgWinLossMiniChart = new Chart(ctx, {
       type: 'line',
       data: {
         labels: ['', '', '', '', ''],
         datasets: [
           {
-            data: [30, 45, 35, 55, 40],
+            label: 'Avg Win',
+            data: winData,
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: false,
+            tension: 0.4,
+            pointRadius: 0,
+          },
+          {
+            label: 'Avg Loss',
+            data: lossData.map(v => -v), // Make negative for loss
             borderColor: '#EF4444',
             backgroundColor: 'rgba(239, 68, 68, 0.1)',
-            fill: true,
+            fill: false,
             tension: 0.4,
             pointRadius: 0,
           },

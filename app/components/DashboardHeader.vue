@@ -1,22 +1,29 @@
 <template>
-  <div class="flex items-center justify-between">
+  <div class="flex items-center justify-between py-2">
     <div>
       <h1 class="text-3xl font-bold">Trading Dashboard</h1>
-      <p class="opacity-70">Performance Overview</p>
+      <p class="opacity-70">
+        ${{ totalBalance.toLocaleString() }} Total Balance •
+        {{ totalTrades }} Total Trades
+      </p>
     </div>
-    <div class="flex items-center gap-4">
-      <div class="badge badge-outline badge-lg">Live</div>
+    <!-- <div class="flex items-center gap-4">
       <select class="select select-bordered select-sm">
-        <option>Last 30 Days</option>
         <option>Last 7 Days</option>
+        <option>Last 30 Days</option>
         <option>Last 90 Days</option>
       </select>
-    </div>
+    </div> -->
   </div>
 </template>
 
 <script setup lang="ts">
-// No props or logic needed for this simple header component
+import { useDashboard } from '../composables/useDashboard'
+
+const {
+  totalBalance,
+  totalTrades
+} = useDashboard()
 </script>
 
 <style scoped>
