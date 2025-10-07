@@ -161,47 +161,57 @@
     <section id="tech" class="py-14 lg:py-20 bg-base-200/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Inside the engine</h2>
-        <p class="mt-2 text-white/70">We don’t just run a fixed strategy. We detect <em>footprints</em> of who’s driving price now:</p>
+        <p class="mt-2 text-white/70">Our advanced trading system combines multiple analytical layers to identify high-probability opportunities:</p>
 
         <div class="mt-8 grid md:grid-cols-2 gap-6">
           <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">LOB</span>
+                <span class="badge badge-primary badge-lg">Trend</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
-                <div class="font-medium text-lg">Order‑book analytics</div>
-                <div class="text-sm opacity-80 mt-1">Quote/trade ratio, cancellations, depth imbalance.</div>
+                <div class="font-medium text-lg">Multi-Timeframe Trend Analysis</div>
+                <div class="text-sm opacity-80 mt-1">Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.</div>
               </div>
               <hr class="bg-primary/20"/>
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">Micro</span>
+                <span class="badge badge-primary badge-lg">Signals</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
-                <div class="font-medium text-lg">Microstructure patterns</div>
-                <div class="text-sm opacity-80 mt-1">Breakout persistence, stop‑runs, short‑lived trends.</div>
+                <div class="font-medium text-lg">OBOS Signals</div>
+                <div class="text-sm opacity-80 mt-1">Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.</div>
               </div>
               <hr class="bg-primary/20"/>
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">Vol</span>
+                <span class="badge badge-primary badge-lg">Confirm</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
-                <div class="font-medium text-lg">Volatility & volume regimes</div>
-                <div class="text-sm opacity-80 mt-1">Clustering volume around breaks vs. tight spreads & low vol.</div>
+                <div class="font-medium text-lg">HTF Confirmation</div>
+                <div class="text-sm opacity-80 mt-1">Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.</div>
               </div>
               <hr class="bg-primary/20"/>
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg">ML</span>
+                <span class="badge badge-primary badge-lg">Risk</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
-                <div class="font-medium text-lg">Unsupervised clustering</div>
-                <div class="text-sm opacity-80 mt-1">Map current features to historical "regimes" for alignment.</div>
+                <div class="font-medium text-lg">Risk Management</div>
+                <div class="text-sm opacity-80 mt-1">Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.</div>
+              </div>
+              <hr class="bg-primary/20"/>
+            </li>
+            <li>
+              <div class="timeline-middle">
+                <span class="badge badge-primary badge-lg">Size</span>
+              </div>
+              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+                <div class="font-medium text-lg">Position Sizing</div>
+                <div class="text-sm opacity-80 mt-1">Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.</div>
               </div>
             </li>
           </ul>
@@ -210,13 +220,14 @@
             <div class="card-body">
               <h3 class="card-title text-2xl">What you get</h3>
               <ul class="list-disc ms-5 text-sm opacity-90 space-y-3 mt-4">
-                <li class="hover:translate-x-1 transition-transform duration-300">Auto‑adaptive trading without being a pro.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Clear, on‑chain transparency.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Fewer knobs. More outcomes.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Risk controls aligned to regime conditions.</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">Multi-timeframe analysis for trend confirmation.</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">Overbought/oversold detection for entry timing.</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">Higher timeframe confirmation reduces false signals.</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">Advanced risk management with trailing stops and take-profits.</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">Consistent position sizing for optimal risk exposure.</li>
               </ul>
               <div class="alert alert-info text-white bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
-                <span>We aim for growth, but markets are risky. Returns aren't guaranteed.</span>
+                <span>Advanced trading system designed for consistent performance across market conditions.</span>
               </div>
             </div>
           </div>

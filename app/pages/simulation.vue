@@ -4,7 +4,7 @@
       <!-- Header -->
       <div class="mb-8">
         <NuxtLink to="/Wallet" class="btn btn-ghost btn-sm mb-4">
-          ← Back to Wallet
+          ← Back to Home
         </NuxtLink>
         <h1 class="text-3xl font-bold mb-2">Trading Rules – Mini Simulation</h1>
         <p class="text-white/70">
