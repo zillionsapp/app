@@ -35,7 +35,12 @@
               </div>
             </div>
           </div>
-          <div class="text-2xl font-bold text-success">$248.78</div>
+          <div class="flex items-center justify-between">
+            <div class="text-2xl font-bold text-success">$248.78</div>
+            <div class="w-16 h-8">
+              <canvas ref="netPnLChart" class="w-full h-full"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -51,7 +56,12 @@
               </div>
             </div>
           </div>
-          <div class="text-2xl font-bold">$248.78</div>
+          <div class="flex items-center justify-between">
+            <div class="text-2xl font-bold">$248.78</div>
+            <div class="w-16 h-8">
+              <canvas ref="tradeExpectancyChart" class="w-full h-full"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -67,7 +77,12 @@
               </div>
             </div>
           </div>
-          <div class="text-2xl font-bold">1.24</div>
+          <div class="flex items-center justify-between">
+            <div class="text-2xl font-bold">1.24</div>
+            <div class="w-16 h-8">
+              <canvas ref="profitFactorChart" class="w-full h-full"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -83,7 +98,12 @@
               </div>
             </div>
           </div>
-          <div class="text-2xl font-bold text-info">39.02%</div>
+          <div class="flex items-center justify-between">
+            <div class="text-2xl font-bold text-info">39.02%</div>
+            <div class="w-16 h-8">
+              <canvas ref="winRateChart" class="w-full h-full"></canvas>
+            </div>
+          </div>
         </div>
       </div>
 
@@ -99,9 +119,14 @@
               </div>
             </div>
           </div>
-          <div class="text-2xl font-bold">
-            <span class="text-success">$34.82</span>
-            <span class="text-error ml-2">$51.32</span>
+          <div class="flex items-center justify-between">
+            <div class="text-2xl font-bold">
+              <span class="text-success">$34.82</span>
+              <span class="text-error ml-2">$51.32</span>
+            </div>
+            <div class="w-16 h-8">
+              <canvas ref="avgWinLossChart" class="w-full h-full"></canvas>
+            </div>
           </div>
         </div>
       </div>
@@ -136,7 +161,9 @@
       <div class="card bg-base-200 shadow-lg">
         <div class="card-body">
           <h2 class="card-title">Daily Net Cumulative P&L</h2>
-          <canvas ref="cumulativePnLCanvas" class="h-48"></canvas>
+          <div class="h-48 w-full">
+            <canvas ref="cumulativePnLCanvas" class="h-full w-full"></canvas>
+          </div>
         </div>
       </div>
 
@@ -144,7 +171,9 @@
       <div class="card bg-base-200 shadow-lg">
         <div class="card-body">
           <h2 class="card-title">Net Daily P&L</h2>
-          <canvas ref="dailyPnLCanvas" class="h-48"></canvas>
+          <div class="h-48 w-full">
+            <canvas ref="dailyPnLCanvas" class="h-full w-full"></canvas>
+          </div>
         </div>
       </div>
     </div>
@@ -303,7 +332,9 @@ import {
   LinearScale,
   Tooltip,
   Legend,
-  Filler
+  Filler,
+  DoughnutController,
+  ArcElement
 } from 'chart.js'
 
 // Register Chart.js components
@@ -318,6 +349,8 @@ Chart.register(
   Tooltip,
   Legend,
   Filler,
+  DoughnutController,
+  ArcElement,
 )
 
 // Props
@@ -372,9 +405,19 @@ const rangeVolBps = computed(() => strategies.value?.range?.volEwmaBps ?? null)
 const zellaScoreCanvas = ref<HTMLCanvasElement | null>(null)
 const cumulativePnLCanvas = ref<HTMLCanvasElement | null>(null)
 const dailyPnLCanvas = ref<HTMLCanvasElement | null>(null)
+const netPnLChart = ref<HTMLCanvasElement | null>(null)
+const tradeExpectancyChart = ref<HTMLCanvasElement | null>(null)
+const profitFactorChart = ref<HTMLCanvasElement | null>(null)
+const winRateChart = ref<HTMLCanvasElement | null>(null)
+const avgWinLossChart = ref<HTMLCanvasElement | null>(null)
 let zellaScoreChart: Chart | null = null
 let cumulativePnLChart: Chart | null = null
 let dailyPnLChart: Chart | null = null
+let netPnLMiniChart: Chart | null = null
+let tradeExpectancyMiniChart: Chart | null = null
+let profitFactorMiniChart: Chart | null = null
+let winRateMiniChart: Chart | null = null
+let avgWinLossMiniChart: Chart | null = null
 
 // Chart data series
 const labels = computed(() => trades.value.map((t: Trade) => toHms(t.t)))
@@ -401,6 +444,11 @@ onBeforeUnmount(() => {
   zellaScoreChart?.destroy?.()
   cumulativePnLChart?.destroy?.()
   dailyPnLChart?.destroy?.()
+  netPnLMiniChart?.destroy?.()
+  tradeExpectancyMiniChart?.destroy?.()
+  profitFactorMiniChart?.destroy?.()
+  winRateMiniChart?.destroy?.()
+  avgWinLossMiniChart?.destroy?.()
 })
 
 watch([trades, totalFees], () => {
@@ -412,21 +460,27 @@ function rebuildCharts() {
   zellaScoreChart?.destroy?.()
   cumulativePnLChart?.destroy?.()
   dailyPnLChart?.destroy?.()
+  netPnLMiniChart?.destroy?.()
+  tradeExpectancyMiniChart?.destroy?.()
+  profitFactorMiniChart?.destroy?.()
+  winRateMiniChart?.destroy?.()
+  avgWinLossMiniChart?.destroy?.()
   buildCharts()
 }
 
 function buildCharts() {
-  // Zella Score Gauge Chart
+  // Zella Score Gauge Chart - Custom triangular gauge
   if (zellaScoreCanvas.value) {
-    zellaScoreChart = new Chart(zellaScoreCanvas.value.getContext('2d')!, {
+    const ctx = zellaScoreCanvas.value.getContext('2d')!
+    zellaScoreChart = new Chart(ctx, {
       type: 'doughnut',
       data: {
         datasets: [
           {
-            data: [81, 19], // Score and remaining
+            data: [81, 19],
             backgroundColor: [
-              '#10B981', // Green for score
-              '#374151', // Gray for background
+              '#22C55E',
+              '#E5E7EB',
             ],
             borderWidth: 0,
           },
@@ -434,84 +488,285 @@ function buildCharts() {
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
-        cutout: '70%',
+        maintainAspectRatio: true,
+        rotation: -90,
+        circumference: 180,
+        cutout: '75%',
         plugins: {
           legend: { display: false },
           tooltip: { enabled: false },
         },
       },
     })
+
+    // Draw the triangular pointer
+    const centerX = zellaScoreCanvas.value.width / 2
+    const centerY = zellaScoreCanvas.value.height / 2
+    const outerRadius = 120
+
+    // Draw triangular pointer at score position (81/100 * 180 degrees = 145.8 degrees)
+    const pointerAngle = (81 / 100) * 180 * (Math.PI / 180) - Math.PI / 2
+
+    ctx.save()
+    ctx.translate(centerX, centerY)
+    ctx.rotate(pointerAngle)
+    ctx.beginPath()
+    ctx.moveTo(0, -5)
+    ctx.lineTo(-10, 10)
+    ctx.lineTo(10, 10)
+    ctx.closePath()
+    ctx.fillStyle = '#22C55E'
+    ctx.fill()
+    ctx.restore()
   }
 
-  // Cumulative P&L Chart
+  // Daily Net Cumulative P&L Chart
   if (cumulativePnLCanvas.value) {
-    cumulativePnLChart = new Chart(cumulativePnLCanvas.value.getContext('2d')!, {
+    const ctx = cumulativePnLCanvas.value.getContext('2d')!
+    cumulativePnLChart = new Chart(ctx, {
       type: 'line',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        labels: ['12/09/2022', '12/09/2022', '12/09/2022', '12/09/2022', '12/09/2022'],
         datasets: [
           {
             label: 'Cumulative P&L',
-            data: [100, 150, 200, 180, 250, 300, 280, 350, 400, 380, 450, 500],
+            data: [200, 150, 50, -50, -200],
             borderColor: '#10B981',
-            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            backgroundColor: 'rgba(16, 185, 129, 0.2)',
             fill: true,
-            tension: 0.4,
+            tension: 0.1,
+            pointRadius: 0,
           },
         ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
         plugins: {
           legend: { display: false },
         },
         scales: {
           x: {
             grid: { display: false },
+            ticks: { color: '#9CA3AF', font: { size: 10 } },
           },
           y: {
-            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-            ticks: { callback: (v) => `$${Number(v)}` },
+            grid: { color: 'rgba(156, 163, 175, 0.2)' },
+            ticks: {
+              color: '#9CA3AF',
+              callback: (v) => `$${Number(v)}`,
+              font: { size: 10 }
+            },
+          },
+        },
+        elements: {
+          point: {
+            radius: 0,
           },
         },
       },
     })
   }
 
-  // Daily P&L Chart
+  // Net Daily P&L Chart
   if (dailyPnLCanvas.value) {
-    dailyPnLChart = new Chart(dailyPnLCanvas.value.getContext('2d')!, {
+    const ctx = dailyPnLCanvas.value.getContext('2d')!
+    dailyPnLChart = new Chart(ctx, {
       type: 'bar',
       data: {
-        labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+        labels: ['12/09/2022', '12/09/2022', '12/09/2022', '12/09/2022', '12/09/2022'],
         datasets: [
           {
             label: 'Daily P&L',
-            data: [10, 15, -5, 20, 18, -8, 25, 12, -3, 22, 30, 8],
-            backgroundColor: (context) => {
-              const value = context.parsed.y
-              return value >= 0 ? '#10B981' : '#EF4444'
-            },
+            data: [100, 80, -60, 120, -40],
+            backgroundColor: [
+              '#10B981',
+              '#10B981',
+              '#EF4444',
+              '#10B981',
+              '#EF4444',
+            ],
+            borderRadius: 2,
+            borderSkipped: false,
           },
         ],
       },
       options: {
         responsive: true,
-        maintainAspectRatio: false,
+        maintainAspectRatio: true,
         plugins: {
           legend: { display: false },
         },
         scales: {
           x: {
             grid: { display: false },
+            ticks: { color: '#9CA3AF', font: { size: 10 } },
           },
           y: {
-            grid: { color: 'rgba(255, 255, 255, 0.1)' },
-            ticks: { callback: (v) => `$${Number(v)}` },
+            grid: { color: 'rgba(156, 163, 175, 0.2)' },
+            ticks: {
+              color: '#9CA3AF',
+              callback: (v) => `$${Number(v)}`,
+              font: { size: 10 }
+            },
           },
         },
+      },
+    })
+  }
+
+  // Mini Charts for Stats Cards
+  // Net P&L Mini Chart
+  if (netPnLChart.value) {
+    const ctx = netPnLChart.value.getContext('2d')!
+    netPnLMiniChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['', '', '', '', ''],
+        datasets: [
+          {
+            data: [10, 25, 15, 30, 20],
+            borderColor: '#3B82F6',
+            backgroundColor: 'rgba(59, 130, 246, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: { point: { radius: 0 } },
+      },
+    })
+  }
+
+  // Trade Expectancy Mini Chart
+  if (tradeExpectancyChart.value) {
+    const ctx = tradeExpectancyChart.value.getContext('2d')!
+    tradeExpectancyMiniChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['', '', '', '', ''],
+        datasets: [
+          {
+            data: [20, 35, 25, 40, 30],
+            borderColor: '#10B981',
+            backgroundColor: 'rgba(16, 185, 129, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: { point: { radius: 0 } },
+      },
+    })
+  }
+
+  // Profit Factor Mini Chart
+  if (profitFactorChart.value) {
+    const ctx = profitFactorChart.value.getContext('2d')!
+    profitFactorMiniChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['', '', '', '', ''],
+        datasets: [
+          {
+            data: [1.2, 1.8, 1.4, 2.0, 1.6],
+            borderColor: '#8B5CF6',
+            backgroundColor: 'rgba(139, 92, 246, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: { point: { radius: 0 } },
+      },
+    })
+  }
+
+  // Win Rate Mini Chart
+  if (winRateChart.value) {
+    const ctx = winRateChart.value.getContext('2d')!
+    winRateMiniChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['', '', '', '', ''],
+        datasets: [
+          {
+            data: [35, 45, 40, 50, 42],
+            borderColor: '#F97316',
+            backgroundColor: 'rgba(249, 115, 22, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: { point: { radius: 0 } },
+      },
+    })
+  }
+
+  // Avg Win/Loss Mini Chart
+  if (avgWinLossChart.value) {
+    const ctx = avgWinLossChart.value.getContext('2d')!
+    avgWinLossMiniChart = new Chart(ctx, {
+      type: 'line',
+      data: {
+        labels: ['', '', '', '', ''],
+        datasets: [
+          {
+            data: [30, 45, 35, 55, 40],
+            borderColor: '#EF4444',
+            backgroundColor: 'rgba(239, 68, 68, 0.1)',
+            fill: true,
+            tension: 0.4,
+            pointRadius: 0,
+          },
+        ],
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: true,
+        plugins: { legend: { display: false }, tooltip: { enabled: false } },
+        scales: {
+          x: { display: false },
+          y: { display: false },
+        },
+        elements: { point: { radius: 0 } },
       },
     })
   }
