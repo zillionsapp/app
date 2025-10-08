@@ -88,7 +88,7 @@
     <section id="features" class="py-16 lg:py-24 bg-base-200/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
-        <p class="mt-2 text-white/70">Not another “DeFI” or "auto trading" app. Zillions detects market strategies in real-time - and adapts.</p>
+        <p class="mt-2 text-white/70">Not another "trading bot" app. Zillions detects market strategies in real-time - and adapts.</p>
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
@@ -108,7 +108,7 @@
             <div class="card-body">
               <div class="badge badge-primary badge-outline mb-2">UX</div>
               <h3 class="card-title text-xl">Hands‑off simplicity</h3>
-              <p class="text-sm opacity-80">No knobs, no charts to study. Fund a vault and let the AI adapt 24/7.</p>
+              <p class="text-sm opacity-80">No knobs, no charts to study. Fund a vault and let the algorithm adapt 24/7.</p>
             </div>
           </article>
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
