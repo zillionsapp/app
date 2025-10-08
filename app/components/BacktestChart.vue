@@ -5,29 +5,6 @@
       <h3 class="text-xl font-bold text-white">
         Performance Chart
       </h3>
-      <div class="flex rounded-lg p-1">
-        <button
-          @click="activeView = 'both'"
-          :class="activeView === 'both' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
-          class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
-        >
-          Combined
-        </button>
-        <button
-          @click="activeView = 'price'"
-          :class="activeView === 'price' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
-          class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
-        >
-          Price Only
-        </button>
-        <button
-          @click="activeView = 'portfolio'"
-          :class="activeView === 'portfolio' ? 'bg-blue-600 text-white shadow-md' : 'text-gray-600 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-gray-700'"
-          class="px-4 py-2 rounded-md text-sm font-medium transition-all duration-200"
-        >
-          Portfolio Only
-        </button>
-      </div>
     </div>
 
     <!-- Loading state -->
@@ -69,17 +46,6 @@
         </div>
       </div>
 
-      <!-- Trade Markers Legend -->
-      <div v-if="tradeMarkers.length > 0" class="mt-4 flex justify-center space-x-6 text-sm">
-        <div class="flex items-center">
-          <div class="w-4 h-4 bg-green-600 rounded-full mr-2"></div>
-          <span class="text-gray-700 dark:text-gray-300 font-medium">Buy Trade</span>
-        </div>
-        <div class="flex items-center">
-          <div class="w-4 h-4 bg-red-600 rounded-full mr-2"></div>
-          <span class="text-gray-700 dark:text-gray-300 font-medium">Sell Trade</span>
-        </div>
-      </div>
     </div>
   </div>
 </template>
@@ -92,6 +58,7 @@ import {
   LinearScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
@@ -104,6 +71,7 @@ ChartJS.register(
   LinearScale,
   PointElement,
   LineElement,
+  LineController,
   Title,
   Tooltip,
   Legend,
