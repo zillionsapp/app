@@ -41,9 +41,7 @@
             Become a <span class="text-primary">Zillionaire</span>
           </h1>
           <p class="mt-6 text-base md:text-lg text-white/80 leading-relaxed animate-fade-in">
-            <span class="text-primary"> <b>DeFAI</b></span> for <b>everyone</b>.<br>
-            
-            <span class="italic">Grow your capital with ease.</span> 
+            Zillions is an on‑chain, autonomous “meta‑trading” bot designed to help more people participate in markets - without needing to be a pro. 
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
