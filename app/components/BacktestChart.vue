@@ -28,10 +28,10 @@
       >
         <div class="font-semibold mb-2">{{ tooltipData.date }}</div>
         <div v-if="tooltipData.price" class="text-blue-300 mb-1">
-          Price: ${{ tooltipData.price.toFixed(2) }}
+          Price: ${{ tooltipData.price.toFixed(2) }} ({{ tooltipData.pricePct >= 0 ? '+' : '' }}{{ tooltipData.pricePct.toFixed(2) }}%)
         </div>
         <div v-if="tooltipData.portfolio" class="text-green-300 mb-1">
-          Portfolio: ${{ tooltipData.portfolio.toFixed(2) }}
+          Portfolio: ${{ tooltipData.portfolio.toFixed(2) }} ({{ tooltipData.portfolioPct >= 0 ? '+' : '' }}{{ tooltipData.portfolioPct.toFixed(2) }}%)
         </div>
         <div v-if="tooltipData.buyHold !== undefined" class="text-gray-300 mb-1">
           Buy & Hold: ${{ tooltipData.buyHold.toFixed(2) }}
@@ -218,10 +218,18 @@ const chartOptions = computed(() => ({
             const vsBuyHold = portfolioData.value - buyHoldData.value
             const vsBuyHoldPct = buyHoldData.value !== 0 ? (vsBuyHold / buyHoldData.value) * 100 : 0
 
+            // Calculate percentage changes from initial values
+            const startPrice = props.priceData[0]?.price || 1
+            const initialCapital = props.initialCapital || 1000
+            const pricePct = startPrice !== 0 ? ((priceData.price - startPrice) / startPrice) * 100 : 0
+            const portfolioPct = initialCapital !== 0 ? ((portfolioData.value - initialCapital) / initialCapital) * 100 : 0
+
             tooltipData.value = {
               date: new Date(priceData.time).toLocaleString(),
               price: priceData.price,
+              pricePct: pricePct,
               portfolio: portfolioData.value,
+              portfolioPct: portfolioPct,
               buyHold: buyHoldData.value,
               vsBuyHold: vsBuyHold,
               vsBuyHoldPct: vsBuyHoldPct,
