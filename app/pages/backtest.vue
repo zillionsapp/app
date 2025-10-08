@@ -17,7 +17,7 @@
           />
 
           <!-- Analysis and Improvement Section -->
-          <BacktestAnalysis
+          <!-- <BacktestAnalysis
             v-if="result && !loading"
             :result="result"
             :analysis="analysis"
@@ -32,7 +32,7 @@
             @generate-optimal-trades="generateOptimalTrades"
             @backtest-optimal-strategy="backtestOptimalStrategy"
             @analyze-optimal-performance="analyzeOptimalPerformance"
-          />
+          /> -->
         </div>
 
         <!-- Results Panel -->
