@@ -1,51 +1,47 @@
 <!-- ZillionsLanding.vue -->
 <template>
   <div class="min-h-screen flex flex-col bg-base-100 text-white selection:bg-primary/10 overflow-x-hidden">
-    <!-- Subtle gradient backdrop -->
-    <div class="pointer-events-none fixed inset-0 -z-10">
-      <div
-        class="absolute -top-40 -left-40 h-[48rem] w-[48rem] rounded-full blur-3xl opacity-25"
-        :style="{ background: 'radial-gradient(50% 50% at 50% 50%, var(--p) 0%, transparent 65%)' }"
-      />
-      <div
-        class="absolute -bottom-40 -right-40 h-[48rem] w-[48rem] rounded-full blur-3xl opacity-10"
-        :style="{ background: 'radial-gradient(50% 50% at 50% 50%, var(--a) 0%, transparent 70%)' }"
-      />
+    <!-- Background Accents -->
+    <div class="pointer-events-none absolute inset-0 opacity-40">
+      <div class="absolute -top-24 -right-24 w-[40rem] h-[40rem] rounded-full blur-3xl bg-gradient-to-r from-primary/30 via-secondary/30 to-accent/30 animate-gradient"></div>
+      <div class="absolute -bottom-24 -left-24 w-[32rem] h-[32rem] rounded-full blur-3xl bg-gradient-to-r from-accent/20 via-secondary/20 to-primary/20 animate-gradient [animation-delay:2s]"></div>
     </div>
 
     <!-- Navbar -->
-    <header class="navbar max-w-7xl mx-auto w-full px-4 lg:px-6 py-6 backdrop-blur-sm bg-base-100/80 sticky top-0 z-50">
-      <div class="navbar-start gap-3">
-        <img :src="logoToUse" alt="Zillions" class="h-8 w-auto rounded-full" />
-        <a class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary"> </span></a>
-      </div>
-      <div class="navbar-center hidden md:flex">
-        <ul class="menu menu-horizontal px-1">
-          <li><a href="#features">Features</a></li>
-          <li><a href="#how">How it works</a></li>
-          <li><a href="#tech">Technology</a></li>
-          <li><a href="#faq">FAQ</a></li>
-        </ul>
-      </div>
-      <div class="navbar-end">
-        <a href="#waitlist" class="btn btn-primary btn-sm rounded-xl">Join the waitlist</a>
-      </div>
-    </header>
+     <div class="w-full flex justify-center">
+      <header class="navbar max-w-7xl mx-auto w-full px-4 lg:px-6 py-2 mt-8 backdrop-blur-sm bg-base-100/50 fixed rounded-2xl top-0 z-50 border-base-300 shadow">
+        <div class="navbar-start gap-3">
+          <img :src="logoToUse" alt="Zillions" class="h-8 w-auto rounded-full" />
+          <a class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary"> </span></a>
+        </div>
+        <div class="navbar-center hidden md:flex">
+          <ul class="menu menu-horizontal px-1">
+            <li><a href="#features">Features</a></li>
+            <li><a href="#how">How it works</a></li>
+            <li><a href="#tech">Technology</a></li>
+            <li><a href="#faq">FAQ</a></li>
+          </ul>
+        </div>
+        <div class="navbar-end">
+          <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">Join the waitlist</a>
+        </div>
+      </header>
+     </div>
 
     <!-- Hero -->
-    <section class="w-full">
+    <section class="w-full pt-16">
       <div class="max-w-7xl mx-auto px-4 lg:px-6 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center py-10 lg:py-20">
         <div>
           <div class="badge badge-outline badge-lg border-base-300 text-xs md:text-sm mb-6 animate-fade-in">On‑chain • Non‑custodial • AI‑driven</div>
           <h1 class="text-4xl md:text-6xl/tight font-bold tracking-tight animate-slide-up">
-            Become a <span class="text-primary">Zillionaire</span>
+            Become a <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">Zillionaire</span>
           </h1>
           <p class="mt-6 text-base md:text-lg text-white/80 leading-relaxed animate-fade-in">
-            Zillions is an on‑chain, autonomous “meta‑trading” bot designed to help more people participate in markets - without needing to be a pro. 
+            An on‑chain, autonomous “meta‑trading” bot designed to help more people participate in markets - without needing to be a pro. 
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
-            <a href="#waitlist" class="btn btn-primary btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">Join the waitlist</a>
+            <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">Join the waitlist</a>
             <a href="#how" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">See how it works</a>
           </div>
 
@@ -92,28 +88,28 @@
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-primary badge-outline mb-2">Core</div>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Core</div>
               <h3 class="card-title text-xl">Meta‑trading engine</h3>
               <p class="text-sm opacity-80">Aligns with the currently dominant strategy regime instead of running blind or fixed logic.</p>
             </div>
           </article>
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-primary badge-outline mb-2">Security</div>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Security</div>
               <h3 class="card-title text-xl">On‑chain & transparent</h3>
               <p class="text-sm opacity-80">Execution, history, and parameters live on chain for auditability. No black box custody.</p>
             </div>
           </article>
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-primary badge-outline mb-2">UX</div>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">UX</div>
               <h3 class="card-title text-xl">Hands‑off simplicity</h3>
               <p class="text-sm opacity-80">No knobs, no charts to study. Fund a vault and let the algorithm adapt 24/7.</p>
             </div>
           </article>
           <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-primary badge-outline mb-2">Safety</div>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Safety</div>
               <h3 class="card-title text-xl">Risk‑aware</h3>
               <p class="text-sm opacity-80">Position sizing & regime‑specific risk controls aim to protect during adverse phases.</p>
             </div>
@@ -129,28 +125,28 @@
         <div class="mt-8 grid lg:grid-cols-3 gap-6">
           <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-primary badge-lg">1</div>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">1</div>
               <h3 class="card-title mt-3 text-2xl">Connect your wallet</h3>
               <p class="text-sm opacity-80">Non‑custodial by design. You keep control.</p>
             </div>
           </div>
           <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-primary badge-lg">2</div>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">2</div>
               <h3 class="card-title mt-3 text-2xl">Fund your vault</h3>
               <p class="text-sm opacity-80">Allocate capital to a Zillions vault. Transparent fees, on‑chain execution.</p>
             </div>
           </div>
           <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-primary badge-lg">3</div>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">3</div>
               <h3 class="card-title mt-3 text-2xl">AI adapts in real time</h3>
               <p class="text-sm opacity-80">The engine follows the dominant regime - momentum, mean‑reversion, liquidity hunts and more.</p>
             </div>
           </div>
         </div>
         <div class="mt-10">
-          <a href="#waitlist" class="btn btn-primary rounded-xl">Get early access</a>
+          <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 rounded-xl">Get early access</a>
         </div>
       </div>
     </section>
@@ -165,7 +161,7 @@
           <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'trend' }" @click="selectedStrategy = 'trend'">Trend</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'trend'">Trend</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'trend' }" @click="selectedStrategy = 'trend'">
                 <div class="font-medium text-lg">Multi-Timeframe Trend Analysis</div>
@@ -175,7 +171,7 @@
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'signals' }" @click="selectedStrategy = 'signals'">Signals</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'signals'">Signals</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'signals' }" @click="selectedStrategy = 'signals'">
                 <div class="font-medium text-lg">OBOS Signals</div>
@@ -185,7 +181,7 @@
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'confirm' }" @click="selectedStrategy = 'confirm'">Confirm</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'confirm'">Confirm</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'confirm' }" @click="selectedStrategy = 'confirm'">
                 <div class="font-medium text-lg">HTF Confirmation</div>
@@ -195,7 +191,7 @@
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'risk' }" @click="selectedStrategy = 'risk'">Risk</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'risk'">Risk</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'risk' }" @click="selectedStrategy = 'risk'">
                 <div class="font-medium text-lg">Risk Management</div>
@@ -205,7 +201,7 @@
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge badge-primary badge-lg cursor-pointer transition-all duration-300 hover:scale-110" :class="{ 'badge-accent': selectedStrategy === 'size' }" @click="selectedStrategy = 'size'">Size</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'size'">Size</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'size' }" @click="selectedStrategy = 'size'">
                 <div class="font-medium text-lg">Position Sizing</div>
@@ -271,7 +267,7 @@
           </div>
           <div class="card bg-base-200 border-2 border-primary hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-primary mb-2">Modern</div>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 mb-2">Modern</div>
               <h3 class="card-title text-xl">Zillions</h3>
               <ul class="list-disc ms-5 text-sm opacity-90 space-y-3 mt-4">
                 <li class="hover:translate-x-1 transition-transform duration-300">Meta‑trading engine aligns with the dominant regime.</li>
@@ -291,7 +287,7 @@
         <div class="card  transition-all duration-500 rounded-3xl">
           <div class="card-body text-center">
             <!-- Heading -->
-            <h2 class="text-3xl md:text-4xl font-bold tracking-tight bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">
+            <h2 class="text-3xl md:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">
               Be one of the first to trade smarter
             </h2>
             <p class="mt-3 text-base md:text-lg opacity-80">
@@ -309,7 +305,7 @@
                 class="input input-lg w-full rounded-2xl bg-base-100/70 backdrop-blur-sm border border-base-300/60 focus:border-primary focus:ring-2 focus:ring-primary/30 text-lg"
               />
               <button
-                class="btn btn-primary btn-lg rounded-2xl shadow-lg hover:shadow-primary/40 transition-all duration-300 flex items-center gap-2 justify-center"
+                class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-2xl shadow-lg hover:shadow-primary/40 transition-all duration-300 flex items-center gap-2 justify-center mt-2"
                 :class="{ 'btn-disabled loading': isSubmitting }"
                 :disabled="isSubmitting"
               >

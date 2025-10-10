@@ -136,7 +136,7 @@
     <footer class="sticky bottom-0 left-0 right-0">
       <div class="max-w-3xl mx-auto px-4 lg:px-6">
         <div class="grid grid-cols-3 gap-3 py-4">
-          <button class="btn btn-lg rounded-2xl btn-primary gap-2" @click="emit('deposit')">
+          <button class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-2xl gap-2" @click="emit('deposit')">
             <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
               <path d="M12 4v16m-8-8h16" stroke-linecap="round"/>
             </svg>
