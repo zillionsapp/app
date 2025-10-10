@@ -9,7 +9,7 @@
 
     <!-- Navbar -->
      <div class="w-full flex justify-center">
-      <header class="navbar max-w-7xl mx-auto w-full px-4 lg:px-6 py-2 mt-8 backdrop-blur-sm bg-base-100/50 fixed rounded-2xl top-0 z-50 border-base-300 shadow">
+      <header class="navbar max-w-7xl mx-auto w-full px-4 lg:px-6 py-2 mt-8 backdrop-blur-sm bg-base-100/50 fixed rounded-2xl top-0 z-50 border border-base-300 shadow">
         <div class="navbar-start gap-3">
           <img :src="logoToUse" alt="Zillions" class="h-8 w-auto rounded-full" />
           <a class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary"> </span></a>
@@ -81,7 +81,7 @@
     </section>
 
     <!-- Feature grid -->
-    <section id="features" class="py-16 lg:py-24 bg-base-200/40">
+    <section id="features" class="py-16 lg:py-24">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
         <p class="mt-2 text-white/70">Not another "trading bot" app. Zillions detects market strategies in real-time - and adapts.</p>
