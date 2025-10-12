@@ -1,6 +1,6 @@
 <!-- ZillionsLanding.vue -->
 <template>
-  <div class="min-h-screen flex flex-col bg-base-100 text-white selection:bg-primary/10 overflow-x-hidden">
+  <div class="min-h-screen flex flex-col bg-base-300 text-white selection:bg-primary/10 overflow-x-hidden">
     <!-- Background Accents -->
     <div class="pointer-events-none absolute inset-0 opacity-40 overflow-hidden">
       <div class="absolute -top-24 -right-24 w-[40rem] h-[40rem] rounded-full blur-3xl bg-gradient-to-r from-primary/30 via-secondary/30 to-accent/30 animate-gradient"></div>
@@ -48,7 +48,7 @@
         </div>
 
         <div class="relative">
-          <div class="mockup-window border border-base-300 rounded-3xl overflow-hidden shadow-2xl bg-base-200">
+          <div class="mockup-window border border-base-300 rounded-3xl overflow-hidden shadow-2xl bg-base-100">
             <WalletPreview/>
           </div>
           <div class="absolute -right-6 -bottom-6 hidden md:block">
@@ -60,19 +60,19 @@
       <!-- Stats -->
       <div class="max-w-7xl mx-auto px-4 lg:px-6 my-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in">
-          <div class="stat bg-base-200/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
+          <div class="stat bg-base-100/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">No expertise needed</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">For everyone</div>
           </div>
-          <div class="stat bg-base-200/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
+          <div class="stat bg-base-100/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">On‑chain</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Transparent</div>
           </div>
-          <div class="stat bg-base-200/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
+          <div class="stat bg-base-100/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">Adaptive</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Regime‑aware</div>
           </div>
-          <div class="stat bg-base-200/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
+          <div class="stat bg-base-100/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">Hands‑off</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Auto‑pilot</div>
           </div>
@@ -86,28 +86,28 @@
         <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
         <p class="mt-2 text-white/70">Not another "trading bot" app. Zillions detects market strategies in real-time - and adapts.</p>
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
-          <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
+          <article class="card bg-base-100 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Core</div>
               <h3 class="card-title text-xl">Meta‑trading engine</h3>
               <p class="text-sm opacity-80">Aligns with the currently dominant strategy regime instead of running blind or fixed logic.</p>
             </div>
           </article>
-          <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
+          <article class="card bg-base-100 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Security</div>
               <h3 class="card-title text-xl">On‑chain & transparent</h3>
               <p class="text-sm opacity-80">Execution, history, and parameters live on chain for auditability. No black box custody.</p>
             </div>
           </article>
-          <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
+          <article class="card bg-base-100 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">UX</div>
               <h3 class="card-title text-xl">Hands‑off simplicity</h3>
               <p class="text-sm opacity-80">No knobs, no charts to study. Fund a vault and let the algorithm adapt 24/7.</p>
             </div>
           </article>
-          <article class="card bg-base-200 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
+          <article class="card bg-base-100 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Safety</div>
               <h3 class="card-title text-xl">Risk‑aware</h3>
@@ -123,21 +123,21 @@
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Three steps, zero guesswork</h2>
         <div class="mt-8 grid lg:grid-cols-3 gap-6">
-          <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+          <div class="card bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">1</div>
               <h3 class="card-title mt-3 text-2xl">Connect your wallet</h3>
               <p class="text-sm opacity-80">Non‑custodial by design. You keep control.</p>
             </div>
           </div>
-          <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+          <div class="card bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">2</div>
               <h3 class="card-title mt-3 text-2xl">Fund your vault</h3>
               <p class="text-sm opacity-80">Allocate capital to a Zillions vault. Transparent fees, on‑chain execution.</p>
             </div>
           </div>
-          <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+          <div class="card bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">3</div>
               <h3 class="card-title mt-3 text-2xl">AI adapts in real time</h3>
@@ -152,7 +152,7 @@
     </section>
 
     <!-- Technology (high level) -->
-    <section id="tech" class="py-14 lg:py-20 bg-base-200/40">
+    <section id="tech" class="py-14 lg:py-20 bg-base-100/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Inside the engine</h2>
         <p class="mt-2 text-white/70">Our trading system analyzes market trends, signals, and risk to find the best opportunities. It adapts to changing conditions automatically.</p>
@@ -163,7 +163,7 @@
               <div class="timeline-middle">
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'trend'">Trend</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'trend' }" @click="selectedStrategy = 'trend'">
+              <div class="timeline-end timeline-box bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'trend' }" @click="selectedStrategy = 'trend'">
                 <div class="font-medium text-lg">Multi-Timeframe Trend Analysis</div>
                 <div class="text-sm opacity-80 mt-1">Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.</div>
               </div>
@@ -173,7 +173,7 @@
               <div class="timeline-middle">
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'signals'">Signals</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'signals' }" @click="selectedStrategy = 'signals'">
+              <div class="timeline-end timeline-box bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'signals' }" @click="selectedStrategy = 'signals'">
                 <div class="font-medium text-lg">OBOS Signals</div>
                 <div class="text-sm opacity-80 mt-1">Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.</div>
               </div>
@@ -183,7 +183,7 @@
               <div class="timeline-middle">
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'confirm'">Confirm</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'confirm' }" @click="selectedStrategy = 'confirm'">
+              <div class="timeline-end timeline-box bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'confirm' }" @click="selectedStrategy = 'confirm'">
                 <div class="font-medium text-lg">HTF Confirmation</div>
                 <div class="text-sm opacity-80 mt-1">Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.</div>
               </div>
@@ -193,7 +193,7 @@
               <div class="timeline-middle">
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'risk'">Risk</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'risk' }" @click="selectedStrategy = 'risk'">
+              <div class="timeline-end timeline-box bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'risk' }" @click="selectedStrategy = 'risk'">
                 <div class="font-medium text-lg">Risk Management</div>
                 <div class="text-sm opacity-80 mt-1">Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.</div>
               </div>
@@ -203,14 +203,14 @@
               <div class="timeline-middle">
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'size'">Size</span>
               </div>
-              <div class="timeline-end timeline-box bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'size' }" @click="selectedStrategy = 'size'">
+              <div class="timeline-end timeline-box bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'size' }" @click="selectedStrategy = 'size'">
                 <div class="font-medium text-lg">Position Sizing</div>
                 <div class="text-sm opacity-80 mt-1">Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.</div>
               </div>
             </li>
           </ul>
 
-          <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+          <div class="card bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="mb-4">
                 <h3 class="card-title text-2xl">{{ strategyContent[selectedStrategy].title }}</h3>
@@ -232,11 +232,11 @@
 
 
               <!-- Strategy-specific alerts -->
-              <div v-if="selectedStrategy !== 'overview'" class="alert alert-info text-white bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
+              <div v-if="selectedStrategy !== 'overview'" class="alert alert-info text-white bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
                 <span>{{ strategyContent[selectedStrategy].description }}</span>
               </div>
 
-              <div v-if="selectedStrategy === 'overview'" class="alert alert-info text-white bg-base-200/50 backdrop-blur-sm mt-6 border border-info/20">
+              <div v-if="selectedStrategy === 'overview'" class="alert alert-info text-white bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
                 <span>{{ strategyContent[selectedStrategy].description }}</span>
               </div>
 
@@ -253,7 +253,7 @@
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Built for the many - not just pros</h2>
         <div class="mt-6 grid md:grid-cols-2 gap-6">
-          <div class="card bg-base-200 border border-base-300 hover:shadow-lg transition-all duration-300">
+          <div class="card bg-base-100 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge badge-outline mb-2">Legacy</div>
               <h3 class="card-title text-xl">Typical trading app</h3>
@@ -265,7 +265,7 @@
               </ul>
             </div>
           </div>
-          <div class="card bg-base-200 border-2 border-primary hover:shadow-lg transition-all duration-300">
+          <div class="card bg-base-100 border-2 border-primary hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 mb-2">Modern</div>
               <h3 class="card-title text-xl">Zillions</h3>
@@ -282,7 +282,7 @@
     </section>
 
     <!-- Waitlist -->
-    <section id="waitlist" class="py-24 lg:py-32 bg-base-200/40 relative overflow-hidden">
+    <section id="waitlist" class="py-24 lg:py-32 bg-base-100/40 relative overflow-hidden">
       <div class="max-w-3xl mx-auto px-4 lg:px-6 relative z-10">
         <div class="card  transition-all duration-500 rounded-3xl">
           <div class="card-body text-center">
@@ -344,12 +344,12 @@
 
 
     <!-- FAQ -->
-    <section id="faq" class="py-20 lg:py-28">
+    <section id="faq" class="bg-base-200 py-20 lg:py-28">
       <div class="max-w-4xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold text-center">FAQ</h2>
         <p class="mt-3 text-white/70 text-center">Common questions about Zillions</p>
         <div class="mt-10 join join-vertical w-full">
-          <div class="collapse collapse-arrow join-item border border-base-300 hover:bg-base-200/50 transition-all duration-300">
+          <div class="collapse collapse-arrow join-item border border-base-300 hover:bg-base-100/50 transition-all duration-300">
             <input type="checkbox" />
             <div class="collapse-title text-md font-medium">Do I need trading experience?</div>
             <div class="collapse-content text-sm opacity-80">
@@ -382,7 +382,7 @@
     </section>
 
     <!-- Footer -->
-    <footer class="mt-auto border-t border-base-300 bg-base-200/30">
+    <footer class="mt-auto border-t border-base-300 bg-base-100/30">
       <div class="max-w-7xl mx-auto px-4 lg:px-6 py-10 grid md:grid-cols-2 gap-6">
         <div>
           <div class="flex items-center gap-3">
