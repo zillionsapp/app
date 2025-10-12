@@ -60,19 +60,19 @@
       <!-- Stats -->
       <div class="max-w-7xl mx-auto px-4 lg:px-6 my-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in">
-          <div class="stat bg-base-100/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
+          <div class="stat bg-base-100 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">No expertise needed</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">For everyone</div>
           </div>
-          <div class="stat bg-base-100/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
+          <div class="stat bg-base-100 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">On‑chain</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Transparent</div>
           </div>
-          <div class="stat bg-base-100/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
+          <div class="stat bg-base-100 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">Adaptive</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Regime‑aware</div>
           </div>
-          <div class="stat bg-base-100/50 backdrop-blur-sm rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
+          <div class="stat bg-base-100 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">Hands‑off</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Auto‑pilot</div>
           </div>
