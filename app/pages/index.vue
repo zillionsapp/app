@@ -37,7 +37,7 @@
             Become a <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">Zillionaire</span>
           </h1>
           <p class="mt-6 text-base md:text-lg text-white/80 leading-relaxed animate-fade-in">
-            An on‑chain, autonomous “meta‑trading” bot designed to help more people participate in markets - without needing to be a pro. 
+            An on‑chain, autonomous trading bot designed to help more people <b>participate in markets without needing to be a trading pro</b>. 
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
