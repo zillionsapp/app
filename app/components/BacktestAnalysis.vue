@@ -65,11 +65,11 @@
     </div>
 
     <!-- Analysis Results -->
-    <div v-if="analysis" class="bg-white dark:bg-gray-800 rounded-lg p-4 mb-4">
+    <div v-if="analysis" class="bg-gray-800 rounded-lg p-4 mb-4">
       <h4 class="text-md font-semibold mb-3 text-white">Trade Analysis Results</h4>
       <div class="grid grid-cols-1 gap-4 text-sm">
         <div>
-          <h5 class="font-medium text-gray-700 dark:text-gray-300 mb-2">Trade Performance</h5>
+          <h5 class="font-medium text-gray-300 mb-2">Trade Performance</h5>
           <div class="space-y-1">
             <div class="flex justify-between">
               <span>Total Trades:</span>

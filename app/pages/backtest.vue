@@ -1,5 +1,5 @@
 <template>
-  <div class="bg-base-100 text-white min-h-screen">
+  <div class="bg-base-300 text-white min-h-screen">
     <div class="container mx-auto px-4 py-8">
       <h1 class="text-3xl font-bold text-white mb-8">
         Strategy Backtest

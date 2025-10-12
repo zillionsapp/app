@@ -12,48 +12,48 @@
     <!-- Summary Cards -->
     <div class="grid grid-cols-2 md:grid-cols-5 gap-4">
       <div class="bg-base-200 rounded-lg shadow-md p-4">
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Portfolio Value</div>
+        <div class="text-sm font-medium text-gray-400">Portfolio Value</div>
         <div class="text-2xl font-bold text-primary">
           ${{ result.result.equity.toFixed(2) }}
         </div>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
+        <div class="text-sm text-gray-400">
           Final Balance
         </div>
       </div>
 
       <div class="bg-base-200 rounded-lg shadow-md p-4">
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Strategy PnL</div>
-        <div class="text-2xl font-bold text-green-600 dark:text-green-400">
+        <div class="text-sm font-medium text-gray-400">Strategy PnL</div>
+        <div class="text-2xl font-bold text-green-400">
           ${{ (result.result.equity - result.config.initialCapital).toFixed(2) }}
         </div>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
+        <div class="text-sm text-gray-400">
           {{ result.result.retPct.toFixed(2) }}%
         </div>
       </div>
 
       <div class="bg-base-200 rounded-lg shadow-md p-4">
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Buy & Hold PnL</div>
-        <div class="text-2xl font-bold text-blue-600 dark:text-blue-400">
+        <div class="text-sm font-medium text-gray-400">Buy & Hold PnL</div>
+        <div class="text-2xl font-bold text-blue-400">
           ${{ buyHoldPnL.toFixed(2) }}
         </div>
-        <div class="text-sm text-gray-500 dark:text-gray-400">
+        <div class="text-sm text-gray-400">
           {{ buyHoldReturn.toFixed(2) }}%
         </div>
       </div>
 
       <div class="bg-base-200 rounded-lg shadow-md p-4">
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">vs Buy & Hold</div>
-        <div :class="strategyVsBuyHold >= 0 ? 'text-2xl font-bold text-green-600 dark:text-green-400' : 'text-2xl font-bold text-red-600 dark:text-red-400'">
+        <div class="text-sm font-medium text-gray-400">vs Buy & Hold</div>
+        <div :class="strategyVsBuyHold >= 0 ? 'text-2xl font-bold text-green-400' : 'text-2xl font-bold text-red-400'">
           {{ strategyVsBuyHold >= 0 ? '+' : '' }}${{ strategyVsBuyHold.toFixed(2) }}
         </div>
-        <div :class="strategyVsBuyHoldPct >= 0 ? 'text-sm text-green-600 dark:text-green-400' : 'text-sm text-red-600 dark:text-red-400'">
+        <div :class="strategyVsBuyHoldPct >= 0 ? 'text-sm text-green-400' : 'text-sm text-red-400'">
           {{ strategyVsBuyHoldPct >= 0 ? '+' : '' }}{{ strategyVsBuyHoldPct.toFixed(2) }}%
         </div>
       </div>
 
       <div class="bg-base-200 rounded-lg shadow-md p-4">
-        <div class="text-sm font-medium text-gray-500 dark:text-gray-400">Win Rate</div>
-        <div class="text-2xl font-bold text-purple-600 dark:text-purple-400">
+        <div class="text-sm font-medium text-gray-400">Win Rate</div>
+        <div class="text-2xl font-bold text-purple-400">
           {{ winRate.toFixed(1) }}%
         </div>
       </div>
@@ -65,62 +65,62 @@
       <!-- Summary Stats -->
       <div class="my-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div class="bg-base-200 rounded-lg p-3">
-          <div class="text-gray-500 dark:text-gray-400">Total Trades</div>
+          <div class="text-gray-400">Total Trades</div>
           <div class="text-lg font-semibold text-white">{{ roundTripTrades.length }}</div>
         </div>
-        <div class="bg-green-50 dark:bg-green-900/20 rounded-lg p-3">
-          <div class="text-gray-500 dark:text-gray-400">Winning Trades</div>
-          <div class="text-lg font-semibold text-green-600 dark:text-green-400">{{ winningTrades }}</div>
+        <div class="bg-green-900/20 rounded-lg p-3">
+          <div class="text-gray-400">Winning Trades</div>
+          <div class="text-lg font-semibold text-green-400">{{ winningTrades }}</div>
         </div>
-        <div class="bg-red-50 dark:bg-red-900/20 rounded-lg p-3">
-          <div class="text-gray-500 dark:text-gray-400">Losing Trades</div>
-          <div class="text-lg font-semibold text-red-600 dark:text-red-400">{{ losingTrades }}</div>
+        <div class="bg-red-900/20 rounded-lg p-3">
+          <div class="text-gray-400">Losing Trades</div>
+          <div class="text-lg font-semibold text-red-400">{{ losingTrades }}</div>
         </div>
-        <div class="bg-blue-50 dark:bg-blue-900/20 rounded-lg p-3">
-          <div class="text-gray-500 dark:text-gray-400">Win Rate</div>
-          <div class="text-lg font-semibold text-blue-600 dark:text-blue-400">{{ winRate.toFixed(1) }}%</div>
+        <div class="bg-blue-900/20 rounded-lg p-3">
+          <div class="text-gray-400">Win Rate</div>
+          <div class="text-lg font-semibold text-blue-400">{{ winRate.toFixed(1) }}%</div>
         </div>
       </div>
       
       <!-- Trades Table -->
       <div class="overflow-x-auto">
-        <table class="min-w-full divide-y divide-gray-200 dark:divide-gray-700">
+        <table class="min-w-full divide-y divide-gray-700">
           <thead class="bg-base-200">
             <tr>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Trade #
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Entry Time
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Exit Time
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Duration
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Entry Price
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Exit Price
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Quantity
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 P&L ($)
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 P&L (%)
               </th>
-              <th class="px-6 py-3 text-left text-xs font-medium text-gray-500 dark:text-gray-300 uppercase tracking-wider">
+              <th class="px-6 py-3 text-left text-xs font-medium text-gray-300 uppercase tracking-wider">
                 Result
               </th>
             </tr>
           </thead>
-          <tbody class="bg-base-200/60 divide-y divide-gray-200 dark:divide-gray-700">
-            <tr v-for="(roundTrip, index) in roundTripTrades" :key="index" :class="roundTrip.pnl >= 0 ? 'bg-green-50 dark:bg-green-900/20' : 'bg-red-50 dark:bg-red-900/20'">
+          <tbody class="bg-base-200/60 divide-y divide-gray-700">
+            <tr v-for="(roundTrip, index) in roundTripTrades" :key="index" :class="roundTrip.pnl >= 0 ? 'bg-success/10' : 'bg-error/10'">
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
                 {{ index + 1 }}
               </td>
@@ -142,14 +142,14 @@
               <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
                 {{ roundTrip.quantity }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="roundTrip.pnl >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="roundTrip.pnl >= 0 ? 'text-green-400' : 'text-red-400'">
                 ${{ roundTrip.pnl.toFixed(2) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="roundTrip.pnlPct >= 0 ? 'text-green-600 dark:text-green-400' : 'text-red-600 dark:text-red-400'">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="roundTrip.pnlPct >= 0 ? 'text-green-400' : 'text-red-400'">
                 {{ roundTrip.pnlPct.toFixed(2) }}%
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="roundTrip.pnl >= 0 ? 'bg-green-100 text-green-800 dark:bg-green-800 dark:text-green-100' : 'bg-red-100 text-red-800 dark:bg-red-800 dark:text-red-100'" class="px-2 py-1 text-xs font-medium rounded-full">
+                <span :class="roundTrip.pnl >= 0 ? 'bg-green-100 text-green-100' : 'bg-red-100 text-red-100'" class="px-2 py-1 text-xs font-medium rounded-full">
                   {{ roundTrip.pnl >= 0 ? 'PROFIT' : 'LOSS' }}
                 </span>
               </td>

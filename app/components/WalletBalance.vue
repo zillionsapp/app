@@ -1,6 +1,6 @@
 <template>
   <section class="card">
-    <div class="card-body">
+    <div class="card-body flex flex-wrap">
       <!-- Balance headline -->
       <div class="flex items-baseline justify-between">
         <div>
@@ -26,7 +26,7 @@
       </div>
 
       <!-- Sparkline / area chart -->
-      <div class="mt-6">
+      <div class="mt-6 w-full">
         <div class="w-full h-40 md:h-48 rounded-2xl relative overflow-hidden">
           <svg :viewBox="`0 0 ${chartWidth} ${chartHeight}`" class="w-full h-full">
             <g opacity="0.15">
