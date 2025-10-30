@@ -149,7 +149,7 @@
                 {{ roundTrip.pnlPct.toFixed(2) }}%
               </td>
               <td class="px-6 py-4 whitespace-nowrap">
-                <span :class="roundTrip.pnl >= 0 ? 'bg-green-100 text-green-100' : 'bg-red-100 text-red-100'" class="px-2 py-1 text-xs font-medium rounded-full">
+                <span :class="roundTrip.pnl >= 0 ? 'bg-success text-green-100' : 'bg-error text-red-100'" class="px-2 py-1 text-xs font-medium rounded-full">
                   {{ roundTrip.pnl >= 0 ? 'PROFIT' : 'LOSS' }}
                 </span>
               </td>
