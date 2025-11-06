@@ -1,16 +1,12 @@
 <template>
-  <div class="min-h-screen bg-base-200 text-white" data-theme="zillions">
-    <div class="container mx-auto px-4 py-8">
-      <!-- Header -->
-      <div class="mb-8">
-        <NuxtLink to="/" class="btn btn-ghost btn-sm mb-4">
-          ← Back to Home
-        </NuxtLink>
-        <h1 class="text-3xl font-bold mb-2">Trading Rules – Mini Simulation</h1>
-        <p class="text-white/70">
-          Goal: Interactively test how <b>"sell only in profit"</b> + <b>Stop-Loss</b> + <b>Position Sizing</b> with a high hit rate protects capital.
-        </p>
-      </div>
+  <div class="space-y-6">
+    <!-- Header -->
+    <div class="mb-8">
+      <h1 class="text-3xl font-bold mb-2">Trading Rules – Mini Simulation</h1>
+      <p class="text-white/70">
+        Goal: Interactively test how <b>"sell only in profit"</b> + <b>Stop-Loss</b> + <b>Position Sizing</b> with a high hit rate protects capital.
+      </p>
+    </div>
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
         <!-- Controls Panel -->
@@ -231,12 +227,16 @@
             </div>
           </div>
         </div>
-      </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
+// Protect this page with authentication
+definePageMeta({
+  layout: 'app'
+})
+
 // Utility: seeded RNG (Mulberry32)
 function mulberry32(a: number) {
   return function() {

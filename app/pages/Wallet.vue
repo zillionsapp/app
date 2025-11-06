@@ -1,9 +1,6 @@
 <!-- components/WalletDashboard.vue -->
 <template>
-  <div class="flex flex-col justify-between bg-base-200/60 text-white min-h-screen" data-theme="zillions">
-    <!-- Top bar -->
-    <WalletHeader />
-
+  <div class="flex flex-col justify-between text-white" data-theme="zillions">
     <!-- Balance + Chart -->
     <main class="mx-auto w-full px-4 lg:px-6 flex-1 flex flex-wrap">
       <div class="flex-1">
@@ -39,7 +36,7 @@
         />
       </div>
       
-      <!-- <div class="flex-1">
+      <div class="flex-1">
         <TradingStrategySelector
           :strategies="tradingStrategies"
           :selected-strategies="selectedStrategies"
@@ -48,7 +45,7 @@
           @update-allocation="updateAllocation"
           @get-max-allocation="getMaxAllocation"
         />
-      </div> -->
+      </div>
     </main>
 
     <!-- Action bar -->
@@ -94,6 +91,7 @@ import SendModal from '@/components/SendModal.vue'
 
 // Protect this page with authentication
 definePageMeta({
+  layout: 'app',
   middleware: 'auth'
 })
 

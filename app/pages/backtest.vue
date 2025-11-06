@@ -1,9 +1,8 @@
 <template>
-  <div class="bg-base-300 text-white min-h-screen">
-    <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold text-white mb-8">
-        Strategy Backtest
-      </h1>
+  <div class="space-y-6">
+    <h1 class="text-3xl font-bold text-white">
+      Strategy Backtest
+    </h1>
 
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
         <!-- Left Column: Configuration and Analysis -->
@@ -66,7 +65,6 @@
           </div>
         </div>
       </div>
-    </div>
   </div>
 </template>
 
@@ -75,6 +73,7 @@ import { ref, reactive, onMounted } from 'vue'
 
 // Protect this page with authentication
 definePageMeta({
+  layout: 'app',
   middleware: 'auth'
 })
 
@@ -319,10 +318,12 @@ const createMockBacktestResult = (optimalTradesData) => {
   let currentPosition = null
   let entryTrade = null
 
-  trades.forEach((trade, index) => {
-    const tradeTime = originalPriceData.length > index ?
-      (typeof originalPriceData[index] === 'object' ? originalPriceData[index].time : new Date(Date.now() - (trades.length - index) * 15 * 60 * 1000).toISOString()) :
-      new Date(Date.now() - (trades.length - index) * 15 * 60 * 1000).toISOString()
+  trades.forEach((trade) => {
+    // Extract the bar index from trade.time (e.g., "Bar_123" -> 123)
+    const barIndex = parseInt(trade.time.split('_')[1]) || 0
+    const tradeTime = originalPriceData[barIndex] && typeof originalPriceData[barIndex] === 'object' ?
+      originalPriceData[barIndex].time :
+      new Date(Date.now() - barIndex * 15 * 60 * 1000).toISOString()
 
     if (trade.type === 'BUY') {
       // This is an entry
@@ -331,8 +332,8 @@ const createMockBacktestResult = (optimalTradesData) => {
         formattedTrades.push({
           time: tradeTime,
           side: 'SELL',
-          price: trade.price.toFixed(6),
-          qty: currentPosition.qty.toFixed(8),
+          price: currentPosition.price.toFixed(6),
+          qty: currentPosition.qty,
           note: 'EOD flatten'
         })
       }

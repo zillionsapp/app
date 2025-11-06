@@ -61,6 +61,12 @@
 import { onMounted } from 'vue'
 import { useDashboard } from '../composables/useDashboard'
 
+definePageMeta({
+  layout: 'app',
+  middleware: 'auth'
+})
+
+
 // Composables
 const {
   loading,

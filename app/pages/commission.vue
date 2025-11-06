@@ -138,6 +138,7 @@ import { ref, reactive } from 'vue'
 
 // Protect this page with authentication
 definePageMeta({
+  layout: 'app',
   middleware: 'auth'
 })
 
