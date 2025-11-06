@@ -1,5 +1,5 @@
 <template>
-  <div class="min-h-screen flex bg-base-100 text-white">
+  <div class="min-h-screen flex bg-base-100 text-base-content">
     <!-- Sidebar - Fixed on desktop, mobile drawer on mobile -->
     <aside
       :class="[

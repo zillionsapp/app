@@ -2,7 +2,7 @@
   <div class="bg-base-200 rounded-lg shadow-lg p-6">
     <!-- Header with view toggle -->
     <div class="flex justify-between items-center mb-6">
-      <h3 class="text-xl font-bold text-white">
+      <h3 class="text-xl font-bold text-base-content">
         Performance Chart
       </h3>
     </div>
@@ -23,7 +23,7 @@
       <div
         v-if="showTooltip && tooltipData"
         ref="tooltipEl"
-        class="absolute bg-black bg-opacity-90 text-white p-3 rounded-lg pointer-events-none z-10 text-sm"
+        class="absolute bg-black bg-opacity-90 text-base-content p-3 rounded-lg pointer-events-none z-10 text-sm"
         :style="{ left: tooltip.x + 'px', top: tooltip.y + 'px', minWidth: '220px' }"
       >
         <div class="font-semibold mb-2">{{ tooltipData.date }}</div>

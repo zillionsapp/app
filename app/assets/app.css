@@ -2,13 +2,12 @@
 @plugin "daisyui";
 
 @plugin "daisyui/theme" {
-  name: "light";
-  default: true;
-  color-scheme: light;
+  name: "dark";
+  color-scheme: dark;
   --color-base-100: #1a1b1e;
   --color-base-200: #141517;
   --color-base-300: #0c0c0d;
-  --color-base-content: #1a1b1e;
+  --color-base-content: #ecf0ed;
   --color-primary: #00ff9d;
   --color-primary-content: #ecf0ed;
   --color-secondary: #7c3aed;
@@ -20,21 +19,21 @@
 }
 
 @plugin "daisyui/theme" {
-  name: "dark";
+  name: "light";
   prefersdark: true;
-  color-scheme: dark;
-  --color-base-100: #1a1b1e;
-  --color-base-200: #141517;
-  --color-base-300: #0c0c0d;
-  --color-base-content: #1a1b1e;
+  color-scheme: light;
+  --color-base-100: #ecf0ed;
+  --color-base-200: #fff;
+  --color-base-300: #ecf0ed;
+  --color-base-content: #fff;
   --color-primary: #00ff9d;
-  --color-primary-content: #ecf0ed;
+  --color-primary-content: #141517;
   --color-secondary: #7c3aed;
-  --color-secondary-content: #ecf0ed;
+  --color-secondary-content: #141517;
   --color-accent: #ff006e;
-  --color-accent-content: #ecf0ed;
+  --color-accent-content: #141517;
   --color-neutral: #1a1b1e;
-  --color-neutral-content: #ecf0ed;
+  --color-neutral-content: #141517;
 }
 
 /* Glass effect for cards */

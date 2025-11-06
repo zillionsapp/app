@@ -1,7 +1,7 @@
 <template>
-  <div class="bg-base-300 text-white min-h-screen">
+  <div class="bg-base-300 text-base-content min-h-screen">
     <div class="container mx-auto px-4 py-8">
-      <h1 class="text-3xl font-bold text-white mb-8">
+      <h1 class="text-3xl font-bold text-base-content mb-8">
         Commission Calculator
       </h1>
 
@@ -19,7 +19,7 @@
                 type="number"
                 step="100"
                 min="0"
-                class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-white"
+                class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-base-content"
                 placeholder="Enter profit amount"
                 @input="calculateCommissions"
               />
@@ -30,7 +30,7 @@
               <label class="block text-sm font-medium mb-2">Commission Type</label>
               <select
                 v-model="commissionType"
-                class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-white"
+                class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-base-content"
                 @change="calculateCommissions"
               >
                 <option value="direct">Direct Rep</option>
@@ -48,7 +48,7 @@
                   step="0.1"
                   min="0"
                   max="100"
-                  class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-white"
+                  class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-base-content"
                   @input="calculateCommissions"
                 />
               </div>
@@ -60,7 +60,7 @@
                   step="0.1"
                   min="0"
                   max="100"
-                  class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-white"
+                  class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-base-content"
                   @input="calculateCommissions"
                 />
               </div>
@@ -72,7 +72,7 @@
                   step="0.1"
                   min="0"
                   max="100"
-                  class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-white"
+                  class="w-full px-3 py-2 bg-base-100 border border-gray-600 rounded-md text-base-content"
                   @input="calculateCommissions"
                 />
               </div>
@@ -81,7 +81,7 @@
             <!-- Reset Button -->
             <button
               @click="resetDefaults"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-base-content font-medium py-2 px-4 rounded-md transition-colors"
             >
               Reset to Defaults
             </button>

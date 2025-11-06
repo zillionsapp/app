@@ -22,12 +22,12 @@
         <table class="table table-zebra">
           <thead>
             <tr>
-              <th class="text-white">Date</th>
-              <th class="text-white">Symbol</th>
-              <th class="text-white">Side</th>
-              <th class="text-white text-right">Quantity</th>
-              <th class="text-white text-right">Price</th>
-              <th class="text-white text-right">P&L</th>
+              <th class="text-base-content">Date</th>
+              <th class="text-base-content">Symbol</th>
+              <th class="text-base-content">Side</th>
+              <th class="text-base-content text-right">Quantity</th>
+              <th class="text-base-content text-right">Price</th>
+              <th class="text-base-content text-right">P&L</th>
             </tr>
           </thead>
           <tbody>

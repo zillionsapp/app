@@ -61,12 +61,12 @@
 
     <!-- Trades Analyzer -->
     <div class="bg-base-200/60 rounded-lg shadow-md p-6">
-      <h3 class="text-lg font-semibold mb-4 text-white">Trades Analyzer</h3>
+      <h3 class="text-lg font-semibold mb-4 text-base-content">Trades Analyzer</h3>
       <!-- Summary Stats -->
       <div class="my-4 grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
         <div class="bg-base-200 rounded-lg p-3">
           <div class="text-gray-400">Total Trades</div>
-          <div class="text-lg font-semibold text-white">{{ roundTripTrades.length }}</div>
+          <div class="text-lg font-semibold text-base-content">{{ roundTripTrades.length }}</div>
         </div>
         <div class="bg-green-900/20 rounded-lg p-3">
           <div class="text-gray-400">Winning Trades</div>
@@ -121,25 +121,25 @@
           </thead>
           <tbody class="bg-base-200/60 divide-y divide-gray-700">
             <tr v-for="(roundTrip, index) in roundTripTrades" :key="index" :class="roundTrip.pnl >= 0 ? 'bg-success/10' : 'bg-error/10'">
-              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-base-content">
                 {{ index + 1 }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-base-content">
                 {{ formatDate(roundTrip.entryTime) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-base-content">
                 {{ formatDate(roundTrip.exitTime) }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-base-content">
                 {{ roundTrip.duration }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-base-content">
                 ${{ roundTrip.entryPrice }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-base-content">
                 ${{ roundTrip.exitPrice }}
               </td>
-              <td class="px-6 py-4 whitespace-nowrap text-sm text-white">
+              <td class="px-6 py-4 whitespace-nowrap text-sm text-base-content">
                 {{ roundTrip.quantity }}
               </td>
               <td class="px-6 py-4 whitespace-nowrap text-sm font-medium" :class="roundTrip.pnl >= 0 ? 'text-green-400' : 'text-red-400'">

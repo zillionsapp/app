@@ -9,10 +9,10 @@
       <div class="relative w-full max-w-md transform overflow-hidden rounded-2xl bg-base-100 p-6 text-left shadow-xl transition-all">
         <!-- Header -->
         <div class="flex items-center justify-between mb-6">
-          <h3 class="text-lg font-semibold text-white">Send Funds</h3>
+          <h3 class="text-lg font-semibold text-base-content">Send Funds</h3>
           <button
             @click="closeModal"
-            class="text-white/60 hover:text-white transition-colors"
+            class="text-base-content/60 hover:text-base-content transition-colors"
           >
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
@@ -22,20 +22,20 @@
 
         <!-- Sender Info -->
         <div class="mb-6 p-3 bg-base-200 rounded-lg">
-          <div class="text-sm text-white/60 mb-1">Sending from:</div>
-          <div class="font-medium text-white">{{ fromEmail }}</div>
+          <div class="text-sm text-base-content/60 mb-1">Sending from:</div>
+          <div class="font-medium text-base-content">{{ fromEmail }}</div>
         </div>
 
         <!-- Recipient Email Input -->
         <div class="mb-4">
-          <label class="block text-sm font-medium text-white mb-2">
+          <label class="block text-sm font-medium text-base-content mb-2">
             Recipient Email
           </label>
           <input
             v-model="recipientEmail"
             type="email"
             placeholder="Enter recipient email"
-            class="w-full px-3 py-2 border border-base-300 rounded-lg bg-base-100 text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+            class="w-full px-3 py-2 border border-base-300 rounded-lg bg-base-100 text-base-content focus:ring-2 focus:ring-primary focus:border-transparent"
             :class="{ 'border-error': emailError }"
             @input="clearErrors"
           />
@@ -44,7 +44,7 @@
 
         <!-- Amount Input -->
         <div class="mb-6">
-          <label class="block text-sm font-medium text-white mb-2">
+          <label class="block text-sm font-medium text-base-content mb-2">
             Amount ($)
           </label>
           <input
@@ -53,7 +53,7 @@
             min="0"
             step="0.01"
             placeholder="Enter amount"
-            class="w-full px-3 py-2 border border-base-300 rounded-lg bg-base-100 text-white focus:ring-2 focus:ring-primary focus:border-transparent"
+            class="w-full px-3 py-2 border border-base-300 rounded-lg bg-base-100 text-base-content focus:ring-2 focus:ring-primary focus:border-transparent"
             :class="{ 'border-error': amountError }"
             @input="clearErrors"
           />
@@ -62,7 +62,7 @@
 
         <!-- Quick Amount Buttons -->
         <div class="mb-6">
-          <div class="text-sm font-medium text-white mb-2">Quick Select:</div>
+          <div class="text-sm font-medium text-base-content mb-2">Quick Select:</div>
           <div class="grid grid-cols-3 gap-2">
             <button
               v-for="amount in quickAmounts"
@@ -85,7 +85,7 @@
         <div class="flex gap-3">
           <button
             @click="closeModal"
-            class="flex-1 px-4 py-2 text-white border border-base-300 rounded-lg hover:bg-base-200 transition-colors"
+            class="flex-1 px-4 py-2 text-base-content border border-base-300 rounded-lg hover:bg-base-200 transition-colors"
             :disabled="loading"
           >
             Cancel

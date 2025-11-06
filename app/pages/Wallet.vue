@@ -1,6 +1,6 @@
 <!-- components/WalletDashboard.vue -->
 <template>
-  <div class="flex flex-col justify-between text-white" data-theme="zillions">
+  <div class="flex flex-col justify-between text-base-content" data-theme="zillions">
     <!-- Balance + Chart -->
     <main class="mx-auto w-full px-4 lg:px-6 flex-1 flex flex-wrap">
       <div class="flex-1">

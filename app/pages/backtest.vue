@@ -1,6 +1,6 @@
 <template>
   <div class="space-y-6">
-    <h1 class="text-3xl font-bold text-white">
+    <h1 class="text-3xl font-bold text-base-content">
       Strategy Backtest
     </h1>
 

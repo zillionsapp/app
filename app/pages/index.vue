@@ -1,6 +1,6 @@
 <!-- ZillionsLanding.vue -->
 <template>
-  <div class="min-h-screen flex flex-col bg-base-100 text-white selection:bg-primary/10 overflow-x-hidden">
+  <div class="min-h-screen flex flex-col bg-base-100 text-base-content selection:bg-primary/10 overflow-x-hidden">
     <!-- Background Accents -->
     <div class="pointer-events-none fixed inset-0 opacity-40">
       <div class="absolute -top-24 -right-24 w-[40rem] h-[40rem] rounded-full blur-3xl bg-gradient-to-r from-primary/30 via-secondary/30 to-accent/30 animate-gradient"></div>
@@ -36,7 +36,7 @@
           <h1 class="text-4xl md:text-6xl/tight font-bold tracking-tight animate-slide-up">
             Become a <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">Zillionaire</span>
           </h1>
-          <p class="mt-6 text-base md:text-lg text-white/80 leading-relaxed animate-fade-in">
+          <p class="mt-6 text-base md:text-lg text-base-content/80 leading-relaxed animate-fade-in">
             An on‑chain, autonomous trading bot designed to help more people <b>participate in markets without needing to be a trading pro</b>. 
           </p>
 
@@ -61,19 +61,19 @@
       <div class="max-w-7xl mx-auto px-4 lg:px-6 my-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in">
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">No expertise needed</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">No expertise needed</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">For everyone</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">On‑chain</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">On‑chain</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Transparent</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">Adaptive</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">Adaptive</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Regime‑aware</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-white/50">Hands‑off</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">Hands‑off</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">Auto‑pilot</div>
           </div>
         </div>
@@ -84,7 +84,7 @@
     <section id="features" class="py-16 lg:py-24">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
-        <p class="mt-2 text-white/70">Not another "trading bot" app. Zillions detects market strategies in real-time - and adapts.</p>
+        <p class="mt-2 text-base-content/70">Not another "trading bot" app. Zillions detects market strategies in real-time - and adapts.</p>
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <article class="card bg-base-200/50 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
@@ -155,7 +155,7 @@
     <section id="tech" class="py-14 lg:py-20 bg-base-100/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold">Inside the engine</h2>
-        <p class="mt-2 text-white/70">Our trading system analyzes market trends, signals, and risk to find the best opportunities. It adapts to changing conditions automatically.</p>
+        <p class="mt-2 text-base-content/70">Our trading system analyzes market trends, signals, and risk to find the best opportunities. It adapts to changing conditions automatically.</p>
 
         <div class="mt-8 grid md:grid-cols-2 gap-6">
           <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
@@ -223,7 +223,7 @@
                       <div class="w-3 h-3 bg-primary rounded-full"></div>
                     </div>
                     <div class="flex-1">
-                      <p class="text-sm font-medium text-white/90 leading-relaxed">{{ benefit }}</p>
+                      <p class="text-sm font-medium text-base-content/90 leading-relaxed">{{ benefit }}</p>
                     </div>
                   </div>
                 </div>
@@ -232,11 +232,11 @@
 
 
               <!-- Strategy-specific alerts -->
-              <div v-if="selectedStrategy !== 'overview'" class="alert alert-info text-white bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
+              <div v-if="selectedStrategy !== 'overview'" class="alert alert-info text-base-content bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
                 <span>{{ strategyContent[selectedStrategy].description }}</span>
               </div>
 
-              <div v-if="selectedStrategy === 'overview'" class="alert alert-info text-white bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
+              <div v-if="selectedStrategy === 'overview'" class="alert alert-info text-base-content bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
                 <span>{{ strategyContent[selectedStrategy].description }}</span>
               </div>
 
@@ -347,7 +347,7 @@
     <section id="faq" class="py-20 lg:py-28">
       <div class="max-w-4xl mx-auto px-4 lg:px-6">
         <h2 class="text-2xl md:text-3xl font-bold text-center">FAQ</h2>
-        <p class="mt-3 text-white/70 text-center">Common questions about Zillions</p>
+        <p class="mt-3 text-base-content/70 text-center">Common questions about Zillions</p>
         <div class="mt-10 join join-vertical w-full bg-base-200 rounded rounded-2xl">
           <div class="collapse collapse-arrow join-item border border-base-300 hover:bg-base-100/50 transition-all duration-300 rounded-t-xl">
             <input type="checkbox" />

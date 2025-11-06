@@ -1,5 +1,5 @@
 <template>
-  <div class="p-4 md:p-6 space-y-6 text-white min-h-screen">
+  <div class="p-4 md:p-6 space-y-6 text-base-content min-h-screen">
     <!-- Loading State -->
     <div v-if="loading" class="flex items-center justify-center min-h-[400px]">
       <div class="text-center">
