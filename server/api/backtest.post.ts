@@ -17,6 +17,7 @@ interface BacktestConfig {
   commissionPct: number
   slippagePct: number
   posPct: number
+  strategyConfig: any
 }
 
 // Backtest execution function that uses the new strategy
@@ -31,8 +32,8 @@ async function executeBacktest(config: BacktestConfig) {
     throw new Error('No candles returned from Binance')
   }
 
-  // Create strategy instance
-  const strategy = new RTBMomentumBreakoutStrategy()
+  // Create strategy instance with config
+  const strategy = new RTBMomentumBreakoutStrategy(config.strategyConfig)
 
   // State for backtesting
   let cash = config.initialCapital
@@ -124,7 +125,20 @@ export default defineEventHandler(async (event: H3Event) => {
       initialCapital: body.initialCapital || 1000,
       commissionPct: body.commissionPct || 0.05,
       slippagePct: body.slippagePct || 0,
-      posPct: body.posPct || 10
+      posPct: body.posPct || 10,
+      strategyConfig: {
+        smaFastLen: body.smaFastLen,
+        smaSlowLen: body.smaSlowLen,
+        rsiLen: body.rsiLen,
+        atrLen: body.atrLen,
+        dipPeriod: body.dipPeriod,
+        spacingBars: body.spacingBars,
+        atrAvgPeriod: body.atrAvgPeriod,
+        profitTargetPct: body.profitTargetPct,
+        stopLossPct: body.stopLossPct,
+        timeExitBars: body.timeExitBars,
+        trailMult: body.trailMult
+      }
     }
 
     // Validate required fields

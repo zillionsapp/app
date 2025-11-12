@@ -16,7 +16,7 @@
           />
 
           <!-- Analysis and Improvement Section -->
-          <BacktestAnalysis
+          <!-- <BacktestAnalysis
             v-if="result && !loading"
             :result="result"
             :analysis="analysis"
@@ -33,7 +33,7 @@
             @backtest-optimal-strategy="backtestOptimalStrategy"
             @analyze-optimal-performance="analyzeOptimalPerformance"
             @export-optimal-trades="exportOptimalTrades"
-          />
+          /> -->
         </div>
 
         <!-- Results Panel -->
@@ -94,39 +94,26 @@ const handleChartDataReady = (ready) => {
   console.log('Chart data ready:', ready)
 }
 
-// Default configuration - Strategy Analyzer Optimized Settings
+// Default configuration - BTC Dip-Peak Mean Reversion Strategy
 const defaultConfig = {
   symbol: 'BTCUSDT',
   tf: '15m',
-  htf: '1h',
   lookbackDays: 120,
   initialCapital: 1000,
   commissionPct: 0.05,
   slippagePct: 0,
   posPct: 10,
-  useTrend: true,
-  useHTF: true,
-  trendLen: 35,
-  upTh: 55,
-  dnTh: 43,
-  htfLongTh: 55,
-  htfShortTh: 47,
-  obosLen: 12,
-  adaptLen: 14,
-  showOBOS: true,
-  winLen: 26,
-  needBars: 6,
-  minSpacing: 3,
-  enableShorts: false,
-  tpPct: 10,
-  tpPortion: 50,
-  useTrail: true,
-  trailPct: 3.4,
-  armTrailPct: 1.2,
-  minHoldBars: 2,
-  useATRstop: false,
+  smaFastLen: 20,
+  smaSlowLen: 50,
+  rsiLen: 14,
   atrLen: 14,
-  atrMult: 3
+  dipPeriod: 20,
+  spacingBars: 8,
+  atrAvgPeriod: 50,
+  profitTargetPct: 5,
+  stopLossPct: 3,
+  timeExitBars: 50,
+  trailMult: 1.5
 }
 
 const config = reactive({ ...defaultConfig })

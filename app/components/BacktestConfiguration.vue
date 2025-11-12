@@ -6,13 +6,13 @@
 
     <!-- Strategy Explanation -->
     <div class="mb-6 p-4 bg-blue-900/20 rounded-lg border border-blue-800">
-      <h3 class="text-sm font-semibold text-blue-500 mb-2">How This Strategy Works</h3>
+      <h3 class="text-sm font-semibold text-blue-500 mb-2">BTC Dip-Peak Mean Reversion Strategy</h3>
       <div class="text-sm text-blue-500 space-y-2">
-        <p><strong>Multi-Timeframe Trend Analysis:</strong> Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.</p>
-        <p><strong>OBOS Signals:</strong> Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.</p>
-        <p><strong>HTF Confirmation:</strong> Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.</p>
-        <p><strong>Risk Management:</strong> Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.</p>
-        <p><strong>Position Sizing:</strong> Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.</p>
+        <p><strong>Mean Reversion Approach:</strong> Buys significant dips and sells peaks in BTCUSDT, capitalizing on price corrections in volatile crypto markets.</p>
+        <p><strong>Dip Detection:</strong> Identifies entries when price drops below a threshold from recent highs, using SMA indicators for trend context.</p>
+        <p><strong>Peak Exit:</strong> Exits positions on profit targets, overbought signals, or time limits to capture mean-reverting moves.</p>
+        <p><strong>Risk Management:</strong> Uses stop-losses, trailing stops after profit, and spacing rules to manage risk and prevent over-trading.</p>
+        <p><strong>Position Sizing:</strong> Percentage-based sizing with commission factors for realistic backtesting.</p>
       </div>
     </div>
 
@@ -36,37 +36,20 @@
           </select>
         </div>
 
-        <div class="grid grid-cols-2 gap-4">
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              Timeframe
-            </label>
-            <select
-              v-model="config.tf"
-              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
-            >
-              <option value="15m">15m</option>
-              <option value="30m">30m</option>
-              <option value="1h">1h</option>
-              <option value="4h">4h</option>
-              <option value="1d">1d</option>
-            </select>
-          </div>
-
-          <div>
-            <label class="block text-sm font-medium text-gray-300 mb-2">
-              HTF
-            </label>
-            <select
-              v-model="config.htf"
-              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
-            >
-              <option value="1h">1h</option>
-              <option value="4h">4h</option>
-              <option value="1d">1d</option>
-              <option value="3d">3d</option>
-            </select>
-          </div>
+        <div>
+          <label class="block text-sm font-medium text-gray-300 mb-2">
+            Timeframe
+          </label>
+          <select
+            v-model="config.tf"
+            class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+          >
+            <option value="15m">15m</option>
+            <option value="30m">30m</option>
+            <option value="1h">1h</option>
+            <option value="4h">4h</option>
+            <option value="1d">1d</option>
+          </select>
         </div>
 
         <div class="grid grid-cols-2 gap-4">
@@ -110,64 +93,153 @@
         </div>
       </div>
 
-      <!-- Advanced Settings -->
+      <!-- Indicator Settings -->
       <div class="space-y-4">
-        <h3 class="text-lg font-medium text-base-content">Advanced Settings</h3>
-
-        <div class="flex items-center">
-          <input
-            v-model="config.useTrend"
-            type="checkbox"
-            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-          />
-          <label class="ml-2 block text-sm text-gray-300">
-            Use Trend Filter
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <input
-            v-model="config.useHTF"
-            type="checkbox"
-            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-          />
-          <label class="ml-2 block text-sm text-gray-300">
-            Use HTF Confirmation
-          </label>
-        </div>
-
-        <div class="flex items-center">
-          <input
-            v-model="config.useTrail"
-            type="checkbox"
-            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
-          />
-          <label class="ml-2 block text-sm text-gray-300">
-            Enable Trailing Stop
-          </label>
-        </div>
+        <h3 class="text-lg font-medium text-base-content">Indicator Settings</h3>
 
         <div class="grid grid-cols-2 gap-4">
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">
-              TP % (Take Profit)
+              SMA Fast Length
             </label>
             <input
-              v-model.number="config.tpPct"
+              v-model.number="config.smaFastLen"
               type="number"
-              step="0.1"
+              min="5"
+              max="50"
               class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
             />
           </div>
 
           <div>
             <label class="block text-sm font-medium text-gray-300 mb-2">
-              Trail % (Stop Loss)
+              SMA Slow Length
             </label>
             <input
-              v-model.number="config.trailPct"
+              v-model.number="config.smaSlowLen"
+              type="number"
+              min="20"
+              max="100"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              RSI Length
+            </label>
+            <input
+              v-model.number="config.rsiLen"
+              type="number"
+              min="5"
+              max="30"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              ATR Length
+            </label>
+            <input
+              v-model.number="config.atrLen"
+              type="number"
+              min="5"
+              max="30"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Dip Period (bars)
+            </label>
+            <input
+              v-model.number="config.dipPeriod"
+              type="number"
+              min="10"
+              max="50"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Spacing Bars
+            </label>
+            <input
+              v-model.number="config.spacingBars"
+              type="number"
+              min="1"
+              max="20"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+            />
+          </div>
+        </div>
+      </div>
+
+      <!-- Risk Management -->
+      <div class="space-y-4">
+        <h3 class="text-lg font-medium text-base-content">Risk Management</h3>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Profit Target %
+            </label>
+            <input
+              v-model.number="config.profitTargetPct"
               type="number"
               step="0.1"
+              min="1"
+              max="20"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Stop Loss %
+            </label>
+            <input
+              v-model.number="config.stopLossPct"
+              type="number"
+              step="0.1"
+              min="1"
+              max="10"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+            />
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-4">
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Time Exit Bars
+            </label>
+            <input
+              v-model.number="config.timeExitBars"
+              type="number"
+              min="10"
+              max="100"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
+            />
+          </div>
+
+          <div>
+            <label class="block text-sm font-medium text-gray-300 mb-2">
+              Trail Multiplier
+            </label>
+            <input
+              v-model.number="config.trailMult"
+              type="number"
+              step="0.1"
+              min="1"
+              max="3"
               class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
             />
           </div>
@@ -221,15 +293,20 @@ defineEmits(['run-backtest', 'reset-config'])
 const defaultConfig = {
   symbol: 'BTCUSDT',
   tf: '15m',
-  htf: '1h',
   lookbackDays: 120,
   initialCapital: 1000,
   posPct: 10,
-  useTrend: true,
-  useHTF: true,
-  useTrail: true,
-  tpPct: 10,
-  trailPct: 3.4
+  smaFastLen: 20,
+  smaSlowLen: 50,
+  rsiLen: 14,
+  atrLen: 14,
+  dipPeriod: 20,
+  spacingBars: 8,
+  atrAvgPeriod: 50,
+  profitTargetPct: 5,
+  stopLossPct: 3,
+  timeExitBars: 50,
+  trailMult: 1.5
 }
 
 // Computed property to check if current config differs from defaults
@@ -237,15 +314,20 @@ const isCustomParameters = computed(() => {
   return (
     props.config.symbol !== defaultConfig.symbol ||
     props.config.tf !== defaultConfig.tf ||
-    props.config.htf !== defaultConfig.htf ||
     props.config.initialCapital !== defaultConfig.initialCapital ||
     props.config.posPct !== defaultConfig.posPct ||
     props.config.lookbackDays !== defaultConfig.lookbackDays ||
-    props.config.useTrend !== defaultConfig.useTrend ||
-    props.config.useHTF !== defaultConfig.useHTF ||
-    props.config.useTrail !== defaultConfig.useTrail ||
-    props.config.tpPct !== defaultConfig.tpPct ||
-    props.config.trailPct !== defaultConfig.trailPct
+    props.config.smaFastLen !== defaultConfig.smaFastLen ||
+    props.config.smaSlowLen !== defaultConfig.smaSlowLen ||
+    props.config.rsiLen !== defaultConfig.rsiLen ||
+    props.config.atrLen !== defaultConfig.atrLen ||
+    props.config.dipPeriod !== defaultConfig.dipPeriod ||
+    props.config.spacingBars !== defaultConfig.spacingBars ||
+    props.config.atrAvgPeriod !== defaultConfig.atrAvgPeriod ||
+    props.config.profitTargetPct !== defaultConfig.profitTargetPct ||
+    props.config.stopLossPct !== defaultConfig.stopLossPct ||
+    props.config.timeExitBars !== defaultConfig.timeExitBars ||
+    props.config.trailMult !== defaultConfig.trailMult
   )
 })
 </script>
