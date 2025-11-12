@@ -73,61 +73,61 @@
     "trend": {
       "title": "Multi-Timeframe Trend Analysis",
       "description": "Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.",
-      "benefits": [
-        "Analyzes trends across multiple timeframes simultaneously (1m, 5m, 15m, 1h, 4h, 1d)",
-        "Uses Rate of Change (ROC) to measure momentum strength and direction",
-        "Exponential Moving Averages (EMA) identify primary trend direction",
-        "Filters out market noise while preserving significant trend movements",
-        "Provides trend strength scoring from 0-100 for position confidence"
-      ],
+      "benefits": {
+        "1": "Analyzes trends across multiple timeframes simultaneously (1m, 5m, 15m, 1h, 4h, 1d)",
+        "2": "Uses Rate of Change (ROC) to measure momentum strength and direction",
+        "3": "Exponential Moving Averages (EMA) identify primary trend direction",
+        "4": "Filters out market noise while preserving significant trend movements",
+        "5": "Provides trend strength scoring from 0-100 for position confidence"
+      },
       "alert": "Our trend analysis engine examines price movements across multiple timeframes to identify the dominant market direction, filtering out short-term noise while capturing significant trend changes."
     },
     "signals": {
       "title": "OBOS Signals",
       "description": "Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.",
-      "benefits": [
-        "RSI divergence detection identifies momentum shifts before price confirms",
-        "Pivot point analysis finds key support/resistance levels automatically",
-        "Overbought (>70 RSI) and oversold (<30 RSI) condition monitoring",
-        "Volume-price divergence analysis for signal confirmation",
-        "Multi-indicator convergence increases signal reliability to 78%"
-      ],
+      "benefits": {
+        "1": "RSI divergence detection identifies momentum shifts before price confirms",
+        "2": "Pivot point analysis finds key support/resistance levels automatically",
+        "3": "Overbought (>70 RSI) and oversold (<30 RSI) condition monitoring",
+        "4": "Volume-price divergence analysis for signal confirmation",
+        "5": "Multi-indicator convergence increases signal reliability to 78%"
+      },
       "alert": "Advanced signal detection combines RSI, pivot points, and volume analysis to identify high-probability entry points when momentum diverges from price direction."
     },
     "confirm": {
       "title": "HTF Confirmation",
       "description": "Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.",
-      "benefits": [
-        "Requires 4-hour and daily timeframe alignment before execution",
-        "Reduces false signal rate by 65% compared to single timeframe",
-        "Eliminates trades against the broader market trend",
-        "Provides confidence scoring based on timeframe alignment",
-        "Prevents entries during uncertain or choppy market conditions"
-      ],
+      "benefits": {
+        "1": "Requires 4-hour and daily timeframe alignment before execution",
+        "2": "Reduces false signal rate by 65% compared to single timeframe",
+        "3": "Eliminates trades against the broader market trend",
+        "4": "Provides confidence scoring based on timeframe alignment",
+        "5": "Prevents entries during uncertain or choppy market conditions"
+      },
       "alert": "Higher timeframe confirmation ensures trades align with the broader market structure, dramatically reducing false signals and improving overall accuracy."
     },
     "risk": {
       "title": "Risk Management",
       "description": "Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.",
-      "benefits": [
-        "Dynamic trailing stops adjust based on market volatility (ATR-based)",
-        "Take-profit levels set at 2:1 reward-to-risk minimum ratios",
-        "Position sizing adjusts based on win rate and volatility",
-        "Maximum drawdown protection with circuit breakers",
-        "Risk-adjusted position sizing prevents overexposure"
-      ],
+      "benefits": {
+        "1": "Dynamic trailing stops adjust based on market volatility (ATR-based)",
+        "2": "Take-profit levels set at 2:1 reward-to-risk minimum ratios",
+        "3": "Position sizing adjusts based on win rate and volatility",
+        "4": "Maximum drawdown protection with circuit breakers",
+        "5": "Risk-adjusted position sizing prevents overexposure"
+      },
       "alert": "Sophisticated risk management system uses trailing stops, take-profit optimization, and dynamic position sizing to protect capital while maximizing returns."
     },
     "size": {
       "title": "Position Sizing",
       "description": "Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.",
-      "benefits": [
-        "Percentage-based sizing maintains consistent risk exposure",
-        "Volatility-adjusted sizing reduces exposure in turbulent markets",
-        "Win rate optimization adjusts size based on recent performance",
-        "Portfolio heat management prevents over-concentration",
-        "Compounding-friendly sizing supports long-term growth"
-      ],
+      "benefits": {
+        "1": "Percentage-based sizing maintains consistent risk exposure",
+        "2": "Volatility-adjusted sizing reduces exposure in turbulent markets",
+        "3": "Win rate optimization adjusts size based on recent performance",
+        "4": "Portfolio heat management prevents over-concentration",
+        "5": "Compounding-friendly sizing supports long-term growth"
+      },
       "alert": "Position sizing algorithm ensures optimal capital allocation across different market conditions and strategy performance levels."
     }
   },
@@ -157,7 +157,6 @@
   "waitlist": {
     "title": "Be one of the first to trade smarter",
     "subtitle": "Join the Zillions waitlist and unlock early access to the on-chain meta-trader. Simple, adaptive, transparent.",
-    "placeholder": "you@domain.com",
     "cta": "Join the waitlist",
     "joining": "Joining…",
     "consent": "I agree to receive emails about Zillions and understand this is not financial advice.",

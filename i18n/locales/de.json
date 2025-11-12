@@ -136,28 +136,27 @@
     "legacy": {
       "badge": "Vermächtnis",
       "title": "Typische Trading-App",
-      "items": [
-        "Erwartet, dass du Strategien auswählst und abstimmst.",
-        "Undurchsichtige Logik, Off-Chain-Ausführung.",
-        "Schwer zu verstehen; leicht Fehler zu machen.",
-        "Manuelles Trading ist schwierig - du kannst nicht besser als Meister & Algos sein."
-      ]
+      "items": {
+        "1": "Erwartet, dass du Strategien auswählst und abstimmst.",
+        "2": "Undurchsichtige Logik, Off-Chain-Ausführung.",
+        "3": "Schwer zu verstehen; leicht Fehler zu machen.",
+        "4": "Manuelles Trading ist schwierig - du kannst nicht besser als Meister & Algos sein."
+      }
     },
     "modern": {
       "badge": "Modern",
       "title": "Zillions",
-      "items": [
-        "Meta-Trading-Engine richtet sich nach dem dominanten Regime.",
-        "On-Chain, transparente Vaults; standardmäßig einfach.",
-        "Für jeden konzipiert. Kein Profi erforderlich.",
-        "KI & Scoring-Algo erkennt, welche Strategien am besten funktionieren."
-      ]
+      "items": {
+        "1": "Meta-Trading-Engine richtet sich nach dem dominanten Regime.",
+        "2": "On-Chain, transparente Vaults; standardmäßig einfach.",
+        "3": "Für jeden konzipiert. Kein Profi erforderlich.",
+        "4": "KI & Scoring-Algo erkennt, welche Strategien am besten funktionieren."
+      }
     }
   },
   "waitlist": {
     "title": "Sei einer der Ersten, der intelligenter handelt",
     "subtitle": "Tritt der Zillions-Warteliste bei und erhalte frühen Zugang zum On-Chain-Meta-Trader. Einfach, adaptiv, transparent.",
-    "placeholder": "du@domain.com",
     "cta": "Zur Warteliste hinzufügen",
     "joining": "Wird hinzugefügt…",
     "consent": "Ich stimme zu, E-Mails über Zillions zu erhalten und verstehe, dass dies keine Finanzberatung ist.",

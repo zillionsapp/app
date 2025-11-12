@@ -37,18 +37,16 @@ export default defineNuxtConfig({
   ],
   i18n: {
     locales: [
-      { code: 'en', language: 'en-US', name: 'English' },
-      { code: 'de', language: 'de-DE', name: 'Deutsch' }
+      { code: 'en', file: 'en.json' },
+      { code: 'de', file: 'de.json' }
     ],
     defaultLocale: 'en',
-    strategy: 'prefix_except_default',
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
       redirectOn: 'root',
       alwaysRedirect: false
     },
-    vueI18n: './i18n.config.ts'
   },
   runtimeConfig: {
     // Private keys (only available on server-side)

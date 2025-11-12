@@ -12,7 +12,7 @@
       <header class="navbar max-w-7xl mx-auto w-full px-4 lg:px-6 py-2 mt-8 backdrop-blur-sm bg-base-200/50 fixed rounded-2xl top-0 z-50 border border-base-300 shadow">
         <div class="navbar-start gap-3">
           <img :src="logoToUse" alt="Zillions" class="h-8 w-auto rounded-full" />
-          <a class="font-semibold tracking-tight text-lg">Zillions<span class="text-primary"> </span></a>
+          <a class="font-semibold tracking-tight text-lg bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">Zillions<span class="text-primary"> </span></a>
         </div>
         <div class="navbar-center hidden md:flex">
           <ul class="menu menu-horizontal px-1">
@@ -25,11 +25,11 @@
         <div class="navbar-end flex gap-2">
           <div class="dropdown dropdown-end">
             <button class="btn btn-ghost btn-sm">
-              {{ $i18n.locale.toUpperCase() }}
+              {{ locale.toUpperCase() }}
             </button>
             <ul class="dropdown-content menu bg-base-100 rounded-box z-[1] w-32 p-2 shadow">
-              <li><a @click="$i18n.setLocale('en')">English</a></li>
-              <li><a @click="$i18n.setLocale('de')">Deutsch</a></li>
+              <li><a @click="setLocale('en')">English</a></li>
+              <li><a @click="setLocale('de')">Deutsch</a></li>
             </ul>
           </div>
           <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.waitlist') }}</a>
@@ -226,13 +226,53 @@
               </div>
 
               <div class="mt-6 space-y-4">
-                <div v-for="(benefit, index) in $t(`technology.${selectedStrategy}.benefits`)" :key="index" class="group">
+                <div class="group">
                   <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
                     <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
                       <div class="w-3 h-3 bg-primary rounded-full"></div>
                     </div>
                     <div class="flex-1">
-                      <p class="text-sm font-medium text-base-content/90 leading-relaxed">{{ benefit }}</p>
+                      <p class="text-sm font-medium text-base-content/90 leading-relaxed">{{ $t(`technology.${selectedStrategy}.benefits.1`) }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="group">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                    <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
+                      <div class="w-3 h-3 bg-primary rounded-full"></div>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-base-content/90 leading-relaxed">{{ $t(`technology.${selectedStrategy}.benefits.2`) }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="group">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                    <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
+                      <div class="w-3 h-3 bg-primary rounded-full"></div>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-base-content/90 leading-relaxed">{{ $t(`technology.${selectedStrategy}.benefits.3`) }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="group">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                    <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
+                      <div class="w-3 h-3 bg-primary rounded-full"></div>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-base-content/90 leading-relaxed">{{ $t(`technology.${selectedStrategy}.benefits.4`) }}</p>
+                    </div>
+                  </div>
+                </div>
+                <div class="group">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                    <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
+                      <div class="w-3 h-3 bg-primary rounded-full"></div>
+                    </div>
+                    <div class="flex-1">
+                      <p class="text-sm font-medium text-base-content/90 leading-relaxed">{{ $t(`technology.${selectedStrategy}.benefits.5`) }}</p>
                     </div>
                   </div>
                 </div>
@@ -259,7 +299,10 @@
               <div class="badge badge-outline mb-2">{{ $t('comparison.legacy.badge') }}</div>
               <h3 class="card-title text-xl">{{ $t('comparison.legacy.title') }}</h3>
               <ul class="list-disc ms-5 text-sm opacity-80 space-y-3 mt-4">
-                <li v-for="item in $t('comparison.legacy.items')" :key="item" class="hover:translate-x-1 transition-transform duration-300">{{ item }}</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">{{ $t(`comparison.${legacyType}.items.1`) }}</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">{{ $t(`comparison.${legacyType}.items.2`) }}</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">{{ $t(`comparison.${legacyType}.items.3`) }}</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">{{ $t(`comparison.${legacyType}.items.4`) }}</li>
               </ul>
             </div>
           </div>
@@ -268,7 +311,10 @@
               <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 mb-2">{{ $t('comparison.modern.badge') }}</div>
               <h3 class="card-title text-xl">{{ $t('comparison.modern.title') }}</h3>
               <ul class="list-disc ms-5 text-sm opacity-90 space-y-3 mt-4">
-                <li v-for="item in $t('comparison.modern.items')" :key="item" class="hover:translate-x-1 transition-transform duration-300">{{ item }}</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">{{ $t(`comparison.${modernType}.items.1`) }}</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">{{ $t(`comparison.${modernType}.items.2`) }}</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">{{ $t(`comparison.${modernType}.items.3`) }}</li>
+                <li class="hover:translate-x-1 transition-transform duration-300">{{ $t(`comparison.${modernType}.items.4`) }}</li>
               </ul>
             </div>
           </div>
@@ -295,7 +341,7 @@
                 v-model="email"
                 type="email"
                 required
-                :placeholder="$t('waitlist.placeholder')"
+                placeholder="email@example.com"
                 class="input input-lg w-full rounded-2xl bg-base-100/70 backdrop-blur-sm border border-base-300/60 focus:border-primary focus:ring-2 focus:ring-primary/30 text-lg"
               />
               <button
@@ -400,9 +446,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, reactive } from 'vue'
+import { ref, computed, reactive, onMounted } from 'vue'
 import PrivacyModal from '../components/PrivacyModal.vue'
 import TermsModal from '../components/TermsModal.vue'
+
+const { setLocale, locale, t } = useI18n()
+const { $i18n } = useNuxtApp()
 
 /**
  * Props
@@ -413,6 +462,11 @@ import TermsModal from '../components/TermsModal.vue'
 const props = defineProps<{ logoSrc?: string }>()
 const EMBEDDED_LOGO = '/logo.jpg'
 const logoToUse = computed(() => props.logoSrc || EMBEDDED_LOGO)
+
+const legacyType = ref('legacy')
+const modernType = ref('modern')
+
+
 
 import Airtable from 'airtable'
 
