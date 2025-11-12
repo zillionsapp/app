@@ -39,7 +39,7 @@
         />
       </div>
       
-      <div class="flex-1">
+      <!-- <div class="flex-1">
         <TradingStrategySelector
           :strategies="tradingStrategies"
           :selected-strategies="selectedStrategies"
@@ -48,7 +48,7 @@
           @update-allocation="updateAllocation"
           @get-max-allocation="getMaxAllocation"
         />
-      </div>
+      </div> -->
     </main>
 
     <!-- Action bar -->

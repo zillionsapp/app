@@ -2,7 +2,7 @@
   <section class="mt-6">
     <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
       <!-- Remaining Cash -->
-      <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
+      <div class="stat bg-base-200 rounded-2xl p-4 border border-base-300/60">
         <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v20M2 12h20" stroke-linecap="round"/>
@@ -16,7 +16,7 @@
       </div>
 
       <!-- BTC Holding -->
-      <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
+      <div class="stat bg-base-200 rounded-2xl p-4 border border-base-300/60">
         <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M6 4h12M6 4v16M6 4H4m2 0h2m8 0H6m0 0v16m0-16h12m-6 8h6" stroke-linecap="round" stroke-linejoin="round"/>
@@ -30,7 +30,7 @@
       </div>
 
       <!-- Holding Value -->
-      <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
+      <div class="stat bg-base-200 rounded-2xl p-4 border border-base-300/60">
         <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" stroke-linecap="round" stroke-linejoin="round"/>
@@ -44,7 +44,7 @@
       </div>
 
       <!-- Total Deposited -->
-      <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
+      <div class="stat bg-base-200 rounded-2xl p-4 border border-base-300/60">
         <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M3 12h18M3 6h18M3 18h18" stroke-linecap="round"/>
@@ -58,7 +58,7 @@
       </div>
 
       <!-- PnL Cash -->
-      <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
+      <div class="stat bg-base-200 rounded-2xl p-4 border border-base-300/60">
         <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 20V4m-7 5l7-5 7 5" stroke-linecap="round" stroke-linejoin="round"/>
@@ -74,7 +74,7 @@
       </div>
 
       <!-- PnL Percentage -->
-      <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
+      <div class="stat bg-base-200 rounded-2xl p-4 border border-base-300/60">
         <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" stroke-linecap="round"/>
@@ -93,13 +93,13 @@
     <!-- Additional Info Row -->
     <div class="mt-3 grid grid-cols-1 md:grid-cols-2 gap-3">
       <!-- Investment Date -->
-      <div class="bg-base-100/50 rounded-xl p-3 border border-base-300/30">
+      <div class="bg-base-200 rounded-xl p-3 border border-base-300/30">
         <div class="text-xs opacity-70 uppercase tracking-wide">Investment Started</div>
         <div class="text-sm font-medium mt-1">{{ formatDate(depositAt) }}</div>
       </div>
 
       <!-- Performance Indicator -->
-      <div class="bg-base-100/50 rounded-xl p-3 border border-base-300/30">
+      <div class="bg-base-200 rounded-xl p-3 border border-base-300/30">
         <div class="text-xs opacity-70 uppercase tracking-wide">Performance</div>
         <div class="text-sm font-medium mt-1" :class="earningsPct >= 0 ? 'text-success' : 'text-error'">
           {{ earningsPct >= 0 ? 'Profit' : 'Loss' }} of {{ Math.abs(earningsPct).toFixed(2) }}%
