@@ -56,6 +56,8 @@ export default defineNuxtConfig({
     airtableBaseId: process.env.AIRTABLE_BASE_ID,
     airtableWalletTable: process.env.AIRTABLE_WALLET_TABLE,
     airtableCryptoResearchTable: process.env.AIRTABLE_CRYPTO_RESEARCH_TABLE,
+    airtableReferralTable: process.env.AIRTABLE_REFERRAL_TABLE,
+    airtableReferralBaseId: process.env.AIRTABLE_REFERRAL_BASE_ID,
     openrouterApiKey: process.env.OPENROUTER_API_KEY,
     anthropicApiKey: process.env.ANTHROPHIC_API_KEY,
 

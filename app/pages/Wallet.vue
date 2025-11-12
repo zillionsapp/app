@@ -339,9 +339,21 @@ onMounted(async () => {
 
 /* Balance calculations */
 const currency = computed(() => props.currency)
-const deposited = computed(() => walletDetails.value?.deposit || props.deposited)
+const initialDeposit = computed(() => walletDetails.value?.deposit || props.deposited)
 const cash = computed(() => walletDetails.value?.cash || walletBalance.value || 0)
 const btc = computed(() => walletDetails.value?.btc || 0)
+
+// Calculate total value sent (both cash and BTC converted to USD)
+const totalSentValue = computed(() => {
+  if (!walletDetails.value?.trades) return 0
+  return walletDetails.value.trades
+    .filter((trade: any) => trade.side === 'SELL') // Assuming SELL means sending/selling
+    .reduce((total: number, trade: any) => total + trade.amount_usd, 0)
+})
+
+// Total Deposited = Initial deposit - Value of funds sent
+const deposited = computed(() => initialDeposit.value - totalSentValue.value)
+
 const equity = computed(() => cash.value + btc.value * (btcPrice.value || 0))
 const depositAt = computed(() => {
   return walletDetails.value?.created_at || props.depositAt || ''
