@@ -16,7 +16,7 @@ export default defineNuxtConfig({
     },
     scheduledTasks: {
       // Run paper trading every 5 minutes
-      '0,5,10,15,20,25,30,35,40,45,50,55 * * * *': 'paper-trading',
+      // '0,5,10,15,20,25,30,35,40,45,50,55 * * * *': 'paper-trading',
       // Run crypto research daily at 9:00 AM UTC
       /* '0 9 * * *': 'crypto-research', */
       // Run BTC day trader every hour (24/7 for crypto)
