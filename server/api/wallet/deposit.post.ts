@@ -59,18 +59,21 @@ export default defineEventHandler(async (event) => {
       // Update existing record
       const existingRecord = existingRecords[0]
       if (existingRecord) {
-        const currentAmount = existingRecord.fields.Amount as number || 0
-        const newAmount = currentAmount + amount
+        const currentDeposit = existingRecord.fields.Deposit as number || 0
+        const currentCash = existingRecord.fields.Cash as number || 0
+        const newDeposit = currentDeposit + amount
+        const newCash = currentCash + amount
 
         await base(tableName).update(existingRecord.id, {
-          Amount: newAmount,
+          Deposit: newDeposit,
+          Cash: newCash,
           'Updated At': now
         })
 
         return {
           success: true,
           action: 'updated',
-          newBalance: newAmount,
+          newBalance: newCash,
           email
         }
       }
@@ -78,7 +81,8 @@ export default defineEventHandler(async (event) => {
       // Create new wallet record
       await base(tableName).create({
         Email: email,
-        Amount: amount,
+        Deposit: amount,
+        Cash: amount,
         'Created At': now,
         'Updated At': now
       })

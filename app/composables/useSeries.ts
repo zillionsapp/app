@@ -17,7 +17,7 @@ type SeriesResponse = {
 }
 
 export function useSeries(
-  initialSymbol = 'SOLUSDT',
+  initialSymbol = 'BTCUSDT',
   initialPeriod: Period = '1M',
   // NEW: earnings inputs (USD deposit at a date)
   depositUsd: number = 5000,

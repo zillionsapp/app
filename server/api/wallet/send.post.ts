@@ -67,7 +67,7 @@ export default defineEventHandler(async (event) => {
     const toRecord = toRecords[0]
 
     // Check if sender has sufficient funds
-    const fromCurrentAmount = fromRecord ? (fromRecord.fields.Amount as number || 0) : 0
+    const fromCurrentAmount = fromRecord ? (fromRecord.fields.Cash as number || 0) : 0
     if (fromCurrentAmount < amount) {
       throw createError({
         statusCode: 400,
@@ -100,7 +100,7 @@ export default defineEventHandler(async (event) => {
       }
 
       await base(tableName).update(fromRecord.id, {
-        Amount: fromNewAmount,
+        Cash: fromNewAmount,
         sentTo: JSON.stringify([...currentSentTo, newTransaction]),
         'Updated At': now
       })
@@ -108,7 +108,7 @@ export default defineEventHandler(async (event) => {
 
     // Update or create receiver's amount (add) and add transaction history
     if (toRecord) {
-      const toCurrentAmount = toRecord.fields.Amount as number || 0
+      const toCurrentAmount = toRecord.fields.Cash as number || 0
       const toNewAmount = toCurrentAmount + amount
       // Get current receivedFrom history or initialize empty array
       let currentReceivedFrom: TransactionDetail[] = []
@@ -130,12 +130,12 @@ export default defineEventHandler(async (event) => {
       }
 
       await base(tableName).update(toRecord.id, {
-        Amount: toNewAmount,
+        Cash: toNewAmount,
         receivedFrom: JSON.stringify([...currentReceivedFrom, newReceivedTransaction]),
         'Updated At': now
       })
     } else {
-      // Add new transaction with email, amount, and timestamp for new wallet
+      // Create new wallet record for receiver
       const newReceivedTransaction: TransactionDetail = {
         email: fromEmail,
         amount: amount,
@@ -144,7 +144,8 @@ export default defineEventHandler(async (event) => {
 
       await base(tableName).create({
         Email: toEmail,
-        Amount: amount,
+        Deposit: amount,
+        Cash: amount,
         receivedFrom: JSON.stringify([newReceivedTransaction]),
         'Created At': now,
         'Updated At': now
@@ -158,7 +159,7 @@ export default defineEventHandler(async (event) => {
       amount,
       fromNewBalance: fromNewAmount,
       toNewBalance: toRecord
-        ? (toRecord.fields.Amount as number || 0) + amount
+        ? (toRecord.fields.Cash as number || 0) + amount
         : amount
     }
   } catch (error: any) {

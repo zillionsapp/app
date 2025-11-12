@@ -42,9 +42,13 @@ interface BalanceResponse {
   success: boolean
   email: string
   balance: number
+  cash?: number
+  btc?: number
+  deposit?: number
   exists: boolean
   sentTo?: string[]
   receivedFrom?: string[]
+  trades?: any[]
   created_at?: string
   updated_at?: string
 }

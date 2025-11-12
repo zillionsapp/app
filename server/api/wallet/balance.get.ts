@@ -33,15 +33,33 @@ export default defineEventHandler(async (event) => {
 
     if (records.length > 0) {
       const record = records[0]
-      const balance = record.fields.Amount as number || 0
+      const cash = record.fields.Cash as number || 0
+      const btc = record.fields.btc as number || 0
+      const deposit = record.fields.Deposit as number || 0
+
+      // Parse trades JSON
+      let trades: any[] = []
+      try {
+        const tradesField = record.fields.Trades as string
+        if (tradesField) {
+          trades = JSON.parse(tradesField)
+        }
+      } catch (parseError) {
+        console.error(`Error parsing trades for ${email}:`, parseError)
+        trades = []
+      }
+
       return {
         success: true,
         email,
-        balance,
+        balance: cash, // For backward compatibility
+        cash,
+        btc,
+        deposit,
         exists: true,
         sentTo: (record.fields.sentTo as string[]) || [],
         receivedFrom: (record.fields.receivedFrom as string[]) || [],
-        trades: (record.fields.trades as string[]) || [],
+        trades,
         created_at: record.fields['Created At'] as string,
         updated_at: record.fields['Updated At'] as string
       }

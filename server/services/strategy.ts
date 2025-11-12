@@ -285,6 +285,48 @@ class RTBMomentumBreakoutStrategy {
     };
   }
 
+  // Get strategy state for persistence
+  getState() {
+    return {
+      position: this.position,
+      entryPrice: this.entryPrice,
+      stopLoss: this.stopLoss,
+      trailingStop: this.trailingStop,
+      barsSinceEntry: this.barsSinceEntry,
+      lastBuyBar: this.lastBuyBar,
+      minLowSinceEntry: this.minLowSinceEntry,
+      closes: this.closes,
+      highs: this.highs,
+      lows: this.lows,
+      smaFastValues: this.smaFastValues,
+      smaSlowValues: this.smaSlowValues,
+      rsiValues: this.rsiValues,
+      atrValues: this.atrValues,
+      recentHighs: this.recentHighs,
+      recentLows: this.recentLows
+    };
+  }
+
+  // Set strategy state from persistence
+  setState(state: any) {
+    this.position = state.position || 0;
+    this.entryPrice = state.entryPrice || 0;
+    this.stopLoss = state.stopLoss || 0;
+    this.trailingStop = state.trailingStop || 0;
+    this.barsSinceEntry = state.barsSinceEntry || 0;
+    this.lastBuyBar = state.lastBuyBar || -this.spacingBars - 1;
+    this.minLowSinceEntry = state.minLowSinceEntry || Infinity;
+    this.closes = state.closes || [];
+    this.highs = state.highs || [];
+    this.lows = state.lows || [];
+    this.smaFastValues = state.smaFastValues || [];
+    this.smaSlowValues = state.smaSlowValues || [];
+    this.rsiValues = state.rsiValues || [];
+    this.atrValues = state.atrValues || [];
+    this.recentHighs = state.recentHighs || [];
+    this.recentLows = state.recentLows || [];
+  }
+
   // Reset strategy state
   reset() {
     this.position = 0;

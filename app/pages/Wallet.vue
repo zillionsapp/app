@@ -8,10 +8,11 @@
           :currency="currency"
           :display-balance="displayBalance"
           :latest-price="latestPrice"
+          :btc-price="btcPrice"
           :period="period"
           :deposit-at="depositAt"
-          :earnings-usd="earningsUsd"
-          :earnings-pct="earningsPct"
+          :earnings-usd="tradingEarningsUsd"
+          :earnings-pct="tradingEarningsPct"
           :loading="loading"
           :error="error"
           :earnings-loading="earningsLoading"
@@ -28,9 +29,11 @@
           :currency="currency"
           :deposited="deposited"
           :deposit-at="depositAt"
-          :earnings-usd="earningsUsd"
-          :earnings-pct="earningsPct"
-          :equity="displayBalance"
+          :earnings-usd="tradingEarningsUsd"
+          :earnings-pct="tradingEarningsPct"
+          :cash="cash"
+          :btc="btc"
+          :btc-price="btcPrice"
           :strategies="tradingStrategies"
           :selected-strategies="selectedStrategies"
         />
@@ -209,6 +212,10 @@ const {
   qtySol, currentValueUsd, earningsUsd, earningsPct,
 } = useSeries('SOLUSDT', '1M', props.deposited, props.depositAt)
 
+/* BTC price for equity calculation */
+const btcSeries = useSeries('BTCUSDT', '1M', 0, '')
+const btcPrice = computed(() => btcSeries.latestPrice.value)
+
 const periods = periodsArr as unknown as string[]
 
 /* Wallet composable */
@@ -265,14 +272,24 @@ onMounted(async () => {
   }
 })
 
-/* Balance headline uses live current value if available */
+/* Balance calculations */
 const currency = computed(() => props.currency)
-const deposited = computed(() => walletBalance.value || props.deposited)
+const deposited = computed(() => walletDetails.value?.deposit || props.deposited)
+const cash = computed(() => walletDetails.value?.cash || walletBalance.value || 0)
+const btc = computed(() => walletDetails.value?.btc || 0)
+const equity = computed(() => cash.value + btc.value * (btcPrice.value || 0))
 const depositAt = computed(() => {
   return walletDetails.value?.created_at || props.depositAt || ''
 })
 const displayBalance = computed(() => {
-  return (currentValueUsd.value ?? 0) > 0 ? (currentValueUsd.value ?? 0) : deposited.value
+  return (currentValueUsd.value ?? 0) > 0 ? (currentValueUsd.value ?? 0) : equity.value
+})
+
+/* Trading earnings: Equity - Deposit */
+const tradingEarningsUsd = computed(() => equity.value - deposited.value)
+const tradingEarningsPct = computed(() => {
+  const dep = deposited.value
+  return dep > 0 ? ((equity.value - deposited.value) / dep) * 100 : 0
 })
 
 /* Chart geometry (unchanged) */

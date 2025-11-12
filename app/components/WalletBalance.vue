@@ -8,8 +8,8 @@
           <h1 class="text-4xl md:text-5xl font-bold tracking-tight mt-1">
             {{ currency }}{{ formatMoney(displayBalance) }}
           </h1>
-          <p v-if="latestPrice" class="text-xs opacity-70 mt-1">
-            BTC last: ${{ formatMoney(latestPrice!) }} • Bought on {{ depositAt }}
+          <p v-if="btcPrice" class="text-xs opacity-70 mt-1">
+            BTC last: ${{ formatMoney(btcPrice!) }}
           </p>
         </div>
         <div class="text-right">
@@ -71,6 +71,7 @@ interface Props {
   currency: string
   displayBalance: number
   latestPrice: number | null
+  btcPrice: number | null
   period: string
   depositAt: string
   earningsUsd: number

@@ -1,18 +1,46 @@
 <template>
   <section class="mt-6">
-    <div class="grid grid-cols-2 md:grid-cols-4 gap-3">
-      <!-- Total Equity -->
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+      <!-- Remaining Cash -->
       <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
         <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
           <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
             <path d="M12 2v20M2 12h20" stroke-linecap="round"/>
           </svg>
           <p class="text-base-content text-left">
-            Total Equity
+            Remaining Cash
           </p>
         </div>
-        <div class="stat-value text-xl font-bold">{{ currency }}{{ formatMoney(equity) }}</div>
-        <div class="stat-desc text-xs opacity-70 text-center">Current portfolio value</div>
+        <div class="stat-value text-xl font-bold">{{ currency }}{{ formatMoney(cash || 0) }}</div>
+        <div class="stat-desc text-xs opacity-70 text-center">Available cash balance</div>
+      </div>
+
+      <!-- BTC Holding -->
+      <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
+        <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M6 4h12M6 4v16M6 4H4m2 0h2m8 0H6m0 0v16m0-16h12m-6 8h6" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="text-base-content text-left">
+            BTC Holding
+          </p>
+        </div>
+        <div class="stat-value text-lg">{{ (btc || 0).toFixed(8) }} BTC</div>
+        <div class="stat-desc text-xs opacity-70 text-center">Bitcoin balance</div>
+      </div>
+
+      <!-- Holding Value -->
+      <div class="stat bg-base-100 rounded-2xl p-4 border border-base-300/60">
+        <div class="stat-title text-xs uppercase opacity-70 flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          <p class="text-base-content text-left">
+            Holding Value
+          </p>
+        </div>
+        <div class="stat-value text-lg">{{ currency }}{{ formatMoney((btc || 0) * (btcPrice || 0)) }}</div>
+        <div class="stat-desc text-xs opacity-70 text-center">BTC value in USD</div>
       </div>
 
       <!-- Total Deposited -->
@@ -190,13 +218,16 @@ interface Props {
   depositAt: string
   earningsUsd: number
   earningsPct: number
-  equity?: number
+  cash?: number
+  btc?: number
+  btcPrice?: number
   strategies?: Strategy[]
   selectedStrategies?: Strategy[]
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  equity: 0
+  cash: 0,
+  btc: 0
 })
 
 /* Utils */
@@ -252,11 +283,11 @@ function getStrategyPnL(strategyId: string) {
 }
 
 function getStrategyValue(strategyId: string) {
-  // Calculate value based on allocation percentage of total equity
+  // Calculate value based on allocation percentage of total deposited
   if (!props.selectedStrategies) return 0
   const strategy = props.selectedStrategies.find(s => s.id === strategyId)
   if (!strategy) return 0
-  return (props.equity * strategy.allocation) / 100
+  return (props.deposited * strategy.allocation) / 100
 }
 
 function getAverageReturn(period: 'daily' | 'weekly') {

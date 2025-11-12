@@ -15,6 +15,7 @@ const PERIOD_LOOKBACK: Record<Period, number> = {
 export default defineEventHandler(async (event: H3Event) => {
   try {
     const q = getQuery(event)
+    const symbol = (q.symbol as string | undefined)?.toUpperCase() || 'SOLUSDT'
     const vs = (q.vs as string | undefined)?.toLowerCase() || 'usd'
     const period = (q.period as Period | undefined) || undefined
 
@@ -36,8 +37,17 @@ export default defineEventHandler(async (event: H3Event) => {
       return { ok: false, error: 'Provide either ?period= or ?from=' }
     }
 
+    // Map symbol to CoinGecko coin ID
+    const coinIdMap: Record<string, string> = {
+      'SOLUSDT': 'solana',
+      'BTCUSDT': 'bitcoin',
+      'ETHUSDT': 'ethereum',
+      // Add more mappings as needed
+    }
+    const coinId = coinIdMap[symbol] || 'solana' // Default to solana
+
     // Fetch from CoinGecko
-    const url = `https://api.coingecko.com/api/v3/coins/solana/market_chart/range?vs_currency=${vs}&from=${fromUnix}&to=${toUnix}`
+    const url = `https://api.coingecko.com/api/v3/coins/${coinId}/market_chart/range?vs_currency=${vs}&from=${fromUnix}&to=${toUnix}`
     const res = await fetch(url, {
       headers: { 'cache-control': 'no-cache' }
     })
