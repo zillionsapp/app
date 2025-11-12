@@ -28,7 +28,7 @@
           </label>
           <select
             v-model="config.symbol"
-            class="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-base-content"
+            class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
           >
             <option value="BTCUSDT">BTCUSDT</option>
             <option value="ETHUSDT">ETHUSDT</option>
@@ -43,7 +43,7 @@
             </label>
             <select
               v-model="config.tf"
-              class="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-base-content"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
             >
               <option value="15m">15m</option>
               <option value="30m">30m</option>
@@ -59,7 +59,7 @@
             </label>
             <select
               v-model="config.htf"
-              class="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-base-content"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
             >
               <option value="1h">1h</option>
               <option value="4h">4h</option>
@@ -78,7 +78,7 @@
               v-model.number="config.initialCapital"
               type="number"
               step="100"
-              class="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-base-content"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
             />
           </div>
 
@@ -91,7 +91,7 @@
               type="number"
               step="1"
               max="100"
-              class="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-base-content"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
             />
           </div>
         </div>
@@ -105,7 +105,7 @@
             type="number"
             min="30"
             max="365"
-            class="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700"
+            class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200"
           />
         </div>
       </div>
@@ -118,7 +118,7 @@
           <input
             v-model="config.useTrend"
             type="checkbox"
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
           />
           <label class="ml-2 block text-sm text-gray-300">
             Use Trend Filter
@@ -129,7 +129,7 @@
           <input
             v-model="config.useHTF"
             type="checkbox"
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
           />
           <label class="ml-2 block text-sm text-gray-300">
             Use HTF Confirmation
@@ -140,7 +140,7 @@
           <input
             v-model="config.useTrail"
             type="checkbox"
-            class="h-4 w-4 text-blue-600 focus:ring-blue-500 border-gray-300 rounded"
+            class="h-4 w-4 text-blue-600 border-gray-300 rounded"
           />
           <label class="ml-2 block text-sm text-gray-300">
             Enable Trailing Stop
@@ -156,7 +156,7 @@
               v-model.number="config.tpPct"
               type="number"
               step="0.1"
-              class="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-base-content"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
             />
           </div>
 
@@ -168,7 +168,7 @@
               v-model.number="config.trailPct"
               type="number"
               step="0.1"
-              class="w-full px-3 py-2 border border-gray-300 border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 bg-gray-700 text-base-content"
+              class="w-full px-3 py-2 rounded-md focus:outline-none focus:ring-2 bg-base-200 text-base-content"
             />
           </div>
         </div>
@@ -179,7 +179,7 @@
         <button
           type="submit"
           :disabled="loading"
-          class="w-full bg-blue-600 bg-gradient-to-r from-primary via-secondary to-accent animate-gradient disabled:bg-gray-400 text-base-content font-medium py-2 px-4 rounded-md transition duration-200"
+          class="w-full bg-blue-600 bg-gradient-to-r from-primary via-secondary to-accent animate-gradient disabled:bg-gray-400 text-white font-medium py-2 px-4 rounded-md transition duration-200"
         >
           <span v-if="loading" class="flex items-center justify-center">
             <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-base-content" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -194,7 +194,7 @@
         <button
           type="button"
           @click="$emit('reset-config')"
-          class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-base-content font-medium py-2 px-4 rounded-md transition duration-200"
+          class="w-full mt-2 bg-gray-500 hover:bg-gray-600 text-white font-medium py-2 px-4 rounded-md transition duration-200"
         >
           Reset to Defaults
         </button>

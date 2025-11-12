@@ -25,12 +25,14 @@
             :analyzing="analyzing"
             :improving="improving"
             :generatingOptimal="generatingOptimal"
+            :exportingOptimal="exportingOptimal"
             @analyze-trades="analyzeTrades"
             @improve-strategy="improveStrategy"
             @apply-improvements="applyImprovements"
             @generate-optimal-trades="generateOptimalTrades"
             @backtest-optimal-strategy="backtestOptimalStrategy"
             @analyze-optimal-performance="analyzeOptimalPerformance"
+            @export-optimal-trades="exportOptimalTrades"
           />
         </div>
 
@@ -83,6 +85,7 @@ const showAllTrades = ref(false)
 const analyzing = ref(false)
 const improving = ref(false)
 const generatingOptimal = ref(false)
+const exportingOptimal = ref(false)
 const analysis = ref(null)
 const improvements = ref(null)
 const optimalTrades = ref(null)
@@ -195,7 +198,8 @@ const improveStrategy = async () => {
       body: {
         currentConfig: result.value.config,
         analysis: analysis.value,
-        trades: result.value.allTrades
+        trades: result.value.allTrades,
+        optimalTrades: optimalTrades.value // Include optimal trades for comparison
       }
     })
     improvements.value = response.improvements
@@ -434,6 +438,51 @@ const analyzeOptimalPerformance = () => {
   })
 
   // You could add a toast notification here showing the analysis
+}
+
+// Handler for exporting optimal trades
+const exportOptimalTrades = async () => {
+  if (!optimalTrades.value || !result.value) {
+    console.error('No optimal trades or backtest result available')
+    return
+  }
+
+  exportingOptimal.value = true
+  try {
+    const response = await $fetch('/api/strategy/export-optimal', {
+      method: 'POST',
+      body: {
+        optimalTrades: optimalTrades.value,
+        symbol: result.value.config.symbol,
+        tf: result.value.config.tf,
+        lookbackDays: result.value.config.lookbackDays,
+        initialCapital: result.value.config.initialCapital,
+        commissionPct: result.value.config.commissionPct
+      }
+    })
+
+    if (response.ok && response.exportData) {
+      // Create and download JSON file
+      const dataStr = JSON.stringify(response.exportData, null, 2)
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr)
+
+      const exportFileDefaultName = `optimal-trades-${result.value.config.symbol}-${new Date().toISOString().split('T')[0]}.json`
+
+      const linkElement = document.createElement('a')
+      linkElement.setAttribute('href', dataUri)
+      linkElement.setAttribute('download', exportFileDefaultName)
+      linkElement.click()
+
+      console.log('Optimal trades exported successfully:', exportFileDefaultName)
+    } else {
+      console.error('Export failed:', response)
+    }
+  } catch (error) {
+    console.error('Optimal trades export failed:', error)
+    // You could add a toast notification here
+  } finally {
+    exportingOptimal.value = false
+  }
 }
 
 // Auto-run backtest on mount with default config

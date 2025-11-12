@@ -1,74 +1,44 @@
 import { H3Event, readBody, setHeaders, setResponseStatus } from 'h3'
 import {
-  StrategyConfig,
-  DEFAULT_CONFIG,
+  RTBMomentumBreakoutStrategy,
   fetchKlines,
-  trendScore,
-  obosSignals,
-  rollingCountTrue,
-  alignHTFtoLTF,
-  atr,
-  pct,
   applyCommission,
   applySlippagePx,
   nowMs,
   days
 } from '../services/strategy'
 
-// Backtest execution function that uses strategy components
-async function executeBacktest(config: Required<StrategyConfig>) {
+interface BacktestConfig {
+  symbol: string
+  tf: string
+  lookbackDays: number
+  limitPerReq: number
+  initialCapital: number
+  commissionPct: number
+  slippagePct: number
+  posPct: number
+}
+
+// Backtest execution function that uses the new strategy
+async function executeBacktest(config: BacktestConfig) {
   // Fetch market data
   const end = nowMs()
   const start = end - days(config.lookbackDays)
 
-  const ltfPromise = fetchKlines(config.symbol, config.tf, start, end, config.limitPerReq)
-  const htfPromise = fetchKlines(config.symbol, config.htf, start - days(5), end, config.limitPerReq)
-
-  const [ltf, htf] = await Promise.all([ltfPromise, htfPromise])
+  const ltf = await fetchKlines(config.symbol, config.tf, start, end, config.limitPerReq)
 
   if (ltf.length === 0) {
-    throw new Error('No LTF candles returned from Binance')
+    throw new Error('No candles returned from Binance')
   }
 
-  if (htf.length === 0) {
-    throw new Error('No HTF candles returned from Binance')
-  }
+  // Create strategy instance
+  const strategy = new RTBMomentumBreakoutStrategy()
 
-  // Run backtest logic using strategy components
-  const times  = ltf.map(c => c.time)
-  const open   = ltf.map(c => c.open)
-  const high   = ltf.map(c => c.high)
-  const low    = ltf.map(c => c.low)
-  const close  = ltf.map(c => c.close)
-
-  const trend = trendScore(close, config.trendLen)
-  const upTrend = trend.map(x => x > config.upTh)
-  const downTrend = trend.map(x => x < config.dnTh)
-
-  const htfScore = alignHTFtoLTF(times, htf, config.trendLen)
-  const htfOKLong = htfScore.map(x => x > config.htfLongTh)
-  const htfOKShrt = htfScore.map(x => x < config.htfShortTh)
-
-  const { isOB, isOS } = obosSignals(close, config.obosLen, config.adaptLen)
-
-  const osBars = rollingCountTrue(isOS, config.winLen)
-  const obBars = rollingCountTrue(isOB, config.winLen)
-
-  const osCross = osBars.map((v, i) => v >= config.needBars && (i > 0 ? osBars[i-1] < config.needBars : true))
-  const obCross = obBars.map((v, i) => v >= config.needBars && (i > 0 ? obBars[i-1] < config.needBars : true))
-
-  const atrSeries = atr(high, low, close, config.atrLen)
-
-  // State
+  // State for backtesting
   let cash = config.initialCapital
-  let position = 0
-  let avgPrice = NaN
-  let posBars = 0
-  let trailActive = false
-  let trailStop = NaN
-  let trailHighWater = NaN
-  let lastEntryBar = -Infinity
-  const trades = []
+  let position = 0 // shares held
+  let avgPrice = 0
+  const trades: any[] = []
 
   const fee = (notional: number) => notional * (config.commissionPct / 100)
 
@@ -76,107 +46,56 @@ async function executeBacktest(config: Required<StrategyConfig>) {
     return cash + position * px
   }
 
-  function enterLong(i: number) {
-    const px = applySlippagePx(close[i], config.slippagePct, "buy")
-    const equity = markToMarket(px)
-    const buyNotional = equity * (config.posPct / 100)
-    if (buyNotional <= 0) return
-    const qty = buyNotional / px
-    const cost = buyNotional + fee(buyNotional)
-    if (cash < cost) return
-    cash -= cost
-
-    const newQty = position + qty
-    avgPrice = (isFinite(avgPrice) && position !== 0)
-      ? (avgPrice * position + px * qty) / newQty
-      : px
-    position = newQty
-
-    trades.push({ time: times[i], side: "BUY", price: px, qty, note: "entry" })
-    lastEntryBar = i
-  }
-
-  function exitPortionAtTP(i: number, portionPct: number) {
-    if (position <= 0) return
-    const targetPx = avgPrice * (1 + config.tpPct / 100)
-    if (high[i] >= targetPx) {
-      const qtyToSell = position * (portionPct / 100)
-      const px = applySlippagePx(targetPx, config.slippagePct, "sell")
-      const proceeds = qtyToSell * px
-      cash += applyCommission(proceeds, config.commissionPct)
-      position -= qtyToSell
-      trades.push({ time: times[i], side: "SELL", price: px, qty: qtyToSell, note: `partial TP ${portionPct}%` })
-    }
-  }
-
-  function applyATRstop(i: number) {
-    if (!config.useATRstop || position <= 0) return
-    const stopPx = close[i] - config.atrMult * atrSeries[i]
-    if (low[i] <= stopPx) {
-      const px = applySlippagePx(stopPx, config.slippagePct, "sell")
-      const proceeds = position * px
-      cash += applyCommission(proceeds, config.commissionPct)
-      trades.push({ time: times[i], side: "SELL", price: px, qty: position, note: "ATR stop" })
-      position = 0; avgPrice = NaN; posBars = 0; trailActive = false; trailStop = NaN; trailHighWater = NaN
-    }
-  }
-
-  function maybeArmTrail(i: number) {
-    if (!config.useTrail || trailActive || position <= 0) return
-    const pnlPct = pct(close[i], avgPrice)
-    if (pnlPct >= config.armTrailPct && posBars >= config.minHoldBars) {
-      trailActive = true
-      trailHighWater = close[i]
-      trailStop = close[i] * (1 - config.trailPct / 100)
-      trades.push({ time: times[i], side: "INFO", price: close[i], qty: 0, note: "arm trail" })
-    }
-  }
-
-  function maintainTrail(i: number) {
-    if (!trailActive || position <= 0) return
-    if (high[i] > trailHighWater) {
-      trailHighWater = high[i]
-      trailStop = trailHighWater * (1 - config.trailPct / 100)
-    }
-    if (low[i] <= trailStop) {
-      const px = applySlippagePx(trailStop, config.slippagePct, "sell")
-      const proceeds = position * px
-      cash += applyCommission(proceeds, config.commissionPct)
-      trades.push({ time: times[i], side: "SELL", price: px, qty: position, note: "trailing stop" })
-      position = 0; avgPrice = NaN; posBars = 0; trailActive = false; trailStop = NaN; trailHighWater = NaN
-    }
-  }
-
-  function spacingOK(i: number) {
-    return (i - lastEntryBar) >= config.minSpacing
-  }
-
+  // Process each bar
   for (let i = 0; i < ltf.length; i++) {
-    posBars = position !== 0 ? posBars + 1 : 0
+    const bar = ltf[i]
+    const signal = strategy.generateSignal(bar.open, bar.high, bar.low, bar.close, bar.volume)
 
-    const longGate  = (!config.useTrend || upTrend[i]) && (!config.useHTF || htfOKLong[i])
-    const shortGate = (!config.useTrend || downTrend[i]) && (!config.useHTF || htfOKShrt[i])
+    // Handle signals
+    if (typeof signal === 'object' && signal.signal !== 0) {
+      const px = signal.signal === 1 ?
+        applySlippagePx(bar.close, config.slippagePct, "buy") :
+        applySlippagePx(bar.close, config.slippagePct, "sell")
 
-    exitPortionAtTP(i, config.tpPortion)
-    maybeArmTrail(i)
-    maintainTrail(i)
-    applyATRstop(i)
-
-    if (osCross[i] && spacingOK(i) && longGate) {
-      enterLong(i)
-    }
-
-    if (config.enableShorts && obCross[i] && spacingOK(i) && shortGate) {
-      // Short path - stub for future implementation
+      if (signal.signal === 1 && position <= 0) {
+        // Enter long
+        const equity = markToMarket(px)
+        const buyNotional = equity * (config.posPct / 100)
+        if (buyNotional <= 0) continue
+        const qty = buyNotional / px
+        const cost = buyNotional + fee(buyNotional)
+        if (cash < cost) continue
+        cash -= cost
+        position = qty
+        avgPrice = px
+        trades.push({ time: bar.time, side: "BUY", price: px, qty, note: "entry" })
+      } else if (signal.signal === -1 && position >= 0) {
+        // Enter short - for now, just close long positions
+        if (position > 0) {
+          const proceeds = position * px
+          cash += applyCommission(proceeds, config.commissionPct)
+          trades.push({ time: bar.time, side: "SELL", price: px, qty: position, note: "exit" })
+          position = 0
+          avgPrice = 0
+        }
+      } else if (signal.signal === 0 && position !== 0) {
+        // Exit position
+        const proceeds = position * px
+        cash += applyCommission(proceeds, config.commissionPct)
+        trades.push({ time: bar.time, side: "SELL", price: px, qty: position, note: "exit" })
+        position = 0
+        avgPrice = 0
+      }
     }
   }
 
+  // Close any remaining position at the end
   if (position !== 0) {
-    const px = close[close.length - 1]
+    const px = ltf[ltf.length - 1].close
     const proceeds = position * px
     cash += applyCommission(proceeds, config.commissionPct)
-    trades.push({ time: times[times.length - 1], side: "SELL", price: px, qty: position, note: "EOD flatten" })
-    position = 0; avgPrice = NaN; trailActive = false
+    trades.push({ time: ltf[ltf.length - 1].time, side: "SELL", price: px, qty: position, note: "EOD flatten" })
+    position = 0
   }
 
   const equity = cash
@@ -186,7 +105,7 @@ async function executeBacktest(config: Required<StrategyConfig>) {
     equity,
     retPct,
     trades,
-    lastPrice: close[close.length - 1],
+    lastPrice: ltf[ltf.length - 1].close,
     bars: ltf.length,
   }
 }
@@ -194,10 +113,19 @@ async function executeBacktest(config: Required<StrategyConfig>) {
 // API handler for backtesting
 export default defineEventHandler(async (event: H3Event) => {
   try {
-    const body = await readBody<StrategyConfig>(event)
+    const body = await readBody<any>(event)
 
-    // Merge with defaults
-    const config: Required<StrategyConfig> = { ...DEFAULT_CONFIG, ...body }
+    // Create simplified config for the new strategy
+    const config: BacktestConfig = {
+      symbol: body.symbol || "BTCUSDT",
+      tf: body.tf || "15m",
+      lookbackDays: body.lookbackDays || 120,
+      limitPerReq: body.limitPerReq || 1000,
+      initialCapital: body.initialCapital || 1000,
+      commissionPct: body.commissionPct || 0.05,
+      slippagePct: body.slippagePct || 0,
+      posPct: body.posPct || 10
+    }
 
     // Validate required fields
     if (!config.symbol || !config.tf) {
@@ -216,7 +144,7 @@ export default defineEventHandler(async (event: H3Event) => {
       'cache-control': 'no-cache'
     })
 
-    // Run backtest using strategy service components
+    // Run backtest using new strategy
     const result = await executeBacktest(config)
 
     // Format trades for response
@@ -254,10 +182,9 @@ export default defineEventHandler(async (event: H3Event) => {
       priceData: priceData,
       data: {
         ltfCandles: ltfCandles.length,
-        htfCandles: await fetchKlines(config.symbol, config.htf,
-          Date.now() - days(config.lookbackDays + 5), Date.now(), config.limitPerReq).then(c => c.length),
+        htfCandles: 0, // Not used in new strategy
         ltfTimeframe: config.tf,
-        htfTimeframe: config.htf
+        htfTimeframe: null
       }
     }
 

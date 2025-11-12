@@ -1,108 +1,312 @@
-import { H3Event, readBody, setHeaders, setResponseStatus } from 'h3'
+// BTC Dip-Peak Mean Reversion Strategy
+// Based on optimal trades analysis for BTCUSDT 15m timeframe
 
-// Strategy configuration interface
-export interface StrategyConfig {
-  // Data
-  symbol?: string
-  tf?: string
-  htf?: string
-  lookbackDays?: number
-  limitPerReq?: number
-
-  // Trading / costs
-  initialCapital?: number
-  commissionPct?: number
-  slippagePct?: number
-
-  // Position sizing
-  posPct?: number
-
-  // Trend / HTF gates
-  useTrend?: boolean
-  useHTF?: boolean
-  trendLen?: number
-  upTh?: number
-  dnTh?: number
-  htfLongTh?: number
-  htfShortTh?: number
-
-  // Triangles
-  obosLen?: number
-  adaptLen?: number
-  showOBOS?: boolean
-
-  // Triangle density trigger
-  winLen?: number
-  needBars?: number
-  minSpacing?: number
-  enableShorts?: boolean
-
-  // Scale-Out & Trail
-  tpPct?: number
-  tpPortion?: number
-  useTrail?: boolean
-  trailPct?: number
-  armTrailPct?: number
-  minHoldBars?: number
-
-  // Emergency Risk
-  useATRstop?: boolean
-  atrLen?: number
-  atrMult?: number
+interface StrategyConfig {
+  smaFastLen?: number; // SMA20
+  smaSlowLen?: number; // SMA50
+  rsiLen?: number; // RSI14
+  atrLen?: number; // ATR14
+  dipPeriod?: number; // Period for recent high/low (20 bars)
+  spacingBars?: number; // Min bars between buys (8)
+  atrAvgPeriod?: number; // Period for avg ATR (50)
+  profitTargetPct?: number; // 5%
+  stopLossPct?: number; // 2-3%
+  timeExitBars?: number; // 50 bars
+  trailMult?: number; // 1.5 for trailing stop
 }
 
-// Default configuration
-export const DEFAULT_CONFIG: Required<StrategyConfig> = {
-  // Data
-  symbol: "BTCUSDT",
-  tf: "15m",
-  htf: "1h",
-  lookbackDays: 120,
-  limitPerReq: 1000,
-
-  // Trading / costs
-  initialCapital: 1000,
-  commissionPct: 0.05,
-  slippagePct: 0,
-
-  // Position sizing
-  posPct: 10,
-
-  // Trend / HTF gates
-  useTrend: true,
-  useHTF: true,
-  trendLen: 40,
-  upTh: 57.0,
-  dnTh: 43.0,
-  htfLongTh: 53.0,
-  htfShortTh: 47.0,
-
-  // Triangles
-  obosLen: 12,
-  adaptLen: 14,
-  showOBOS: true,
-
-  // Triangle density trigger
-  winLen: 20,
-  needBars: 4,
-  minSpacing: 3,
-  enableShorts: false,
-
-  // Scale-Out & Trail
-  tpPct: 8.0,
-  tpPortion: 50.0,
-  useTrail: true,
-  trailPct: 4.0,
-  armTrailPct: 0.8,
-  minHoldBars: 2,
-
-  // Emergency Risk
-  useATRstop: false,
-  atrLen: 14,
-  atrMult: 3.0,
+interface SignalResult {
+  signal: number;
+  position: number;
+  indicators: {
+    emaFast: number;
+    emaSlow: number;
+    rsi: number;
+    atr: number;
+    resistencia: number;
+    soporte: number;
+    stopLoss: number | null;
+    trailingStop: number | null;
+  };
 }
 
-// Utility functions
+class RTBMomentumBreakoutStrategy {
+  smaFastLen: number;
+  smaSlowLen: number;
+  rsiLen: number;
+  atrLen: number;
+  dipPeriod: number;
+  spacingBars: number;
+  atrAvgPeriod: number;
+  profitTargetPct: number;
+  stopLossPct: number;
+  timeExitBars: number;
+  trailMult: number;
+
+  // Internal state
+  position: number; // 0: flat, 1: long
+  entryPrice: number;
+  stopLoss: number;
+  trailingStop: number;
+  barsSinceEntry: number;
+  lastBuyBar: number;
+  minLowSinceEntry: number;
+
+  // Historical data for indicators
+  closes: number[];
+  highs: number[];
+  lows: number[];
+  smaFastValues: number[];
+  smaSlowValues: number[];
+  rsiValues: number[];
+  atrValues: number[];
+  recentHighs: number[];
+  recentLows: number[];
+
+  constructor(config: StrategyConfig = {}) {
+    this.smaFastLen = config.smaFastLen || 20;
+    this.smaSlowLen = config.smaSlowLen || 50;
+    this.rsiLen = config.rsiLen || 14;
+    this.atrLen = config.atrLen || 14;
+    this.dipPeriod = config.dipPeriod || 20;
+    this.spacingBars = config.spacingBars || 8;
+    this.atrAvgPeriod = config.atrAvgPeriod || 50;
+    this.profitTargetPct = config.profitTargetPct || 5;
+    this.stopLossPct = config.stopLossPct || 3;
+    this.timeExitBars = config.timeExitBars || 50;
+    this.trailMult = config.trailMult || 1.5;
+
+    // Internal state
+    this.position = 0; // 0: flat, 1: long
+    this.entryPrice = 0;
+    this.stopLoss = 0;
+    this.trailingStop = 0;
+    this.barsSinceEntry = 0;
+    this.lastBuyBar = -this.spacingBars - 1;
+    this.minLowSinceEntry = Infinity;
+
+    // Historical data for indicators
+    this.closes = [];
+    this.highs = [];
+    this.lows = [];
+    this.smaFastValues = [];
+    this.smaSlowValues = [];
+    this.rsiValues = [];
+    this.atrValues = [];
+    this.recentHighs = [];
+    this.recentLows = [];
+  }
+
+  // SMA calculation
+  sma(values: number[], period: number): number[] {
+    const result = [];
+    for (let i = 0; i < values.length; i++) {
+      if (i < period - 1) {
+        result.push(NaN);
+      } else {
+        const sum = values.slice(i - period + 1, i + 1).reduce((a, b) => a + b, 0);
+        result.push(sum / period);
+      }
+    }
+    return result;
+  }
+
+  // RSI calculation
+  rsi(values: number[], period: number): number[] {
+    const gains = [];
+    const losses = [];
+    for (let i = 1; i < values.length; i++) {
+      const change = values[i] - values[i - 1];
+      gains.push(change > 0 ? change : 0);
+      losses.push(change < 0 ? -change : 0);
+    }
+    const avgGain = this.sma(gains, period);
+    const avgLoss = this.sma(losses, period);
+    const rsi = [];
+    for (let i = 0; i < avgGain.length; i++) {
+      if (isNaN(avgLoss[i]) || avgLoss[i] === 0) {
+        rsi.push(100);
+      } else {
+        rsi.push(100 - (100 / (1 + avgGain[i] / avgLoss[i])));
+      }
+    }
+    return rsi;
+  }
+
+  // ATR calculation
+  atr(high: number[], low: number[], close: number[], period: number): number[] {
+    const tr = [];
+    for (let i = 1; i < high.length; i++) {
+      const hl = high[i] - low[i];
+      const hc = Math.abs(high[i] - close[i - 1]);
+      const lc = Math.abs(low[i] - close[i - 1]);
+      tr.push(Math.max(hl, hc, lc));
+    }
+    return this.sma(tr, period);
+  }
+
+  // Highest in period
+  highest(values: number[], period: number): number[] {
+    const result = [];
+    for (let i = 0; i < values.length; i++) {
+      const start = Math.max(0, i - period + 1);
+      result.push(Math.max(...values.slice(start, i + 1)));
+    }
+    return result;
+  }
+
+  // Lowest in period
+  lowest(values: number[], period: number): number[] {
+    const result = [];
+    for (let i = 0; i < values.length; i++) {
+      const start = Math.max(0, i - period + 1);
+      result.push(Math.min(...values.slice(start, i + 1)));
+    }
+    return result;
+  }
+
+  // Update indicators with new bar
+  updateIndicators(open: number, high: number, low: number, close: number, volume: number): void {
+    this.closes.push(close);
+    this.highs.push(high);
+    this.lows.push(low);
+
+    // Update SMAs
+    if (this.closes.length >= this.smaFastLen) {
+      this.smaFastValues = this.sma(this.closes, this.smaFastLen);
+    }
+    if (this.closes.length >= this.smaSlowLen) {
+      this.smaSlowValues = this.sma(this.closes, this.smaSlowLen);
+    }
+
+    // Update RSI
+    if (this.closes.length >= this.rsiLen + 1) {
+      this.rsiValues = this.rsi(this.closes, this.rsiLen);
+    }
+
+    // Update ATR
+    if (this.closes.length >= this.atrLen + 1) {
+      this.atrValues = this.atr(this.highs, this.lows, this.closes, this.atrLen);
+    }
+
+    // Update recent highs/lows
+    if (this.highs.length >= this.dipPeriod) {
+      this.recentHighs = this.highest(this.highs, this.dipPeriod);
+    }
+    if (this.lows.length >= this.dipPeriod) {
+      this.recentLows = this.lowest(this.lows, this.dipPeriod);
+    }
+  }
+
+  // Generate signal for current bar
+  generateSignal(open: number, high: number, low: number, close: number, volume: number): SignalResult | number {
+    this.updateIndicators(open, high, low, close, volume);
+
+    const len = this.closes.length - 1; // Current index
+    const currentBar = len;
+
+    if (len < Math.max(this.smaSlowLen, this.rsiLen, this.atrLen, this.dipPeriod, this.atrAvgPeriod)) {
+      return 0; // Not enough data
+    }
+
+    const smaF = this.smaFastValues[len];
+    const smaS = this.smaSlowValues[len];
+    const rsiVal = this.rsiValues[len - this.rsiLen + 1];
+    const atrVal = this.atrValues[len - this.atrLen + 1];
+    const recentHigh = this.recentHighs[len];
+    const recentLow = this.recentLows[len];
+
+    // Average ATR over last atrAvgPeriod
+    const atrAvg = this.atrValues.slice(-this.atrAvgPeriod).reduce((a, b) => a + b, 0) / this.atrAvgPeriod;
+
+    let signal = 0;
+
+    // Entry conditions (Buy)
+    const dipThreshold = close <= recentHigh * (1 - 0.02);
+    const spacingOk = (currentBar - this.lastBuyBar) > this.spacingBars;
+
+    const buyCondition = dipThreshold && spacingOk && this.position === 0;
+
+    // Debug logging
+    if (dipThreshold) {
+      console.log(`Potential buy at bar ${currentBar}: close=${close.toFixed(2)}, recentHigh=${recentHigh.toFixed(2)}, smaF=${smaF.toFixed(2)}, smaS=${smaS.toFixed(2)}, spacingOk=${spacingOk}, position=${this.position}, lastBuyBar=${this.lastBuyBar}`);
+    }
+
+    if (buyCondition) {
+      console.log(`Executing buy at bar ${currentBar}`);
+      signal = 1;
+      this.position = 1;
+      this.entryPrice = close;
+      this.stopLoss = this.entryPrice * (1 - this.stopLossPct / 100);
+      this.trailingStop = 0; // Will set after profit
+      this.barsSinceEntry = 0;
+      this.lastBuyBar = currentBar;
+      this.minLowSinceEntry = close;
+    }
+
+    // Exit conditions (Sell)
+    if (this.position === 1) {
+      this.barsSinceEntry++;
+      this.minLowSinceEntry = Math.min(this.minLowSinceEntry, low);
+
+      const profitTarget = this.entryPrice * (1 + this.profitTargetPct / 100);
+      const overbought = rsiVal > 70 || close >= this.minLowSinceEntry * 1.05;
+      const timeExit = this.barsSinceEntry >= this.timeExitBars;
+
+      // Set trailing stop after 5% profit
+      if (close >= this.entryPrice * 1.05 && this.trailingStop === 0) {
+        this.trailingStop = close - (atrVal * this.trailMult);
+      } else if (this.trailingStop > 0) {
+        this.trailingStop = Math.max(this.trailingStop, close - (atrVal * this.trailMult));
+      }
+
+      const trailingHit = this.trailingStop > 0 && close <= this.trailingStop;
+
+      if (close >= profitTarget || overbought || timeExit || close <= this.stopLoss || trailingHit) {
+        signal = -1;
+        this.position = 0;
+        this.trailingStop = 0;
+      }
+    }
+
+    return {
+      signal, // 1: buy, -1: sell, 0: hold
+      position: this.position,
+      indicators: {
+        emaFast: smaF,
+        emaSlow: smaS,
+        rsi: rsiVal,
+        atr: atrVal,
+        resistencia: recentHigh,
+        soporte: recentLow,
+        stopLoss: this.position !== 0 ? this.stopLoss : null,
+        trailingStop: this.position !== 0 ? this.trailingStop : null
+      }
+    };
+  }
+
+  // Reset strategy state
+  reset() {
+    this.position = 0;
+    this.entryPrice = 0;
+    this.stopLoss = 0;
+    this.trailingStop = 0;
+    this.barsSinceEntry = 0;
+    this.lastBuyBar = -this.spacingBars - 1;
+    this.minLowSinceEntry = Infinity;
+    this.closes = [];
+    this.highs = [];
+    this.lows = [];
+    this.smaFastValues = [];
+    this.smaSlowValues = [];
+    this.rsiValues = [];
+    this.atrValues = [];
+    this.recentHighs = [];
+    this.recentLows = [];
+  }
+}
+
+// Utility functions still needed by other parts
 const sleep = (ms: number) => new Promise(r => setTimeout(r, ms))
 
 const INTERVALS = new Set([
@@ -171,218 +375,14 @@ export async function fetchKlines(symbol: string, interval: string, startTimeMs:
   return out
 }
 
-// Technical indicators
-function ema(series: number[], len: number) {
-  const out = new Array(series.length).fill(NaN)
-  if (len <= 1) return series.slice()
-  const k = 2 / (len + 1)
-  let prev = series[0]
-  out[0] = prev
-  for (let i = 1; i < series.length; i++) {
-    const v = series[i]
-    prev = isFinite(prev) ? prev + k * (v - prev) : v
-    out[i] = prev
-  }
-  return out
-}
-
-function rma(series: number[], len: number) {
-  const out = new Array(series.length).fill(NaN)
-  let avg = series[0]
-  out[0] = avg
-  const alpha = 1 / len
-  for (let i = 1; i < series.length; i++) {
-    avg = (avg * (len - 1) + series[i]) / len
-    out[i] = avg
-  }
-  return out
-}
-
-function roc(series: number[], len: number) {
-  const out = new Array(series.length).fill(NaN)
-  for (let i = 0; i < series.length; i++) {
-    if (i - len >= 0 && series[i-len] !== 0) {
-      out[i] = ((series[i] - series[i-len]) / series[i-len]) * 100
-    }
-  }
-  return out
-}
-
-function stdev(series: number[], len: number) {
-  const out = new Array(series.length).fill(NaN)
-  if (len < 2) return out.map(_ => 1e-10)
-  let sum = 0, sumSq = 0
-  const q: number[] = []
-  for (let i = 0; i < series.length; i++) {
-    const v = series[i]
-    q.push(v)
-    sum += v; sumSq += v*v
-    if (q.length > len) {
-      const old = q.shift()
-      if (old !== undefined) {
-        sum -= old; sumSq -= old*old
-      }
-    }
-    if (q.length === len) {
-      const mean = sum / len
-      const varc = Math.max(0, sumSq/len - mean*mean)
-      out[i] = Math.sqrt(varc)
-    }
-  }
-  return out.map(x => isFinite(x) && x > 0 ? x : 1e-10)
-}
-
-function rsi(input: number[], len: number) {
-  const gains = new Array(input.length).fill(0)
-  const losses = new Array(input.length).fill(0)
-  for (let i = 1; i < input.length; i++) {
-    const ch = input[i] - input[i-1]
-    gains[i] = Math.max(0, ch)
-    losses[i] = Math.max(0, -ch)
-  }
-  const avgGain = rma(gains, len)
-  const avgLoss = rma(losses, len)
-  const out = new Array(input.length).fill(NaN)
-  for (let i = 0; i < input.length; i++) {
-    const g = avgGain[i], l = avgLoss[i]
-    if (l === 0) { out[i] = 100; continue }
-    if (!isFinite(g) || !isFinite(l)) continue
-    const rs = g / l
-    out[i] = 100 - (100 / (1 + rs))
-  }
-  return out
-}
-
-function atr(high: number[], low: number[], close: number[], len: number) {
-  const tr = new Array(close.length).fill(NaN)
-  for (let i = 0; i < close.length; i++) {
-    if (i === 0) { tr[i] = high[i] - low[i]; continue }
-    const prevClose = close[i-1]
-    const a = high[i] - low[i]
-    const b = Math.abs(high[i] - prevClose)
-    const c = Math.abs(low[i] - prevClose)
-    tr[i] = Math.max(a, b, c)
-  }
-  return rma(tr, len)
-}
-
-function pivotHigh(series: number[], left = 2, right = 2) {
-  const out = new Array(series.length).fill(NaN)
-  for (let i = left; i < series.length - right; i++) {
-    let isPH = true
-    for (let l = 1; l <= left; l++) if (series[i] <= series[i - l]) { isPH = false; break }
-    for (let r = 1; r <= right && isPH; r++) if (series[i] <= series[i + r]) { isPH = false; break }
-    if (isPH) out[i] = series[i]
-  }
-  return out
-}
-
-function pivotLow(series: number[], left = 2, right = 2) {
-  const out = new Array(series.length).fill(NaN)
-  for (let i = left; i < series.length - right; i++) {
-    let isPL = true
-    for (let l = 1; l <= left; l++) if (series[i] >= series[i - l]) { isPL = false; break }
-    for (let r = 1; r <= right && isPL; r++) if (series[i] >= series[i + r]) { isPL = false; break }
-    if (isPL) out[i] = series[i]
-  }
-  return out
-}
-
-// Strategy components
-function trendScore(close: number[], len: number) {
-  const emaP = ema(close, Math.round(len * 0.5))
-  const rocE = roc(emaP, len)
-  const rocSm = ema(rocE, Math.round(len * 0.33))
-  const zStdev = stdev(rocSm.map(x => (isFinite(x) ? x : 0)), len)
-  const out = new Array(close.length).fill(NaN)
-  for (let i = 0; i < close.length; i++) {
-    const z = (rocSm[i] || 0) / (zStdev[i] || 1e-10)
-    const clamped = Math.max(0, Math.min(100, 50 + 10 * z))
-    out[i] = clamped
-  }
-  return out
-}
-
-function obosSignals(close: number[], obosLen: number, adaptLen: number) {
-  const rocClose = roc(close, obosLen)
-  const rsiLen = Math.max(2, Math.round(obosLen * 0.5))
-  const momRaw = rsi(rocClose.map(x => (isFinite(x) ? x : 0)), rsiLen)
-  const mom = ema(momRaw, Math.max(2, Math.round(obosLen * 0.25)))
-
-  const ph = pivotHigh(mom, 2, 2)
-  const pl = pivotLow(mom, 2, 2)
-
-  const upperThr = new Array(close.length).fill(NaN)
-  const lowerThr = new Array(close.length).fill(NaN)
-
-  let lastPH = 70.0
-  let lastPL = 30.0
-
-  const emaU = { val: undefined as number | undefined, k: 2 / (adaptLen + 1) }
-  const emaL = { val: undefined as number | undefined, k: 2 / (adaptLen + 1) }
-
-  for (let i = 0; i < close.length; i++) {
-    if (isFinite(ph[i])) lastPH = ph[i] as number
-    if (isFinite(pl[i])) lastPL = pl[i] as number
-    emaU.val = emaU.val === undefined ? lastPH : emaU.val + emaU.k * (lastPH - emaU.val)
-    emaL.val = emaL.val === undefined ? lastPL : emaL.val + emaL.k * (lastPL - emaL.val)
-    upperThr[i] = emaU.val
-    lowerThr[i] = emaL.val
-  }
-
-  const isOB = mom.map((m, i) => m > upperThr[i])
-  const isOS = mom.map((m, i) => m < lowerThr[i])
-
-  return { mom, upperThr, lowerThr, isOB, isOS }
-}
-
-function rollingCountTrue(boolArr: boolean[], len: number) {
-  const out = new Array(boolArr.length).fill(0)
-  let count = 0
-  const q = []
-  for (let i = 0; i < boolArr.length; i++) {
-    const v = !!boolArr[i]
-    q.push(v)
-    if (v) count++
-    if (q.length > len) {
-      const old = q.shift()
-      if (old) count--
-    }
-    out[i] = count
-  }
-  return out
-}
-
-function alignHTFtoLTF(ltfTimes: number[], htfCandles: any[], trendLen: number) {
-  const htfClose = htfCandles.map(c => c.close)
-  const htfScore = trendScore(htfClose, trendLen)
-  let j = 0
-  const out = new Array(ltfTimes.length).fill(NaN)
-  for (let i = 0; i < ltfTimes.length; i++) {
-    const t = ltfTimes[i]
-    while (j + 1 < htfCandles.length && htfCandles[j + 1].time <= t) j++
-    out[i] = htfScore[j] ?? NaN
-  }
-  return out
-}
-
-// Export the strategy components for use in backtesting and other APIs
 export {
-  trendScore,
-  obosSignals,
-  rollingCountTrue,
-  alignHTFtoLTF,
-  ema,
-  rma,
-  roc,
-  stdev,
-  rsi,
-  atr,
-  pivotHigh,
-  pivotLow,
-  pct,
-  applyCommission,
-  applySlippagePx,
+  RTBMomentumBreakoutStrategy,
+  sleep,
+  INTERVALS,
   nowMs,
-  days
+  days,
+  pct,
+  pctFrom,
+  applyCommission,
+  applySlippagePx
 }

@@ -6,7 +6,7 @@
       <button
         @click="$emit('analyze-trades')"
         :disabled="analyzing"
-        class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-base-content font-medium py-3 px-6 rounded-md transition duration-200 flex items-center justify-center"
+        class="w-full bg-purple-600 hover:bg-purple-700 disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-md transition duration-200 flex items-center justify-center"
       >
         <span v-if="analyzing" class="flex items-center">
           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-base-content" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -26,7 +26,7 @@
       <button
         @click="$emit('improve-strategy')"
         :disabled="improving || !analysis"
-        class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-base-content font-medium py-3 px-6 rounded-md transition duration-200 flex items-center justify-center"
+        class="w-full bg-green-600 hover:bg-green-700 disabled:bg-gray-400 text-white font-medium py-3 px-6 rounded-md transition duration-200 flex items-center justify-center"
       >
         <span v-if="improving" class="flex items-center">
           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-base-content" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -46,7 +46,7 @@
       <button
         @click="$emit('generate-optimal-trades')"
         :disabled="generatingOptimal"
-        class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:bg-gray-400 text-base-content font-medium py-3 px-6 rounded-md transition duration-200 flex items-center justify-center"
+        class="w-full bg-gradient-to-r from-purple-600 to-pink-600 hover:from-purple-700 hover:to-pink-700 disabled:bg-gray-400 text-bwhite font-medium py-3 px-6 rounded-md transition duration-200 flex items-center justify-center"
       >
         <span v-if="generatingOptimal" class="flex items-center">
           <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-base-content" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
@@ -55,7 +55,7 @@
           </svg>
           Generating Optimal Trades...
         </span>
-        <span v-else class="flex items-center">
+        <span v-else class="flex items-center text-white">
           <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
           </svg>
@@ -65,7 +65,7 @@
     </div>
 
     <!-- Analysis Results -->
-    <div v-if="analysis" class="bg-gray-800 rounded-lg p-4 mb-4">
+    <div v-if="analysis" class="bg-base-100 rounded-lg p-4 mb-4">
       <h4 class="text-md font-semibold mb-3 text-base-content">Trade Analysis Results</h4>
       <div class="grid grid-cols-1 gap-4 text-sm">
         <div>
@@ -201,15 +201,35 @@
           Backtest This Strategy
         </button>
 
-        <button
-          @click="$emit('analyze-optimal-performance')"
-          class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-base-content font-medium py-2 px-3 rounded-md transition duration-200 text-xs flex items-center justify-center"
-        >
-          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+      <button
+        @click="$emit('analyze-optimal-performance')"
+        class="flex-1 bg-gradient-to-r from-blue-500 to-indigo-600 hover:from-blue-600 hover:to-indigo-700 text-base-content font-medium py-2 px-3 rounded-md transition duration-200 text-xs flex items-center justify-center"
+      >
+        <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+        </svg>
+        Analyze Performance
+      </button>
+
+      <button
+        @click="$emit('export-optimal-trades')"
+        :disabled="exportingOptimal"
+        class="flex-1 bg-gradient-to-r from-green-500 to-teal-600 hover:from-green-600 hover:to-teal-700 disabled:bg-gray-400 text-base-content font-medium py-2 px-3 rounded-md transition duration-200 text-xs flex items-center justify-center"
+      >
+        <span v-if="exportingOptimal" class="flex items-center">
+          <svg class="animate-spin -ml-1 mr-2 h-4 w-4 text-base-content" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
           </svg>
-          Analyze Performance
-        </button>
+          Exporting...
+        </span>
+        <span v-else class="flex items-center text-white">
+          <svg class="w-4 h-4 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path>
+          </svg>
+          Export Data
+        </span>
+      </button>
       </div>
 
       <!-- Key Insight -->
@@ -248,7 +268,7 @@
           <div class="mt-4 pt-3 border-t border-gray-200 dark:border-gray-600">
             <button
               @click="$emit('apply-improvements')"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-base-content font-medium py-2 px-4 rounded-md transition duration-200"
+              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition duration-200"
             >
               Apply These Improvements
             </button>
@@ -288,8 +308,12 @@ defineProps({
   generatingOptimal: {
     type: Boolean,
     default: false
+  },
+  exportingOptimal: {
+    type: Boolean,
+    default: false
   }
 })
 
-defineEmits(['analyze-trades', 'improve-strategy', 'apply-improvements', 'generate-optimal-trades', 'backtest-optimal-strategy', 'analyze-optimal-performance'])
+defineEmits(['analyze-trades', 'improve-strategy', 'apply-improvements', 'generate-optimal-trades', 'backtest-optimal-strategy', 'analyze-optimal-performance', 'export-optimal-trades'])
 </script>

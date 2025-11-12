@@ -5,6 +5,7 @@ interface StrategyImprovementRequest {
   currentConfig: any
   analysis: any
   trades: any[]
+  optimalTrades?: any // Optional optimal trades for comparison
 }
 
 interface ParameterChange {
@@ -40,8 +41,8 @@ const PARAMETER_RANGES = {
   posPct: { min: 5, max: 25, step: 1 }
 }
 
-// Generate parameter improvements based on analysis and price pattern analysis
-function generateParameterImprovements(currentConfig: any, analysis: any, priceAnalysis?: any): ParameterChange[] {
+// Generate parameter improvements based on analysis, price pattern analysis, and optimal trades comparison
+function generateParameterImprovements(currentConfig: any, analysis: any, priceAnalysis?: any, optimalTrades?: any): ParameterChange[] {
   const changes: ParameterChange[] = []
 
   // Win rate improvements
@@ -307,6 +308,118 @@ function generateParameterImprovements(currentConfig: any, analysis: any, priceA
     }
   }
 
+  // Optimal trades comparison - enhance strategy to perform more like optimal
+  if (optimalTrades && optimalTrades.performance && optimalTrades.opportunities) {
+    const optimalPerf = optimalTrades.performance
+    const opportunities = optimalTrades.opportunities
+
+    // Calculate performance gap
+    const currentReturn = analysis.totalTrades > 0 ?
+      ((analysis.avgWin * (analysis.totalTrades * analysis.winRate/100)) -
+       (analysis.avgLoss * (analysis.totalTrades * (100-analysis.winRate)/100))) : 0
+
+    const optimalReturn = optimalPerf.totalReturn
+    const performanceGap = optimalReturn - currentReturn
+
+    // If optimal strategy performs significantly better, make strategic adjustments
+    if (performanceGap > 100 && optimalPerf.totalReturnPct > 20) { // Significant outperformance
+      // If optimal captured many dips but current strategy missed them
+      if (opportunities.bestDips > 0 && opportunities.capturedDips === opportunities.bestDips) {
+        // Optimal captured all major dips - current strategy is too conservative
+        if (currentConfig.needBars > 2) {
+          changes.push({
+            param: 'needBars',
+            oldValue: currentConfig.needBars,
+            newValue: Math.max(1, currentConfig.needBars - 2),
+            reason: `Optimal strategy captured all ${opportunities.bestDips} major dips - significantly reducing entry requirements to match optimal performance`
+          })
+        }
+
+        if (currentConfig.winLen > 20) {
+          changes.push({
+            param: 'winLen',
+            oldValue: currentConfig.winLen,
+            newValue: Math.max(10, currentConfig.winLen - 8),
+            reason: 'Dramatically reducing lookback window to match optimal strategy responsiveness'
+          })
+        }
+
+        // Disable overly strict filters if optimal doesn't need them
+        if (currentConfig.useTrend && currentConfig.upTh > 50) {
+          changes.push({
+            param: 'upTh',
+            oldValue: currentConfig.upTh,
+            newValue: currentConfig.upTh - 5,
+            reason: 'Significantly lowering trend threshold to capture dip opportunities like optimal strategy'
+          })
+        }
+      }
+
+      // If optimal has much higher returns, improve position sizing and risk management
+      if (optimalPerf.totalReturnPct > currentReturn * 2) {
+        if (currentConfig.posPct < 20) {
+          changes.push({
+            param: 'posPct',
+            oldValue: currentConfig.posPct,
+            newValue: Math.min(25, currentConfig.posPct + 5),
+            reason: `Optimal strategy achieved ${optimalPerf.totalReturnPct.toFixed(1)}% vs current ${currentReturn.toFixed(1)}% - increasing position size to match`
+          })
+        }
+
+        if (currentConfig.tpPct < 15) {
+          changes.push({
+            param: 'tpPct',
+            oldValue: currentConfig.tpPct,
+            newValue: currentConfig.tpPct + 3,
+            reason: 'Increasing take profit target to capture full move potential like optimal strategy'
+          })
+        }
+      }
+
+      // If optimal strategy trades much more frequently, reduce spacing requirements
+      if (optimalPerf.totalTrades > analysis.totalTrades * 2) {
+        if (currentConfig.minSpacing > 1) {
+          changes.push({
+            param: 'minSpacing',
+            oldValue: currentConfig.minSpacing,
+            newValue: 1,
+            reason: `Optimal strategy executed ${optimalPerf.totalTrades} trades vs current ${analysis.totalTrades} - minimizing spacing between trades`
+          })
+        }
+      }
+    }
+
+    // Moderate performance gap - make targeted improvements
+    else if (performanceGap > 50) {
+      // If optimal captured more opportunities, be slightly more aggressive
+      if (opportunities.capturedDips > 0 && opportunities.bestDips > opportunities.capturedDips) {
+        const captureGap = opportunities.bestDips - opportunities.capturedDips
+        if (captureGap > 1) {
+          if (currentConfig.needBars > 3) {
+            changes.push({
+              param: 'needBars',
+              oldValue: currentConfig.needBars,
+              newValue: currentConfig.needBars - 1,
+              reason: `Optimal strategy captured ${captureGap} more dip opportunities - reducing entry requirements`
+            })
+          }
+        }
+      }
+
+      // If optimal outperforms buy & hold significantly, improve exit strategy
+      if (optimalPerf.vsBuyAndHold > 10) {
+        if (currentConfig.trailPct > 4) {
+          changes.push({
+            param: 'trailPct',
+            oldValue: currentConfig.trailPct,
+            newValue: currentConfig.trailPct - 1,
+            reason: `Optimal strategy outperforms buy & hold by ${optimalPerf.vsBuyAndHold.toFixed(1)}% - tightening stops for better profit capture`
+          })
+        }
+      }
+    }
+  }
+
   return changes
 }
 
@@ -403,7 +516,7 @@ export default defineEventHandler(async (event: H3Event) => {
     })
 
     // Generate parameter improvements
-    const parameterChanges = generateParameterImprovements(body.currentConfig, body.analysis)
+    const parameterChanges = generateParameterImprovements(body.currentConfig, body.analysis, undefined, body.optimalTrades)
 
     // Generate expected improvements
     const expectedImprovements = generateExpectedImprovements(parameterChanges, body.analysis)
