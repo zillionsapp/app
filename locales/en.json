@@ -1,0 +1,190 @@
+{
+  "nav": {
+    "features": "Features",
+    "how": "How it works",
+    "tech": "Technology",
+    "faq": "FAQ",
+    "waitlist": "Join the waitlist"
+  },
+  "hero": {
+    "badge": "On‑chain • Non‑custodial • AI‑driven",
+    "title": "Become a",
+    "titleHighlight": "Zillionaire",
+    "description": "An on‑chain, autonomous trading bot designed to help more people participate in markets without needing to be a trading pro.",
+    "cta": "Join the waitlist",
+    "secondary": "See how it works"
+  },
+  "stats": {
+    "noExpertise": "No expertise needed",
+    "noExpertiseValue": "For everyone",
+    "onChain": "On‑chain",
+    "onChainValue": "Transparent",
+    "adaptive": "Adaptive",
+    "adaptiveValue": "Regime‑aware",
+    "handsFree": "Hands‑off",
+    "handsFreeValue": "Auto‑pilot"
+  },
+  "features": {
+    "title": "Why Zillions is different",
+    "subtitle": "Not another \"trading bot\" app. Zillions detects market strategies in real-time - and adapts.",
+    "metaTrading": {
+      "badge": "Core",
+      "title": "Meta‑trading engine",
+      "description": "Aligns with the currently dominant strategy regime instead of running blind or fixed logic."
+    },
+    "onChainTransparent": {
+      "badge": "Security",
+      "title": "On‑chain & transparent",
+      "description": "Execution, history, and parameters live on chain for auditability. No black box custody."
+    },
+    "handsFreeSimplicity": {
+      "badge": "UX",
+      "title": "Hands‑off simplicity",
+      "description": "No knobs, no charts to study. Fund a vault and let the algorithm adapt 24/7."
+    },
+    "riskAware": {
+      "badge": "Safety",
+      "title": "Risk‑aware",
+      "description": "Position sizing & regime‑specific risk controls aim to protect during adverse phases."
+    }
+  },
+  "howItWorks": {
+    "title": "Three steps, zero guesswork",
+    "step1": {
+      "badge": "1",
+      "title": "Connect your wallet",
+      "description": "Non‑custodial by design. You keep control."
+    },
+    "step2": {
+      "badge": "2",
+      "title": "Fund your vault",
+      "description": "Allocate capital to a Zillions vault. Transparent fees, on‑chain execution."
+    },
+    "step3": {
+      "badge": "3",
+      "title": "AI adapts in real time",
+      "description": "The engine follows the dominant regime - momentum, mean‑reversion, liquidity hunts and more."
+    },
+    "cta": "Get early access"
+  },
+  "technology": {
+    "title": "Inside the engine",
+    "subtitle": "Our trading system analyzes market trends, signals, and risk to find the best opportunities. It adapts to changing conditions automatically.",
+    "trend": {
+      "title": "Multi-Timeframe Trend Analysis",
+      "description": "Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.",
+      "benefits": [
+        "Analyzes trends across multiple timeframes simultaneously (1m, 5m, 15m, 1h, 4h, 1d)",
+        "Uses Rate of Change (ROC) to measure momentum strength and direction",
+        "Exponential Moving Averages (EMA) identify primary trend direction",
+        "Filters out market noise while preserving significant trend movements",
+        "Provides trend strength scoring from 0-100 for position confidence"
+      ],
+      "alert": "Our trend analysis engine examines price movements across multiple timeframes to identify the dominant market direction, filtering out short-term noise while capturing significant trend changes."
+    },
+    "signals": {
+      "title": "OBOS Signals",
+      "description": "Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.",
+      "benefits": [
+        "RSI divergence detection identifies momentum shifts before price confirms",
+        "Pivot point analysis finds key support/resistance levels automatically",
+        "Overbought (>70 RSI) and oversold (<30 RSI) condition monitoring",
+        "Volume-price divergence analysis for signal confirmation",
+        "Multi-indicator convergence increases signal reliability to 78%"
+      ],
+      "alert": "Advanced signal detection combines RSI, pivot points, and volume analysis to identify high-probability entry points when momentum diverges from price direction."
+    },
+    "confirm": {
+      "title": "HTF Confirmation",
+      "description": "Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.",
+      "benefits": [
+        "Requires 4-hour and daily timeframe alignment before execution",
+        "Reduces false signal rate by 65% compared to single timeframe",
+        "Eliminates trades against the broader market trend",
+        "Provides confidence scoring based on timeframe alignment",
+        "Prevents entries during uncertain or choppy market conditions"
+      ],
+      "alert": "Higher timeframe confirmation ensures trades align with the broader market structure, dramatically reducing false signals and improving overall accuracy."
+    },
+    "risk": {
+      "title": "Risk Management",
+      "description": "Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.",
+      "benefits": [
+        "Dynamic trailing stops adjust based on market volatility (ATR-based)",
+        "Take-profit levels set at 2:1 reward-to-risk minimum ratios",
+        "Position sizing adjusts based on win rate and volatility",
+        "Maximum drawdown protection with circuit breakers",
+        "Risk-adjusted position sizing prevents overexposure"
+      ],
+      "alert": "Sophisticated risk management system uses trailing stops, take-profit optimization, and dynamic position sizing to protect capital while maximizing returns."
+    },
+    "size": {
+      "title": "Position Sizing",
+      "description": "Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.",
+      "benefits": [
+        "Percentage-based sizing maintains consistent risk exposure",
+        "Volatility-adjusted sizing reduces exposure in turbulent markets",
+        "Win rate optimization adjusts size based on recent performance",
+        "Portfolio heat management prevents over-concentration",
+        "Compounding-friendly sizing supports long-term growth"
+      ],
+      "alert": "Position sizing algorithm ensures optimal capital allocation across different market conditions and strategy performance levels."
+    }
+  },
+  "comparison": {
+    "title": "Built for the many - not just pros",
+    "legacy": {
+      "badge": "Legacy",
+      "title": "Typical trading app",
+      "items": [
+        "Expect you to pick & tune strategies.",
+        "Opaque logic, off‑chain execution.",
+        "Hard to onboard; easy to make mistakes.",
+        "Manual Trading is tough - you can't ourperform masters & algos."
+      ]
+    },
+    "modern": {
+      "badge": "Modern",
+      "title": "Zillions",
+      "items": [
+        "Meta‑trading engine aligns with the dominant regime.",
+        "On‑chain, transparent vaults; simple by default.",
+        "Designed for everyone. No need to be a pro.",
+        "AI & Scoring algo detects which stratagies works the best."
+      ]
+    }
+  },
+  "waitlist": {
+    "title": "Be one of the first to trade smarter",
+    "subtitle": "Join the Zillions waitlist and unlock early access to the on-chain meta-trader. Simple, adaptive, transparent.",
+    "placeholder": "you@domain.com",
+    "cta": "Join the waitlist",
+    "joining": "Joining…",
+    "consent": "I agree to receive emails about Zillions and understand this is not financial advice.",
+    "finePrint": "By joining you agree to our Terms & Privacy. Unsubscribe anytime.",
+    "terms": "Terms",
+    "privacy": "Privacy",
+    "success": "You're on the list! We'll be in touch soon.",
+    "errorEmail": "Please enter a valid email address.",
+    "errorConsent": "Please agree to receive emails so we can contact you.",
+    "errorSubmit": "Something went wrong. Please try again later."
+  },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "Common questions about Zillions",
+    "q1": "Do I need trading experience?",
+    "a1": "No. Zillions is built so anyone can participate. The engine adapts to markets for you.",
+    "q2": "Is this custodial?",
+    "a2": "No - it's on‑chain and non‑custodial. You can track execution and history transparently.",
+    "q3": "Are returns guaranteed?",
+    "a3": "No. Markets involve risk. The system aims to grow capital by aligning to dominant regimes, but losses are possible.",
+    "q4": "What chains and assets will you support?",
+    "a4": "We'll announce supported chains and assets to waitlisters first."
+  },
+  "footer": {
+    "description": "Zillions is an on‑chain, autonomous \"meta‑trading\" app designed to help more people participate in markets - without needing to be a pro.",
+    "copyright": "© {year} Zillions. All rights reserved.",
+    "disclosures": "Disclosures",
+    "disclaimer": "Trading involves risk, including possible loss of capital. Past performance does not guarantee future results. Availability subject to jurisdiction and compliance screening."
+  }
+}

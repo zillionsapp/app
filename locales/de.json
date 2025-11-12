@@ -1,0 +1,190 @@
+{
+  "nav": {
+    "features": "Funktionen",
+    "how": "So funktioniert es",
+    "tech": "Technologie",
+    "faq": "Häufig gestellte Fragen",
+    "waitlist": "Zur Warteliste hinzufügen"
+  },
+  "hero": {
+    "badge": "On‑Chain • Nicht‑verwahrend • KI‑gesteuert",
+    "title": "Werde ein",
+    "titleHighlight": "Zillionär",
+    "description": "Ein On‑Chain, autonomer Trading-Bot, der mehr Menschen hilft, an Märkten teilzunehmen, ohne ein Trading-Profi sein zu müssen.",
+    "cta": "Zur Warteliste hinzufügen",
+    "secondary": "So funktioniert es"
+  },
+  "stats": {
+    "noExpertise": "Keine Erfahrung erforderlich",
+    "noExpertiseValue": "Für jeden",
+    "onChain": "On‑Chain",
+    "onChainValue": "Transparent",
+    "adaptive": "Adaptiv",
+    "adaptiveValue": "Regime‑bewusst",
+    "handsFree": "Hände frei",
+    "handsFreeValue": "Autopilot"
+  },
+  "features": {
+    "title": "Warum Zillions anders ist",
+    "subtitle": "Nicht nur eine weitere \"Trading-Bot\"-App. Zillions erkennt Marktstrategien in Echtzeit - und passt sich an.",
+    "metaTrading": {
+      "badge": "Kern",
+      "title": "Meta-Trading-Engine",
+      "description": "Richtet sich nach dem aktuell dominanten Strategieregime, anstatt blind oder mit fester Logik zu arbeiten."
+    },
+    "onChainTransparent": {
+      "badge": "Sicherheit",
+      "title": "On‑Chain & transparent",
+      "description": "Ausführung, Verlauf und Parameter sind auf der Blockchain für Überprüfbarkeit. Keine Black-Box-Verwahrung."
+    },
+    "handsFreeSimplicity": {
+      "badge": "UX",
+      "title": "Mühelose Einfachheit",
+      "description": "Keine Knöpfe, keine Charts zum Studieren. Finanziere einen Vault und lass den Algorithmus 24/7 arbeiten."
+    },
+    "riskAware": {
+      "badge": "Sicherheit",
+      "title": "Risikobewusst",
+      "description": "Positionsgröße & regimespezifische Risikokontrollen sollen während ungünstiger Phasen schützen."
+    }
+  },
+  "howItWorks": {
+    "title": "Drei Schritte, null Raterei",
+    "step1": {
+      "badge": "1",
+      "title": "Verbinde dein Wallet",
+      "description": "Von Grund auf nicht-verwahrend. Du behältst die Kontrolle."
+    },
+    "step2": {
+      "badge": "2",
+      "title": "Finanziere deinen Vault",
+      "description": "Allokiere Kapital zu einem Zillions Vault. Transparente Gebühren, On‑Chain-Ausführung."
+    },
+    "step3": {
+      "badge": "3",
+      "title": "KI passt sich in Echtzeit an",
+      "description": "Die Engine folgt dem dominanten Regime - Momentum, Mean-Reversion, Liquiditätsjagden und mehr."
+    },
+    "cta": "Frühen Zugang erhalten"
+  },
+  "technology": {
+    "title": "Innerhalb der Engine",
+    "subtitle": "Unser Handelssystem analysiert Markttrends, Signale und Risiken, um die besten Chancen zu finden. Es passt sich automatisch an verändernde Bedingungen an.",
+    "trend": {
+      "title": "Multi-Timeframe-Trendanalyse",
+      "description": "Verwendet ROC (Rate of Change) und EMA-Indikatoren, um die Gesamttrendrichtung und -stärke über verschiedene Zeitrahmen hinweg zu identifizieren.",
+      "benefits": [
+        "Analysiert Trends gleichzeitig über mehrere Zeitrahmen (1m, 5m, 15m, 1h, 4h, 1d)",
+        "Verwendet Rate of Change (ROC), um Momentum-Stärke und -Richtung zu messen",
+        "Exponentielle gleitende Durchschnitte (EMA) identifizieren die primäre Trendrichtung",
+        "Filtert Marktlärm heraus, während bedeutende Trendbewegungen erhalten bleiben",
+        "Bietet Trend-Stärke-Bewertung von 0-100 für Positionsvertrauen"
+      ],
+      "alert": "Unsere Trendanalyse-Engine untersucht Preisbewegungen über mehrere Zeitrahmen, um die dominante Marktrichtung zu identifizieren, filtert kurzfristige Geräusche heraus und erfasst gleichzeitig bedeutende Trendänderungen."
+    },
+    "signals": {
+      "title": "OBOS-Signale",
+      "description": "Erkennt überkaufte/überverkaufte Bedingungen mit RSI und Pivot-Punkten, um potenzielle Einstiegsmöglichkeiten zu finden, wenn sich Momentum von Preis unterscheidet.",
+      "benefits": [
+        "RSI-Divergenzerkennung identifiziert Momentum-Verschiebungen, bevor der Preis bestätigt",
+        "Pivot-Punkt-Analyse findet automatisch wichtige Unterstützungs-/Widerstandsniveaus",
+        "Überkauft (>70 RSI) und überverkauft (<30 RSI) Bedingungsüberwachung",
+        "Volumen-Preis-Divergenzanalyse zur Signalbestätigung",
+        "Multi-Indikator-Konvergenz erhöht die Signalzuverlässigkeit auf 78%"
+      ],
+      "alert": "Die erweiterte Signalerkennung kombiniert RSI, Pivot-Punkte und Volumenanalyse, um hochwahrscheinliche Einstiegspunkte zu identifizieren, wenn sich Momentum von der Preisrichtung unterscheidet."
+    },
+    "confirm": {
+      "title": "HTF-Bestätigung",
+      "description": "Erfordert Ausrichtung auf höheren Zeitrahmen vor dem Eintritt in Trades, um falsche Signale zu reduzieren und die Genauigkeit zu verbessern.",
+      "benefits": [
+        "Erfordert Ausrichtung auf 4-Stunden- und Tages-Zeitrahmen vor der Ausführung",
+        "Reduziert die falsche Signalrate um 65% im Vergleich zu einem einzelnen Zeitrahmen",
+        "Eliminiert Trades gegen den breiteren Markttrend",
+        "Bietet Vertrauensbewertung basierend auf Zeitrahmen-Ausrichtung",
+        "Verhindert Einträge während unsicherer oder choppy Marktbedingungen"
+      ],
+      "alert": "Die Bestätigung auf höheren Zeitrahmen stellt sicher, dass Trades mit der breiteren Marktstruktur übereinstimmen, reduziert falsche Signale drastisch und verbessert die Gesamtgenauigkeit."
+    },
+    "risk": {
+      "title": "Risikomanagement",
+      "description": "Implementiert Trailing Stops und Take-Profit-Niveaus, um Gewinne zu sichern und gleichzeitig vor Abwärtsrisiken zu schützen.",
+      "benefits": [
+        "Dynamische Trailing Stops passen sich basierend auf Marktvolatilität an (ATR-basiert)",
+        "Take-Profit-Niveaus auf mindestens 2:1 Gewinn-zu-Risiko-Verhältnis gesetzt",
+        "Positionsgröße passt sich basierend auf Gewinnquote und Volatilität an",
+        "Maximaler Drawdown-Schutz mit Circuit Breakern",
+        "Risikoangepasste Positionsgröße verhindert Überexposition"
+      ],
+      "alert": "Ausgefeiltes Risikomanagement-System nutzt Trailing Stops, Take-Profit-Optimierung und dynamische Positionsgröße, um Kapital zu schützen und gleichzeitig Renditen zu maximieren."
+    },
+    "size": {
+      "title": "Positionsgröße",
+      "description": "Verwendet prozentuale Positionsgröße, um konsistente Risikoexposition über verschiedene Handelsgrößen hinweg zu gewährleisten.",
+      "benefits": [
+        "Prozentuale Größe gewährleistet konsistente Risikoexposition",
+        "Volatilitätsangepasste Größe reduziert Exposition in turbulenten Märkten",
+        "Gewinnquoten-Optimierung passt Größe basierend auf jüngster Leistung an",
+        "Portfolio-Heat-Management verhindert Überkonzentration",
+        "Compounding-freundliche Größe unterstützt langfristiges Wachstum"
+      ],
+      "alert": "Der Positionsgrößen-Algorithmus stellt optimale Kapitalallokation über verschiedene Marktbedingungen und Strategie-Leistungsniveaus hinweg sicher."
+    }
+  },
+  "comparison": {
+    "title": "Gebaut für viele - nicht nur Profis",
+    "legacy": {
+      "badge": "Vermächtnis",
+      "title": "Typische Trading-App",
+      "items": [
+        "Erwartet, dass du Strategien auswählst und abstimmst.",
+        "Undurchsichtige Logik, Off-Chain-Ausführung.",
+        "Schwer zu verstehen; leicht Fehler zu machen.",
+        "Manuelles Trading ist schwierig - du kannst nicht besser als Meister & Algos sein."
+      ]
+    },
+    "modern": {
+      "badge": "Modern",
+      "title": "Zillions",
+      "items": [
+        "Meta-Trading-Engine richtet sich nach dem dominanten Regime.",
+        "On-Chain, transparente Vaults; standardmäßig einfach.",
+        "Für jeden konzipiert. Kein Profi erforderlich.",
+        "KI & Scoring-Algo erkennt, welche Strategien am besten funktionieren."
+      ]
+    }
+  },
+  "waitlist": {
+    "title": "Sei einer der Ersten, der intelligenter handelt",
+    "subtitle": "Tritt der Zillions-Warteliste bei und erhalte frühen Zugang zum On-Chain-Meta-Trader. Einfach, adaptiv, transparent.",
+    "placeholder": "du@domain.com",
+    "cta": "Zur Warteliste hinzufügen",
+    "joining": "Wird hinzugefügt…",
+    "consent": "Ich stimme zu, E-Mails über Zillions zu erhalten und verstehe, dass dies keine Finanzberatung ist.",
+    "finePrint": "Durch das Beitreten stimmst du unseren Bedingungen & Datenschutz zu. Jederzeit abmelden.",
+    "terms": "Bedingungen",
+    "privacy": "Datenschutz",
+    "success": "Du bist auf der Liste! Wir werden dich bald kontaktieren.",
+    "errorEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
+    "errorConsent": "Bitte stimme zu, E-Mails zu erhalten, damit wir dich kontaktieren können.",
+    "errorSubmit": "Etwas ist schief gelaufen. Bitte versuche es später erneut."
+  },
+  "faq": {
+    "title": "Häufig gestellte Fragen",
+    "subtitle": "Häufige Fragen zu Zillions",
+    "q1": "Brauche ich Trading-Erfahrung?",
+    "a1": "Nein. Zillions ist so konzipiert, dass jeder teilnehmen kann. Die Engine passt sich für dich an die Märkte an.",
+    "q2": "Ist dies verwahrend?",
+    "a2": "Nein - es ist On-Chain und nicht-verwahrend. Du kannst Ausführung und Verlauf transparent verfolgen.",
+    "q3": "Sind Renditen garantiert?",
+    "a3": "Nein. Märkte beinhalten Risiken. Das System zielt darauf ab, Kapital zu vermehren, indem es sich an dominante Regime anpasst, aber Verluste sind möglich.",
+    "q4": "Welche Chains und Assets werden unterstützt?",
+    "a4": "Wir werden unterstützte Chains und Assets zuerst den Wartelisten-Mitgliedern ankündigen."
+  },
+  "footer": {
+    "description": "Zillions ist eine On-Chain, autonome \"Meta-Trading\"-App, die mehr Menschen hilft, an Märkten teilzunehmen - ohne ein Profi sein zu müssen.",
+    "copyright": "© {year} Zillions. Alle Rechte vorbehalten.",
+    "disclosures": "Offenlegungen",
+    "disclaimer": "Trading beinhaltet Risiken, einschließlich möglicher Kapitalverluste. Frühere Leistung garantiert keine zukünftigen Ergebnisse. Verfügbarkeit unterliegt Gerichtsbarkeit und Compliance-Überprüfung."
+  }
+}

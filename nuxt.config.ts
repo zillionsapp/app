@@ -16,7 +16,11 @@ export default defineNuxtConfig({
     },
     scheduledTasks: {
       // Run paper trading every 5 minutes
-      '0,5,10,15,20,25,30,35,40,45,50,55 * * * *': 'paper-trading'
+      /* '0,5,10,15,20,25,30,35,40,45,50,55 * * * *': 'paper-trading', */
+      // Run crypto research daily at 9:00 AM UTC
+      /* '0 9 * * *': 'crypto-research', */
+      // Run BTC day trader every hour (24/7 for crypto)
+      /* '0,5,10,15,20,25,30,35,40,45,50,55 * * * *': 'btc-day-trader' */
     }
   },
   // Optional: make sure this route is always dynamic and never cached/prerendered
@@ -28,13 +32,32 @@ export default defineNuxtConfig({
   },
   css: ["~/assets/app.css"],
   modules: [
-    '@clerk/nuxt'
+    '@clerk/nuxt',
+    '@nuxtjs/i18n'
   ],
+  i18n: {
+    locales: [
+      { code: 'en', language: 'en-US', name: 'English' },
+      { code: 'de', language: 'de-DE', name: 'Deutsch' }
+    ],
+    defaultLocale: 'en',
+    strategy: 'prefix_except_default',
+    detectBrowserLanguage: {
+      useCookie: true,
+      cookieKey: 'i18n_redirected',
+      redirectOn: 'root',
+      alwaysRedirect: false
+    },
+    vueI18n: './i18n.config.ts'
+  },
   runtimeConfig: {
     // Private keys (only available on server-side)
     airtableApiKey: process.env.AIRTABLE_API_KEY,
     airtableBaseId: process.env.AIRTABLE_BASE_ID,
     airtableWalletTable: process.env.AIRTABLE_WALLET_TABLE,
+    airtableCryptoResearchTable: process.env.AIRTABLE_CRYPTO_RESEARCH_TABLE,
+    openrouterApiKey: process.env.OPENROUTER_API_KEY,
+    anthropicApiKey: process.env.ANTHROPHIC_API_KEY,
 
     // Public keys (available on both client and server)
     public: {

@@ -16,14 +16,23 @@
         </div>
         <div class="navbar-center hidden md:flex">
           <ul class="menu menu-horizontal px-1">
-            <li><a href="#features">Features</a></li>
-            <li><a href="#how">How it works</a></li>
-            <li><a href="#tech">Technology</a></li>
-            <li><a href="#faq">FAQ</a></li>
+            <li><a href="#features">{{ $t('nav.features') }}</a></li>
+            <li><a href="#how">{{ $t('nav.how') }}</a></li>
+            <li><a href="#tech">{{ $t('nav.tech') }}</a></li>
+            <li><a href="#faq">{{ $t('nav.faq') }}</a></li>
           </ul>
         </div>
-        <div class="navbar-end">
-          <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">Join the waitlist</a>
+        <div class="navbar-end flex gap-2">
+          <div class="dropdown dropdown-end">
+            <button class="btn btn-ghost btn-sm">
+              {{ $i18n.locale.toUpperCase() }}
+            </button>
+            <ul class="dropdown-content menu bg-base-100 rounded-box z-[1] w-32 p-2 shadow">
+              <li><a @click="$i18n.setLocale('en')">English</a></li>
+              <li><a @click="$i18n.setLocale('de')">Deutsch</a></li>
+            </ul>
+          </div>
+          <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.waitlist') }}</a>
         </div>
       </header>
      </div>
@@ -32,17 +41,17 @@
     <section class="w-full pt-16">
       <div class="max-w-7xl mx-auto px-4 lg:px-6 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center py-10 lg:py-20">
         <div>
-          <div class="badge badge-outline badge-lg border-base-300 text-xs md:text-sm mb-6 animate-fade-in">On‑chain • Non‑custodial • AI‑driven</div>
+          <div class="badge badge-outline badge-lg border-base-300 text-xs md:text-sm mb-6 animate-fade-in">{{ $t('hero.badge') }}</div>
           <h1 class="text-4xl md:text-6xl/tight font-bold tracking-tight animate-slide-up">
-            Become a <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">Zillionaire</span>
+            {{ $t('hero.title') }} <span class="bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">{{ $t('hero.titleHighlight') }}</span>
           </h1>
           <p class="mt-6 text-base md:text-lg text-base-content/80 leading-relaxed animate-fade-in">
-            An on‑chain, autonomous trading bot designed to help more people <b>participate in markets without needing to be a trading pro</b>. 
+            {{ $t('hero.description') }}
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
-            <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">Join the waitlist</a>
-            <a href="#how" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">See how it works</a>
+            <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('hero.cta') }}</a>
+            <a href="#how" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('hero.secondary') }}</a>
           </div>
 
         </div>
@@ -61,20 +70,20 @@
       <div class="max-w-7xl mx-auto px-4 lg:px-6 my-16">
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in">
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">No expertise needed</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70">For everyone</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.noExpertise') }}</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">{{ $t('stats.noExpertiseValue') }}</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">On‑chain</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70">Transparent</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.onChain') }}</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">{{ $t('stats.onChainValue') }}</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">Adaptive</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70">Regime‑aware</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.adaptive') }}</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">{{ $t('stats.adaptiveValue') }}</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
-            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">Hands‑off</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70">Auto‑pilot</div>
+            <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.handsFree') }}</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">{{ $t('stats.handsFreeValue') }}</div>
           </div>
         </div>
       </div>
@@ -83,35 +92,35 @@
     <!-- Feature grid -->
     <section id="features" class="py-16 lg:py-24">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
-        <h2 class="text-2xl md:text-3xl font-bold">Why Zillions is different</h2>
-        <p class="mt-2 text-base-content/70">Not another "trading bot" app. Zillions detects market strategies in real-time - and adapts.</p>
+        <h2 class="text-2xl md:text-3xl font-bold">{{ $t('features.title') }}</h2>
+        <p class="mt-2 text-base-content/70">{{ $t('features.subtitle') }}</p>
         <div class="mt-10 grid md:grid-cols-2 lg:grid-cols-4 gap-6">
           <article class="card bg-base-200/50 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Core</div>
-              <h3 class="card-title text-xl">Meta‑trading engine</h3>
-              <p class="text-sm opacity-80">Aligns with the currently dominant strategy regime instead of running blind or fixed logic.</p>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">{{ $t('features.metaTrading.badge') }}</div>
+              <h3 class="card-title text-xl">{{ $t('features.metaTrading.title') }}</h3>
+              <p class="text-sm opacity-80">{{ $t('features.metaTrading.description') }}</p>
             </div>
           </article>
           <article class="card bg-base-200/50 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Security</div>
-              <h3 class="card-title text-xl">On‑chain & transparent</h3>
-              <p class="text-sm opacity-80">Execution, history, and parameters live on chain for auditability. No black box custody.</p>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">{{ $t('features.onChainTransparent.badge') }}</div>
+              <h3 class="card-title text-xl">{{ $t('features.onChainTransparent.title') }}</h3>
+              <p class="text-sm opacity-80">{{ $t('features.onChainTransparent.description') }}</p>
             </div>
           </article>
           <article class="card bg-base-200/50 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">UX</div>
-              <h3 class="card-title text-xl">Hands‑off simplicity</h3>
-              <p class="text-sm opacity-80">No knobs, no charts to study. Fund a vault and let the algorithm adapt 24/7.</p>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">{{ $t('features.handsFreeSimplicity.badge') }}</div>
+              <h3 class="card-title text-xl">{{ $t('features.handsFreeSimplicity.title') }}</h3>
+              <p class="text-sm opacity-80">{{ $t('features.handsFreeSimplicity.description') }}</p>
             </div>
           </article>
           <article class="card bg-base-200/50 border border-base-300 hover:translate-y-[-2px] hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">Safety</div>
-              <h3 class="card-title text-xl">Risk‑aware</h3>
-              <p class="text-sm opacity-80">Position sizing & regime‑specific risk controls aim to protect during adverse phases.</p>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-outline mb-2">{{ $t('features.riskAware.badge') }}</div>
+              <h3 class="card-title text-xl">{{ $t('features.riskAware.title') }}</h3>
+              <p class="text-sm opacity-80">{{ $t('features.riskAware.description') }}</p>
             </div>
           </article>
         </div>
@@ -121,32 +130,32 @@
     <!-- How it works -->
     <section id="how" class="py-14 lg:py-20">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
-        <h2 class="text-2xl md:text-3xl font-bold">Three steps, zero guesswork</h2>
+        <h2 class="text-2xl md:text-3xl font-bold">{{ $t('howItWorks.title') }}</h2>
         <div class="mt-8 grid lg:grid-cols-3 gap-6">
           <div class="card bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">1</div>
-              <h3 class="card-title mt-3 text-2xl">Connect your wallet</h3>
-              <p class="text-sm opacity-80">Non‑custodial by design. You keep control.</p>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">{{ $t('howItWorks.step1.badge') }}</div>
+              <h3 class="card-title mt-3 text-2xl">{{ $t('howItWorks.step1.title') }}</h3>
+              <p class="text-sm opacity-80">{{ $t('howItWorks.step1.description') }}</p>
             </div>
           </div>
           <div class="card bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">2</div>
-              <h3 class="card-title mt-3 text-2xl">Fund your vault</h3>
-              <p class="text-sm opacity-80">Allocate capital to a Zillions vault. Transparent fees, on‑chain execution.</p>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">{{ $t('howItWorks.step2.badge') }}</div>
+              <h3 class="card-title mt-3 text-2xl">{{ $t('howItWorks.step2.title') }}</h3>
+              <p class="text-sm opacity-80">{{ $t('howItWorks.step2.description') }}</p>
             </div>
           </div>
           <div class="card bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">3</div>
-              <h3 class="card-title mt-3 text-2xl">AI adapts in real time</h3>
-              <p class="text-sm opacity-80">The engine follows the dominant regime - momentum, mean‑reversion, liquidity hunts and more.</p>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg">{{ $t('howItWorks.step3.badge') }}</div>
+              <h3 class="card-title mt-3 text-2xl">{{ $t('howItWorks.step3.title') }}</h3>
+              <p class="text-sm opacity-80">{{ $t('howItWorks.step3.description') }}</p>
             </div>
           </div>
         </div>
         <div class="mt-10">
-          <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 rounded-xl">Get early access</a>
+          <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 rounded-xl">{{ $t('howItWorks.cta') }}</a>
         </div>
       </div>
     </section>
@@ -154,8 +163,8 @@
     <!-- Technology (high level) -->
     <section id="tech" class="py-14 lg:py-20 bg-base-100/40">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
-        <h2 class="text-2xl md:text-3xl font-bold">Inside the engine</h2>
-        <p class="mt-2 text-base-content/70">Our trading system analyzes market trends, signals, and risk to find the best opportunities. It adapts to changing conditions automatically.</p>
+        <h2 class="text-2xl md:text-3xl font-bold">{{ $t('technology.title') }}</h2>
+        <p class="mt-2 text-base-content/70">{{ $t('technology.subtitle') }}</p>
 
         <div class="mt-8 grid md:grid-cols-2 gap-6">
           <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
@@ -164,8 +173,8 @@
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'trend'">Trend</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'trend' }" @click="selectedStrategy = 'trend'">
-                <div class="font-medium text-lg">Multi-Timeframe Trend Analysis</div>
-                <div class="text-sm opacity-80 mt-1">Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.</div>
+                <div class="font-medium text-lg">{{ $t('technology.trend.title') }}</div>
+                <div class="text-sm opacity-80 mt-1">{{ $t('technology.trend.description') }}</div>
               </div>
               <hr class="bg-primary/20"/>
             </li>
@@ -174,8 +183,8 @@
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'signals'">Signals</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'signals' }" @click="selectedStrategy = 'signals'">
-                <div class="font-medium text-lg">OBOS Signals</div>
-                <div class="text-sm opacity-80 mt-1">Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.</div>
+                <div class="font-medium text-lg">{{ $t('technology.signals.title') }}</div>
+                <div class="text-sm opacity-80 mt-1">{{ $t('technology.signals.description') }}</div>
               </div>
               <hr class="bg-primary/20"/>
             </li>
@@ -184,8 +193,8 @@
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'confirm'">Confirm</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'confirm' }" @click="selectedStrategy = 'confirm'">
-                <div class="font-medium text-lg">HTF Confirmation</div>
-                <div class="text-sm opacity-80 mt-1">Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.</div>
+                <div class="font-medium text-lg">{{ $t('technology.confirm.title') }}</div>
+                <div class="text-sm opacity-80 mt-1">{{ $t('technology.confirm.description') }}</div>
               </div>
               <hr class="bg-primary/20"/>
             </li>
@@ -194,8 +203,8 @@
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'risk'">Risk</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'risk' }" @click="selectedStrategy = 'risk'">
-                <div class="font-medium text-lg">Risk Management</div>
-                <div class="text-sm opacity-80 mt-1">Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.</div>
+                <div class="font-medium text-lg">{{ $t('technology.risk.title') }}</div>
+                <div class="text-sm opacity-80 mt-1">{{ $t('technology.risk.description') }}</div>
               </div>
               <hr class="bg-primary/20"/>
             </li>
@@ -204,8 +213,8 @@
                 <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'size'">Size</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'size' }" @click="selectedStrategy = 'size'">
-                <div class="font-medium text-lg">Position Sizing</div>
-                <div class="text-sm opacity-80 mt-1">Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.</div>
+                <div class="font-medium text-lg">{{ $t('technology.size.title') }}</div>
+                <div class="text-sm opacity-80 mt-1">{{ $t('technology.size.description') }}</div>
               </div>
             </li>
           </ul>
@@ -213,11 +222,11 @@
           <div class="card bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
               <div class="mb-4">
-                <h3 class="card-title text-2xl">{{ strategyContent[selectedStrategy].title }}</h3>
+                <h3 class="card-title text-2xl">{{ $t(`technology.${selectedStrategy}.title`) }}</h3>
               </div>
 
               <div class="mt-6 space-y-4">
-                <div v-for="(benefit, index) in strategyContent[selectedStrategy].benefits" :key="benefit" class="group">
+                <div v-for="(benefit, index) in $t(`technology.${selectedStrategy}.benefits`)" :key="index" class="group">
                   <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
                     <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
                       <div class="w-3 h-3 bg-primary rounded-full"></div>
@@ -229,18 +238,10 @@
                 </div>
               </div>
 
-
-
               <!-- Strategy-specific alerts -->
-              <div v-if="selectedStrategy !== 'overview'" class="alert alert-info text-base-content bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
-                <span>{{ strategyContent[selectedStrategy].description }}</span>
+              <div class="alert alert-info text-base-content bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
+                <span>{{ $t(`technology.${selectedStrategy}.alert`) }}</span>
               </div>
-
-              <div v-if="selectedStrategy === 'overview'" class="alert alert-info text-base-content bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
-                <span>{{ strategyContent[selectedStrategy].description }}</span>
-              </div>
-
-
             </div>
           </div>
         </div>
@@ -251,29 +252,23 @@
     <!-- Comparison -->
     <section class="py-14 lg:py-20">
       <div class="max-w-7xl mx-auto px-4 lg:px-6">
-        <h2 class="text-2xl md:text-3xl font-bold">Built for the many - not just pros</h2>
+        <h2 class="text-2xl md:text-3xl font-bold">{{ $t('comparison.title') }}</h2>
         <div class="mt-6 grid md:grid-cols-2 gap-6">
           <div class="card bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge badge-outline mb-2">Legacy</div>
-              <h3 class="card-title text-xl">Typical trading app</h3>
+              <div class="badge badge-outline mb-2">{{ $t('comparison.legacy.badge') }}</div>
+              <h3 class="card-title text-xl">{{ $t('comparison.legacy.title') }}</h3>
               <ul class="list-disc ms-5 text-sm opacity-80 space-y-3 mt-4">
-                <li class="hover:translate-x-1 transition-transform duration-300">Expect you to pick & tune strategies.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Opaque logic, off‑chain execution.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Hard to onboard; easy to make mistakes.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Manual Trading is tough - you can't ourperform masters & algos.</li>
+                <li v-for="item in $t('comparison.legacy.items')" :key="item" class="hover:translate-x-1 transition-transform duration-300">{{ item }}</li>
               </ul>
             </div>
           </div>
           <div class="card bg-base-200/50 border-2 border-primary hover:shadow-lg transition-all duration-300">
             <div class="card-body">
-              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 mb-2">Modern</div>
-              <h3 class="card-title text-xl">Zillions</h3>
+              <div class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 mb-2">{{ $t('comparison.modern.badge') }}</div>
+              <h3 class="card-title text-xl">{{ $t('comparison.modern.title') }}</h3>
               <ul class="list-disc ms-5 text-sm opacity-90 space-y-3 mt-4">
-                <li class="hover:translate-x-1 transition-transform duration-300">Meta‑trading engine aligns with the dominant regime.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">On‑chain, transparent vaults; simple by default.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">Designed for everyone. No need to be a pro.</li>
-                <li class="hover:translate-x-1 transition-transform duration-300">AI & Scoring algo detects which stratagies works the best.</li>
+                <li v-for="item in $t('comparison.modern.items')" :key="item" class="hover:translate-x-1 transition-transform duration-300">{{ item }}</li>
               </ul>
             </div>
           </div>
@@ -288,11 +283,10 @@
           <div class="card-body text-center">
             <!-- Heading -->
             <h2 class="text-3xl md:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">
-              Be one of the first to trade smarter
+              {{ $t('waitlist.title') }}
             </h2>
             <p class="mt-3 text-base md:text-lg opacity-80">
-              Join the Zillions waitlist and unlock early access to the on-chain meta-trader.  
-              Simple, adaptive, transparent.
+              {{ $t('waitlist.subtitle') }}
             </p>
 
             <!-- Waitlist form -->
@@ -301,7 +295,7 @@
                 v-model="email"
                 type="email"
                 required
-                placeholder="you@domain.com"
+                :placeholder="$t('waitlist.placeholder')"
                 class="input input-lg w-full rounded-2xl bg-base-100/70 backdrop-blur-sm border border-base-300/60 focus:border-primary focus:ring-2 focus:ring-primary/30 text-lg"
               />
               <button
@@ -309,8 +303,8 @@
                 :class="{ 'btn-disabled loading': isSubmitting }"
                 :disabled="isSubmitting"
               >
-                <span v-if="!isSubmitting">Join the waitlist</span>
-                <span v-else>Joining…</span>
+                <span v-if="!isSubmitting">{{ $t('waitlist.cta') }}</span>
+                <span v-else>{{ $t('waitlist.joining') }}</span>
               </button>
             </form>
 
@@ -318,7 +312,7 @@
             <label class="label cursor-pointer justify-center gap-2 mt-3">
               <input type="checkbox" class="checkbox checkbox-sm" v-model="consent" />
               <span class="label-text text-xs opacity-70">
-                I agree to receive emails about Zillions and understand this is not financial advice.
+                {{ $t('waitlist.consent') }}
               </span>
             </label>
 
@@ -331,7 +325,7 @@
 
             <!-- Fine print -->
             <div class="text-xs opacity-60 mt-4">
-              By joining you agree to our <button @click="showTermsModal = true" class="link">Terms</button> & <button @click="showPrivacyModal = true" class="link">Privacy</button>. Unsubscribe anytime.
+              {{ $t('waitlist.finePrint') }} <button @click="showTermsModal = true" class="link">{{ $t('waitlist.terms') }}</button> & <button @click="showPrivacyModal = true" class="link">{{ $t('waitlist.privacy') }}</button>
             </div>
           </div>
         </div>
@@ -346,35 +340,35 @@
     <!-- FAQ -->
     <section id="faq" class="py-20 lg:py-28">
       <div class="max-w-4xl mx-auto px-4 lg:px-6">
-        <h2 class="text-2xl md:text-3xl font-bold text-center">FAQ</h2>
-        <p class="mt-3 text-base-content/70 text-center">Common questions about Zillions</p>
+        <h2 class="text-2xl md:text-3xl font-bold text-center">{{ $t('faq.title') }}</h2>
+        <p class="mt-3 text-base-content/70 text-center">{{ $t('faq.subtitle') }}</p>
         <div class="mt-10 join join-vertical w-full bg-base-200 rounded rounded-2xl">
           <div class="collapse collapse-arrow join-item border border-base-300 hover:bg-base-100/50 transition-all duration-300 rounded-t-xl">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">Do I need trading experience?</div>
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q1') }}</div>
             <div class="collapse-content text-sm opacity-80">
-              No. Zillions is built so anyone can participate. The engine adapts to markets for you.
+              {{ $t('faq.a1') }}
             </div>
           </div>
           <div class="collapse collapse-arrow join-item border border-base-300">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">Is this custodial?</div>
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q2') }}</div>
             <div class="collapse-content text-sm opacity-80">
-              No - it’s on‑chain and non‑custodial. You can track execution and history transparently.
+              {{ $t('faq.a2') }}
             </div>
           </div>
           <div class="collapse collapse-arrow join-item border border-base-300">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">Are returns guaranteed?</div>
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q3') }}</div>
             <div class="collapse-content text-sm opacity-80">
-              No. Markets involve risk. The system aims to grow capital by aligning to dominant regimes, but losses are possible.
+              {{ $t('faq.a3') }}
             </div>
           </div>
           <div class="collapse collapse-arrow join-item border border-base-300 rounded-b-xl">
             <input type="checkbox" />
-            <div class="collapse-title text-md font-medium">What chains and assets will you support?</div>
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q4') }}</div>
             <div class="collapse-content text-sm opacity-80">
-              We’ll announce supported chains and assets to waitlisters first.
+              {{ $t('faq.a4') }}
             </div>
           </div>
         </div>
@@ -390,15 +384,14 @@
             <span class="font-semibold">Zillions</span>
           </div>
           <p class="text-xs opacity-70 mt-3">
-            Zillions is an on‑chain, autonomous “meta‑trading” app designed to help more people participate in markets - without needing to be a pro.
+            {{ $t('footer.description') }}
           </p>
-          <p class="text-xs opacity-60 mt-2">© {{ new Date().getFullYear() }} Zillions. All rights reserved.</p>
+          <p class="text-xs opacity-60 mt-2">{{ $t('footer.copyright', { year: new Date().getFullYear() }) }}</p>
         </div>
         <div class="text-xs opacity-70">
-          <div class="font-semibold mb-2">Disclosures</div>
+          <div class="font-semibold mb-2">{{ $t('footer.disclosures') }}</div>
           <p>
-            Trading involves risk, including possible loss of capital.
-            Past performance does not guarantee future results. Availability subject to jurisdiction and compliance screening.
+            {{ $t('footer.disclaimer') }}
           </p>
         </div>
       </div>
