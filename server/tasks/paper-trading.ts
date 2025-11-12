@@ -1,12 +1,7 @@
 import Airtable from 'airtable'
 import {
+  RTBMomentumBreakoutStrategy,
   fetchKlines,
-  StrategyConfig,
-  DEFAULT_CONFIG,
-  trendScore,
-  obosSignals,
-  rollingCountTrue,
-  alignHTFtoLTF,
   applyCommission,
   applySlippagePx,
   nowMs,
@@ -17,7 +12,9 @@ interface WalletRecord {
   id: string
   email: string
   amount: number
-  trades: string[]
+  trades: TradeRecord[]
+  position: number // 0: flat, 1: long
+  entryAmount?: number
 }
 
 interface TradeSignal {
@@ -37,11 +34,70 @@ interface TradeResult {
   pnl?: number
 }
 
+interface TradeRecord {
+  timestamp: number
+  side: 'BUY' | 'SELL'
+  amount_btc: number
+  pair: string
+  price_usd: number
+  amount_usd: number
+  pnl?: number
+}
+
+// Helper function to convert old string format to TradeRecord
+function parseTradeString(tradeStr: string): TradeRecord | null {
+  try {
+    const parts = tradeStr.split(' | ')
+    if (parts.length < 3) return null
+
+    const timestamp = parseInt(parts[0])
+    const tradePart = parts[1]
+    const amountPart = parts[2]
+
+    // Parse trade part: "SELL 0.00048488 BTCUSDT @ $111368.12"
+    const tradeMatch = tradePart.match(/^(\w+)\s+([\d.]+)\s+(\w+)\s+@\s+\$([\d.]+)$/)
+    if (!tradeMatch) return null
+
+    const side = tradeMatch[1] as 'BUY' | 'SELL'
+    const amount_btc = parseFloat(tradeMatch[2])
+    const pair = tradeMatch[3]
+    const price_usd = parseFloat(tradeMatch[4])
+
+    // Parse amount part: "Amount: $0.03"
+    const amountMatch = amountPart.match(/Amount:\s+\$([\d.]+)/)
+    if (!amountMatch) return null
+
+    const amount_usd = parseFloat(amountMatch[1])
+
+    // Check for PnL
+    let pnl: number | undefined
+    if (parts.length > 3 && parts[3].startsWith('PnL:')) {
+      const pnlMatch = parts[3].match(/PnL:\s*([+-])\$([\d.]+)/)
+      if (pnlMatch) {
+        pnl = parseFloat(pnlMatch[2]) * (pnlMatch[1] === '+' ? 1 : -1)
+      }
+    }
+
+    return {
+      timestamp,
+      side,
+      amount_btc,
+      pair,
+      price_usd,
+      amount_usd,
+      pnl
+    }
+  } catch (error) {
+    console.error('Error parsing trade string:', tradeStr, error)
+    return null
+  }
+}
+
 // Export the bot class for external use
 export class PaperTradingBot {
   private base: Airtable.Base
   private tableName: string
-  private strategyConfig: StrategyConfig
+  private strategy: RTBMomentumBreakoutStrategy
 
   constructor() {
     const base = new Airtable({
@@ -50,7 +106,7 @@ export class PaperTradingBot {
 
     this.base = base
     this.tableName = process.env.AIRTABLE_WALLET_TABLE || 'Wallets'
-    this.strategyConfig = { ...DEFAULT_CONFIG }
+    this.strategy = new RTBMomentumBreakoutStrategy()
   }
 
   async getAllWallets(): Promise<WalletRecord[]> {
@@ -62,23 +118,30 @@ export class PaperTradingBot {
         .all()
 
       return records.map(record => {
-        let trades: string[] = []
+        let parsedTrades: any[] = []
         try {
           // Parse the JSON string from Airtable
           const tradesField = record.fields.Trades as string
           if (tradesField) {
-            trades = JSON.parse(tradesField)
+            parsedTrades = JSON.parse(tradesField)
           }
         } catch (parseError) {
           console.error(`Error parsing trades for wallet ${record.id}:`, parseError)
-          trades = []
+          parsedTrades = []
         }
+
+        // Convert old string format to TradeRecord
+        const trades: TradeRecord[] = parsedTrades
+          .map(t => typeof t === 'string' ? parseTradeString(t) : t)
+          .filter(t => t !== null) as TradeRecord[]
 
         return {
           id: record.id,
           email: record.fields.Email as string,
           amount: record.fields.Amount as number || 0,
-          trades: trades
+          trades: trades,
+          position: record.fields.Position as number || 0,
+          entryAmount: record.fields['Entry Amount'] as number || undefined
         }
       })
     } catch (error) {
@@ -87,79 +150,63 @@ export class PaperTradingBot {
     }
   }
 
-  async updateWalletTrades(walletId: string, trades: string[]): Promise<void> {
+  async updateWallet(walletId: string, trades: TradeRecord[], position: number, entryAmount?: number): Promise<void> {
     try {
-      await this.base(this.tableName).update(walletId, {
+      const updateData: any = {
         'Trades': JSON.stringify(trades),
+        'Position': position,
         'Updated At': new Date().toISOString()
-      })
+      }
+      if (entryAmount !== undefined) {
+        updateData['Entry Amount'] = entryAmount
+      }
+      await this.base(this.tableName).update(walletId, updateData)
     } catch (error) {
-      console.error(`Error updating trades for wallet ${walletId}:`, error)
+      console.error(`Error updating wallet ${walletId}:`, error)
     }
   }
 
   async generateTradingSignal(symbol: string = 'BTCUSDT'): Promise<TradeSignal> {
     try {
       const endTime = nowMs()
-      const startTime = endTime - days(this.strategyConfig.lookbackDays!)
+      const startTime = endTime - days(30) // Get last 30 days for sufficient data
 
-      // Fetch market data
-      const ltfData = await fetchKlines(symbol, this.strategyConfig.tf!, startTime, endTime)
-      const htfData = await fetchKlines(symbol, this.strategyConfig.htf!, startTime, endTime)
+      // Fetch recent market data
+      const data = await fetchKlines(symbol, '15m', startTime, endTime)
 
-      if (ltfData.length < 100 || htfData.length < 20) {
+      if (data.length < 50) {
         return { action: 'HOLD', price: 0, timestamp: endTime, confidence: 0 }
       }
 
-      // Extract price series
-      const close = ltfData.map(d => d.close)
-      const high = ltfData.map(d => d.high)
-      const low = ltfData.map(d => d.low)
+      // Get the latest bar
+      const latestBar = data[data.length - 1]
+      const signal = this.strategy.generateSignal(
+        latestBar.open,
+        latestBar.high,
+        latestBar.low,
+        latestBar.close,
+        latestBar.volume
+      )
 
-      // Calculate indicators
-      const trend = trendScore(close, this.strategyConfig.trendLen!)
-      const obos = obosSignals(close, this.strategyConfig.obosLen!, this.strategyConfig.adaptLen!)
-      const htfTrend = alignHTFtoLTF(ltfData.map(d => d.time), htfData, this.strategyConfig.trendLen!)
+      // Convert signal to action
+      let action: 'BUY' | 'SELL' | 'HOLD' = 'HOLD'
+      let confidence = 0
 
-      // Generate signals
-      const bullishSignals = rollingCountTrue(obos.isOB.map((ob, i) =>
-        trend[i] > this.strategyConfig.upTh! &&
-        htfTrend[i] > this.strategyConfig.htfLongTh! &&
-        !ob // Not overbought
-      ), this.strategyConfig.winLen!)
-
-      const bearishSignals = rollingCountTrue(obos.isOS.map((os, i) =>
-        trend[i] < this.strategyConfig.dnTh! &&
-        htfTrend[i] < this.strategyConfig.htfShortTh! &&
-        !os // Not oversold
-      ), this.strategyConfig.winLen!)
-
-      const currentPrice = close[close.length - 1]
-      const bullishCount = bullishSignals[bullishSignals.length - 1] || 0
-      const bearishCount = bearishSignals[bearishSignals.length - 1] || 0
-
-      // Decision logic
-      if (bullishCount >= this.strategyConfig.needBars! && bearishCount < this.strategyConfig.needBars!) {
-        return {
-          action: 'BUY',
-          price: currentPrice,
-          timestamp: endTime,
-          confidence: Math.min(bullishCount / this.strategyConfig.winLen!, 1)
-        }
-      } else if (bearishCount >= this.strategyConfig.needBars! && bullishCount < this.strategyConfig.needBars!) {
-        return {
-          action: 'SELL',
-          price: currentPrice,
-          timestamp: endTime,
-          confidence: Math.min(bearishCount / this.strategyConfig.winLen!, 1)
+      if (typeof signal === 'object') {
+        if (signal.signal === 1) {
+          action = 'BUY'
+          confidence = 0.8 // High confidence for buy signals
+        } else if (signal.signal === -1) {
+          action = 'SELL'
+          confidence = 0.8 // High confidence for sell signals
         }
       }
 
       return {
-        action: 'HOLD',
-        price: currentPrice,
-        timestamp: nowMs(),
-        confidence: 0
+        action,
+        price: latestBar.close,
+        timestamp: endTime,
+        confidence
       }
     } catch (error) {
       console.error('Error generating trading signal:', error)
@@ -172,22 +219,34 @@ export class PaperTradingBot {
       return null
     }
 
-    const tradeAmount = wallet.amount * (this.strategyConfig.posPct! / 100)
+    // Check position constraints
+    if (signal.action === 'BUY' && wallet.position !== 0) {
+      return null // Already in position
+    }
+    if (signal.action === 'SELL' && wallet.position !== 1) {
+      return null // Not in position
+    }
+
+    const posPct = 10 // 10% position size
+    const commissionPct = 0.05 // 0.05% commission
+    const slippagePct = 0 // No slippage for paper trading
+
+    const tradeAmount = wallet.amount * (posPct / 100)
     const quantity = tradeAmount / signal.price
 
     if (quantity < 0.0001) { // Minimum trade size
       return null
     }
 
-    const commission = applyCommission(tradeAmount, this.strategyConfig.commissionPct!)
-    const slippage = applySlippagePx(signal.price, this.strategyConfig.slippagePct!, signal.action)
+    const commission = applyCommission(tradeAmount, commissionPct)
+    const slippage = applySlippagePx(signal.price, slippagePct, signal.action)
 
     const finalAmount = signal.action === 'BUY' ? commission : tradeAmount - commission
     const finalPrice = signal.action === 'BUY' ? slippage : slippage
 
     return {
       type: signal.action,
-      symbol: this.strategyConfig.symbol!,
+      symbol: 'BTCUSDT',
       quantity: quantity,
       price: finalPrice,
       amount: finalAmount,
@@ -195,11 +254,16 @@ export class PaperTradingBot {
     }
   }
 
-  generateTradeDescription(trade: TradeResult): string {
-    const pnlText = trade.pnl !== undefined ?
-      ` | PnL: ${trade.pnl > 0 ? '+' : ''}$${trade.pnl.toFixed(2)}` : ''
-
-    return `${trade.timestamp} | ${trade.type} ${trade.quantity.toFixed(8)} ${trade.symbol} @ $${trade.price.toFixed(2)} | Amount: $${trade.amount.toFixed(2)}${pnlText}`
+  generateTradeRecord(trade: TradeResult): TradeRecord {
+    return {
+      timestamp: trade.timestamp,
+      side: trade.type,
+      amount_btc: trade.quantity,
+      pair: trade.symbol,
+      price_usd: trade.price,
+      amount_usd: trade.amount,
+      pnl: trade.pnl
+    }
   }
 
   async runPaperTradingCycle(): Promise<void> {
@@ -234,26 +298,29 @@ export class PaperTradingBot {
         const trade = this.executePaperTrade(wallet, signal)
 
         if (trade) {
-          // Calculate PnL for sell orders by comparing to last buy
-          if (trade.type === 'SELL') {
-            const lastBuyTrade = [...wallet.trades]
-              .reverse()
-              .find(t => t.includes('BUY'))
-
-            if (lastBuyTrade) {
-              const buyMatch = lastBuyTrade.match(/Amount: \$([0-9.]+)/)
-              if (buyMatch) {
-                const buyAmount = parseFloat(buyMatch[1])
-                trade.pnl = trade.amount - buyAmount
-              }
-            }
+          // Calculate PnL for sell orders
+          let pnl: number | undefined
+          if (trade.type === 'SELL' && wallet.entryAmount !== undefined) {
+            pnl = trade.amount - wallet.entryAmount
+            trade.pnl = pnl
           }
 
-          const tradeDescription = this.generateTradeDescription(trade)
-          const updatedTrades = [...wallet.trades, tradeDescription]
+          const tradeRecord = this.generateTradeRecord(trade)
+          const updatedTrades = [...wallet.trades, tradeRecord]
 
-          await this.updateWalletTrades(wallet.id, updatedTrades)
-          console.log(`Executed ${trade.type} for ${wallet.email}: ${tradeDescription}`)
+          // Update position and entry amount
+          let newPosition = wallet.position
+          let newEntryAmount = wallet.entryAmount
+          if (trade.type === 'BUY') {
+            newPosition = 1
+            newEntryAmount = trade.amount
+          } else if (trade.type === 'SELL') {
+            newPosition = 0
+            newEntryAmount = undefined
+          }
+
+          await this.updateWallet(wallet.id, updatedTrades, newPosition, newEntryAmount)
+          console.log(`Executed ${trade.type} for ${wallet.email}: ${tradeRecord.side} ${tradeRecord.amount_btc.toFixed(8)} ${tradeRecord.pair} @ $${tradeRecord.price_usd.toFixed(2)}`)
         }
       }
 
