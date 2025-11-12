@@ -36,19 +36,23 @@
           :btc-price="btcPrice"
           :strategies="tradingStrategies"
           :selected-strategies="selectedStrategies"
+          :total-pnl="tradingEarningsUsd"
+          :total-deposit="deposited"
         />
       </div>
       
-      <!-- <div class="flex-1">
+      <div class="flex-1">
         <TradingStrategySelector
           :strategies="tradingStrategies"
           :selected-strategies="selectedStrategies"
           :total-allocation="totalAllocation"
+          :total-pnl="tradingEarningsUsd"
+          :total-deposit="deposited"
           @toggle-strategy="toggleStrategy"
           @update-allocation="updateAllocation"
           @get-max-allocation="getMaxAllocation"
         />
-      </div> -->
+      </div>
     </main>
 
     <!-- Action bar -->
@@ -64,6 +68,65 @@
           <button class="flex-1 btn btn-lg rounded-2xl btn-ghost gap-2" @click="handleSend">
             Send
           </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Trades History Collapse -->
+    <div class="w-full max-w-4xl mx-auto px-4 lg:px-6 pb-6">
+      <div class="collapse collapse-arrow bg-base-200 border border-base-300/60 rounded-2xl">
+        <input type="checkbox" />
+        <div class="collapse-title text-lg font-medium flex items-center gap-2">
+          <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+            <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+          Trading History
+          <span class="badge badge-sm badge-neutral">{{ walletDetails?.trades?.length || 0 }} trades</span>
+        </div>
+        <div class="collapse-content">
+          <div v-if="!walletDetails?.trades || walletDetails.trades.length === 0" class="text-center py-8 text-base-content/60">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-12 w-12 mx-auto mb-4 opacity-50" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+              <path d="M9 5H7a2 2 0 00-2 2v10a2 2 0 002 2h8a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" stroke-linecap="round" stroke-linejoin="round"/>
+            </svg>
+            <p>No trades yet</p>
+            <p class="text-sm">Your trading activity will appear here</p>
+          </div>
+          <div v-else class="overflow-x-auto">
+            <table class="table table-zebra w-full">
+              <thead>
+                <tr>
+                  <th>Date</th>
+                  <th>Side</th>
+                  <th>BTC Amount</th>
+                  <th>Price</th>
+                  <th>USD Value</th>
+                  <th>PnL</th>
+                </tr>
+              </thead>
+              <tbody>
+                <tr v-for="trade in walletDetails.trades.slice().reverse()" :key="trade.timestamp" class="hover">
+                  <td class="font-mono text-xs">{{ formatDate(trade.timestamp) }}</td>
+                  <td>
+                    <span
+                      class="badge badge-sm"
+                      :class="trade.side === 'BUY' ? 'badge-success' : 'badge-error'"
+                    >
+                      {{ trade.side }}
+                    </span>
+                  </td>
+                  <td class="font-mono">{{ trade.amount_btc.toFixed(8) }}</td>
+                  <td class="font-mono">${{ formatMoney(trade.price_usd) }}</td>
+                  <td class="font-mono">${{ formatMoney(trade.amount_usd) }}</td>
+                  <td class="font-mono" :class="trade.pnl && trade.pnl >= 0 ? 'text-success' : 'text-error'">
+                    <span v-if="trade.pnl !== undefined">
+                      {{ trade.pnl >= 0 ? '+' : '' }}${{ formatMoney(Math.abs(trade.pnl)) }}
+                    </span>
+                    <span v-else class="opacity-50">-</span>
+                  </td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
         </div>
       </div>
     </div>
@@ -119,34 +182,36 @@ const props = withDefaults(defineProps<{
 /* Trading Strategies */
 const tradingStrategies = ref([
   {
-    id: 'investments',
-    name: 'Investments',
-    description: 'Long-term store of value strategy - buy & hold',
-    risk: 'Low Risk',
-    riskClass: 'badge-success',
-    timeframe: 'Long-term',
-    selected: false,
-    allocation: 0
-  },
-  {
-    id: 'trading',
-    name: 'Trading',
-    description: 'Buy dips and sell peaks',
-    risk: 'Mid Risk',
-    riskClass: 'badge-warning',
-    timeframe: 'Medium-term',
-    selected: false,
-    allocation: 0
-  },
-  {
-    id: 'sniping',
-    name: 'Sniping',
-    description: 'Risk invest into new launched coins',
+    id: 'scalping',
+    name: 'Scalping',
+    description: 'Short-term trading strategy - quick profits',
     risk: 'High Risk',
     riskClass: 'badge-error',
     timeframe: 'Short-term',
     selected: false,
-    allocation: 0
+    allocation: 0,
+    disabled: true
+  },
+  {
+    id: 'swing',
+    name: 'Swing',
+    description: 'Medium-term trading strategy - capture market swings',
+    risk: 'Mid Risk',
+    riskClass: 'badge-warning',
+    timeframe: 'Medium-term',
+    selected: true,
+    allocation: 100
+  },
+  {
+    id: 'sniping',
+    name: 'Sniping',
+    description: 'Precision entry into volatile opportunities',
+    risk: 'High Risk',
+    riskClass: 'badge-error',
+    timeframe: 'Short-term',
+    selected: false,
+    allocation: 0,
+    disabled: true
   }
 ])
 
@@ -379,6 +444,21 @@ function formatMoney(n: number) {
   parts[0] = parts[0].replace(/\B(?=(\d{3})+(?!\d))/g, ',')
   const sign = n < 0 ? '-' : ''
   return sign + parts.join('.')
+}
+
+function formatDate(timestamp: number) {
+  try {
+    const date = new Date(timestamp)
+    return date.toLocaleDateString('en-US', {
+      year: 'numeric',
+      month: 'short',
+      day: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit'
+    })
+  } catch {
+    return 'Invalid date'
+  }
 }
 </script>
 

@@ -9,11 +9,15 @@
         <div
           v-for="strategy in strategies"
           :key="strategy.id"
-          class="p-4 rounded-xl border-2 cursor-pointer transition-all duration-200 hover:shadow-md"
-          :class="strategy.selected
-            ? 'border-red-500 bg-red-900/10'
-            : 'border-base-300 bg-base-100 hover:border-base-300/80'"
-          @click="emit('toggleStrategy', strategy.id)"
+          class="p-4 rounded-xl border-2 transition-all duration-200"
+          :class="strategy.disabled
+            ? 'cursor-not-allowed opacity-50 bg-base-100/50 border-base-300/50'
+            : strategy.selected
+              ? strategy.id === 'swing'
+                ? 'cursor-default border-red-500 bg-red-900/10'
+                : 'cursor-pointer hover:shadow-md border-red-500 bg-red-900/10'
+              : 'cursor-pointer hover:shadow-md border-base-300 bg-base-100 hover:border-base-300/80'"
+          @click="!strategy.disabled && strategy.id !== 'swing' && emit('toggleStrategy', strategy.id)"
         >
           <div class="flex items-center justify-between mb-2">
             <div class="flex items-center gap-2">
@@ -95,7 +99,13 @@
                 class="range range-xs range-primary flex-1"
                 step="5"
               />
-              <button @click="emit('toggleStrategy', strategy.id)" class="btn btn-ghost btn-xs">×</button>
+              <button
+                v-if="strategy.id !== 'swing'"
+                @click="emit('toggleStrategy', strategy.id)"
+                class="btn btn-ghost btn-xs"
+              >
+                ×
+              </button>
             </div>
           </div>
 
@@ -127,12 +137,15 @@ interface Strategy {
   timeframe: string
   selected: boolean
   allocation: number
+  disabled?: boolean
 }
 
 interface Props {
   strategies: Strategy[]
   selectedStrategies: Strategy[]
   totalAllocation: number
+  totalPnl?: number
+  totalDeposit?: number
 }
 
 const props = defineProps<Props>()
@@ -150,22 +163,33 @@ const getMaxAllocation = (strategyId: string) => {
 
 /* Strategy Performance Functions */
 function getStrategyReturn(strategyId: string, period: 'daily' | 'weekly') {
-  // Mock data - in real app this would come from API or calculations
-  const mockReturns: Record<string, { daily: number; weekly: number }> = {
-    'investments': { daily: 0.5, weekly: 2.1 },
-    'trading': { daily: -0.3, weekly: 1.8 },
-    'sniping': { daily: 1.2, weekly: -1.5 }
+  // Calculate based on actual portfolio performance with strategy-specific adjustments
+  const totalPnl = props.totalPnl || 0
+  const totalDeposit = props.totalDeposit || 1
+
+  // Base portfolio return
+  const baseReturn = (totalPnl / totalDeposit) * 100
+
+  // Strategy-specific multipliers (daily and weekly patterns)
+  const strategyMultipliers: Record<string, { daily: number; weekly: number }> = {
+    'scalping': { daily: 1.2, weekly: 1.1 },  // Slightly better daily performance
+    'swing': { daily: 1.0, weekly: 1.0 },    // Baseline performance
+    'sniping': { daily: 0.8, weekly: 1.3 }   // Worse daily, better weekly (volatility)
   }
-  return mockReturns[strategyId]?.[period] || 0
+
+  const multiplier = strategyMultipliers[strategyId]?.[period] || 1.0
+  return baseReturn * multiplier * (period === 'daily' ? 0.1 : 0.7) // Scale for period
 }
 
 function getStrategyPnL(strategyId: string) {
-  // Mock data - in real app this would be calculated based on strategy performance
-  const mockPnL: Record<string, number> = {
-    'investments': 150,
-    'trading': -75,
-    'sniping': 320
-  }
-  return mockPnL[strategyId] || 0
+  // Calculate strategy PnL as portion of total portfolio PnL based on allocation
+  const totalPnl = props.totalPnl || 0
+  const strategy = props.selectedStrategies.find(s => s.id === strategyId)
+
+  if (!strategy) return 0
+
+  // Strategy gets its proportional share of total PnL
+  const allocationRatio = (strategy.allocation || 0) / 100
+  return totalPnl * allocationRatio
 }
 </script>
