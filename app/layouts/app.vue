@@ -15,17 +15,26 @@
 
       <!-- Navigation -->
       <nav class="p-4 space-y-2">
-        <NuxtLink
-          v-for="item in navigationItems"
-          :key="item.name"
-          :to="item.path"
-          class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-300 transition-colors duration-200 font-medium"
-          :class="{ 'btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 text-left!': $route.path === item.path }"
-          @click="closeSidebarOnMobile"
-        >
-          <component :is="getIcon(item.icon)" class="w-5 h-5" />
-          <span>{{ item.name }}</span>
-        </NuxtLink>
+        <template v-for="item in navigationItems" :key="item.name">
+          <NuxtLink
+            v-if="!item.disabled"
+            :to="item.path"
+            class="flex items-center gap-3 px-4 py-3 rounded-lg hover:bg-base-300 transition-colors duration-200 font-medium"
+            :class="{ 'btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 text-left!': $route.path === item.path }"
+            @click="closeSidebarOnMobile"
+          >
+            <component :is="getIcon(item.icon)" class="w-5 h-5" />
+            <span>{{ item.name }}</span>
+          </NuxtLink>
+          <button
+            v-else
+            disabled
+            class="flex items-center gap-3 px-4 py-3 rounded-lg font-medium btn-disabled cursor-not-allowed opacity-50"
+          >
+            <component :is="getIcon(item.icon)" class="w-5 h-5" />
+            <span>{{ item.name }}</span>
+          </button>
+        </template>
       </nav>
 
       <!-- Sidebar Footer (optional) -->
@@ -89,7 +98,7 @@ const iconMap: Record<string, any> = {
 
 const navigationItems = [
   { name: 'Wallet', path: '/Wallet', icon: 'wallet' },
-  { name: 'Dash', path: '/dash', icon: 'dashboard' },
+  { name: 'Dash', path: '/dash', icon: 'dashboard', disabled: true },
   { name: 'Backtest', path: '/backtest', icon: 'backtest' },
   { name: 'Simulation', path: '/simulation', icon: 'simulation' }
 ]
