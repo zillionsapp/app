@@ -73,61 +73,61 @@
     "trend": {
       "title": "Multi-Timeframe-Trendanalyse",
       "description": "Verwendet ROC (Rate of Change) und EMA-Indikatoren, um die Gesamttrendrichtung und -stärke über verschiedene Zeitrahmen hinweg zu identifizieren.",
-      "benefits": [
-        "Analysiert Trends gleichzeitig über mehrere Zeitrahmen (1m, 5m, 15m, 1h, 4h, 1d)",
-        "Verwendet Rate of Change (ROC), um Momentum-Stärke und -Richtung zu messen",
-        "Exponentielle gleitende Durchschnitte (EMA) identifizieren die primäre Trendrichtung",
-        "Filtert Marktlärm heraus, während bedeutende Trendbewegungen erhalten bleiben",
-        "Bietet Trend-Stärke-Bewertung von 0-100 für Positionsvertrauen"
-      ],
+      "benefits": {
+        "1": "Analysiert Trends gleichzeitig über mehrere Zeitrahmen (1m, 5m, 15m, 1h, 4h, 1d)",
+        "2": "Verwendet Rate of Change (ROC), um Momentum-Stärke und -Richtung zu messen",
+        "3": "Exponentielle gleitende Durchschnitte (EMA) identifizieren die primäre Trendrichtung",
+        "4": "Filtert Marktlärm heraus, während bedeutende Trendbewegungen erhalten bleiben",
+        "5": "Bietet Trend-Stärke-Bewertung von 0-100 für Positionsvertrauen"
+      },
       "alert": "Unsere Trendanalyse-Engine untersucht Preisbewegungen über mehrere Zeitrahmen, um die dominante Marktrichtung zu identifizieren, filtert kurzfristige Geräusche heraus und erfasst gleichzeitig bedeutende Trendänderungen."
     },
     "signals": {
       "title": "OBOS-Signale",
       "description": "Erkennt überkaufte/überverkaufte Bedingungen mit RSI und Pivot-Punkten, um potenzielle Einstiegsmöglichkeiten zu finden, wenn sich Momentum von Preis unterscheidet.",
-      "benefits": [
-        "RSI-Divergenzerkennung identifiziert Momentum-Verschiebungen, bevor der Preis bestätigt",
-        "Pivot-Punkt-Analyse findet automatisch wichtige Unterstützungs-/Widerstandsniveaus",
-        "Überkauft (>70 RSI) und überverkauft (<30 RSI) Bedingungsüberwachung",
-        "Volumen-Preis-Divergenzanalyse zur Signalbestätigung",
-        "Multi-Indikator-Konvergenz erhöht die Signalzuverlässigkeit auf 78%"
-      ],
+      "benefits": {
+        "1": "RSI-Divergenzerkennung identifiziert Momentum-Verschiebungen, bevor der Preis bestätigt",
+        "2": "Pivot-Punkt-Analyse findet automatisch wichtige Unterstützungs-/Widerstandsniveaus",
+        "3": "Überkauft (>70 RSI) und überverkauft (<30 RSI) Bedingungsüberwachung",
+        "4": "Volumen-Preis-Divergenzanalyse zur Signalbestätigung",
+        "5": "Multi-Indikator-Konvergenz erhöht die Signalzuverlässigkeit auf 78%"
+      },
       "alert": "Die erweiterte Signalerkennung kombiniert RSI, Pivot-Punkte und Volumenanalyse, um hochwahrscheinliche Einstiegspunkte zu identifizieren, wenn sich Momentum von der Preisrichtung unterscheidet."
     },
     "confirm": {
       "title": "HTF-Bestätigung",
       "description": "Erfordert Ausrichtung auf höheren Zeitrahmen vor dem Eintritt in Trades, um falsche Signale zu reduzieren und die Genauigkeit zu verbessern.",
-      "benefits": [
-        "Erfordert Ausrichtung auf 4-Stunden- und Tages-Zeitrahmen vor der Ausführung",
-        "Reduziert die falsche Signalrate um 65% im Vergleich zu einem einzelnen Zeitrahmen",
-        "Eliminiert Trades gegen den breiteren Markttrend",
-        "Bietet Vertrauensbewertung basierend auf Zeitrahmen-Ausrichtung",
-        "Verhindert Einträge während unsicherer oder choppy Marktbedingungen"
-      ],
+      "benefits": {
+        "1": "Erfordert Ausrichtung auf 4-Stunden- und Tages-Zeitrahmen vor der Ausführung",
+        "2": "Reduziert die falsche Signalrate um 65% im Vergleich zu einem einzelnen Zeitrahmen",
+        "3": "Eliminiert Trades gegen den breiteren Markttrend",
+        "4": "Bietet Vertrauensbewertung basierend auf Zeitrahmen-Ausrichtung",
+        "5": "Verhindert Einträge während unsicherer oder choppy Marktbedingungen"
+      },
       "alert": "Die Bestätigung auf höheren Zeitrahmen stellt sicher, dass Trades mit der breiteren Marktstruktur übereinstimmen, reduziert falsche Signale drastisch und verbessert die Gesamtgenauigkeit."
     },
     "risk": {
       "title": "Risikomanagement",
       "description": "Implementiert Trailing Stops und Take-Profit-Niveaus, um Gewinne zu sichern und gleichzeitig vor Abwärtsrisiken zu schützen.",
-      "benefits": [
-        "Dynamische Trailing Stops passen sich basierend auf Marktvolatilität an (ATR-basiert)",
-        "Take-Profit-Niveaus auf mindestens 2:1 Gewinn-zu-Risiko-Verhältnis gesetzt",
-        "Positionsgröße passt sich basierend auf Gewinnquote und Volatilität an",
-        "Maximaler Drawdown-Schutz mit Circuit Breakern",
-        "Risikoangepasste Positionsgröße verhindert Überexposition"
-      ],
+      "benefits": {
+        "1": "Dynamische Trailing Stops passen sich basierend auf Marktvolatilität an (ATR-basiert)",
+        "2": "Take-Profit-Niveaus auf mindestens 2:1 Gewinn-zu-Risiko-Verhältnis gesetzt",
+        "3": "Positionsgröße passt sich basierend auf Gewinnquote und Volatilität an",
+        "4": "Maximaler Drawdown-Schutz mit Circuit Breakern",
+        "5": "Risikoangepasste Positionsgröße verhindert Überexposition"
+      },
       "alert": "Ausgefeiltes Risikomanagement-System nutzt Trailing Stops, Take-Profit-Optimierung und dynamische Positionsgröße, um Kapital zu schützen und gleichzeitig Renditen zu maximieren."
     },
     "size": {
       "title": "Positionsgröße",
       "description": "Verwendet prozentuale Positionsgröße, um konsistente Risikoexposition über verschiedene Handelsgrößen hinweg zu gewährleisten.",
-      "benefits": [
-        "Prozentuale Größe gewährleistet konsistente Risikoexposition",
-        "Volatilitätsangepasste Größe reduziert Exposition in turbulenten Märkten",
-        "Gewinnquoten-Optimierung passt Größe basierend auf jüngster Leistung an",
-        "Portfolio-Heat-Management verhindert Überkonzentration",
-        "Compounding-freundliche Größe unterstützt langfristiges Wachstum"
-      ],
+      "benefits": {
+        "1": "Prozentuale Größe gewährleistet konsistente Risikoexposition",
+        "2": "Volatilitätsangepasste Größe reduziert Exposition in turbulenten Märkten",
+        "3": "Gewinnquoten-Optimierung passt Größe basierend auf jüngster Leistung an",
+        "4": "Portfolio-Heat-Management verhindert Überkonzentration",
+        "5": "Compounding-freundliche Größe unterstützt langfristiges Wachstum"
+      },
       "alert": "Der Positionsgrößen-Algorithmus stellt optimale Kapitalallokation über verschiedene Marktbedingungen und Strategie-Leistungsniveaus hinweg sicher."
     }
   },
