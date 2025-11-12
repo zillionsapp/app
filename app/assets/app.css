@@ -20,12 +20,11 @@
 
 @plugin "daisyui/theme" {
   name: "light";
-  prefersdark: true;
   color-scheme: light;
   --color-base-100: #ecf0ed;
   --color-base-200: #fff;
   --color-base-300: #ecf0ed;
-  --color-base-content: #fff;
+  --color-base-content: #141517;
   --color-primary: #00ff9d;
   --color-primary-content: #141517;
   --color-secondary: #7c3aed;
