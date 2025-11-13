@@ -33,8 +33,8 @@
             </ul>
           </div> -->
           <div v-if="hasInvite" class="flex gap-2">
-            <NuxtLink to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.signUp') }}</NuxtLink>
-            <NuxtLink to="/sign-in" class="btn btn-ghost btn-sm">{{ $t('nav.signIn') }}</NuxtLink>
+            <NuxtLink :to="route.query.invite ? `/sign-up?invite=${route.query.invite}` : '/sign-up'" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.signUp') }}</NuxtLink>
+            <NuxtLink :to="route.query.invite ? `/sign-in?invite=${route.query.invite}` : '/sign-in'" class="btn btn-ghost btn-sm">{{ $t('nav.signIn') }}</NuxtLink>
           </div>
         </div>
       </header>
@@ -53,8 +53,8 @@
           </p>
 
           <div v-if="hasInvite" class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
-            <NuxtLink to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('nav.signUp') }}</NuxtLink>
-            <NuxtLink to="/sign-in" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('nav.signIn') }}</NuxtLink>
+            <NuxtLink :to="route.query.invite ? `/sign-up?invite=${route.query.invite}` : '/sign-up'" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('nav.signUp') }}</NuxtLink>
+            <NuxtLink :to="route.query.invite ? `/sign-in?invite=${route.query.invite}` : '/sign-in'" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('nav.signIn') }}</NuxtLink>
           </div>
 
         </div>

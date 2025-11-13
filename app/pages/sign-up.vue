@@ -35,6 +35,9 @@
           </div>
 
           <div v-if="isValidCode" class="mt-8">
+            <div class="text-center mb-4">
+              <p class="text-green-600 font-medium">✓ Invite code validated! Please complete your registration:</p>
+            </div>
             <SignUp
               :redirect-url="redirectUrl"
               @complete="handleSignUpComplete"
@@ -58,28 +61,34 @@
 <script setup>
 import { ref, computed, onMounted } from 'vue'
 import { useRoute } from 'vue-router'
-
-// SignUp component should be auto-imported by Clerk
+import { SignUp, useClerk } from '@clerk/vue'
 
 const route = useRoute()
 const inviteCode = ref('')
 const isValidCode = ref(false)
 const referrerData = ref(null)
 
-// Check for invite code in URL query parameter
+// Check for invite code in URL query parameter or localStorage
 onMounted(() => {
   const urlInviteCode = route.query.invite
+  const storedInviteCode = process.client ? localStorage.getItem('usedInviteCode') : null
+
   if (urlInviteCode) {
+    // Store the invite code for persistence
+    if (process.client) {
+      localStorage.setItem('usedInviteCode', urlInviteCode.toUpperCase())
+    }
     inviteCode.value = urlInviteCode.toUpperCase()
+    validateInviteCode()
+  } else if (storedInviteCode) {
+    // Use stored invite code if no URL parameter
+    inviteCode.value = storedInviteCode
     validateInviteCode()
   }
 })
 
 const redirectUrl = computed(() => {
-  if (isValidCode.value && referrerData.value) {
-    return `/sign-up?referrer=${referrerData.value.referrerId}&code=${inviteCode.value}`
-  }
-  return '/sign-up'
+  return '/wallet' // Redirect to wallet after successful sign-up
 })
 
 const validateInviteCode = async () => {
