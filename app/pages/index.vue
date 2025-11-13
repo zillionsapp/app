@@ -410,11 +410,109 @@
               {{ $t('faq.a3') }}
             </div>
           </div>
-          <div class="collapse collapse-arrow join-item border border-base-300 rounded-b-xl">
+          <div class="collapse collapse-arrow join-item border border-base-300">
             <input type="checkbox" />
             <div class="collapse-title text-md font-medium">{{ $t('faq.q4') }}</div>
             <div class="collapse-content text-sm opacity-80">
               {{ $t('faq.a4') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q5') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a5') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q6') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a6') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q7') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a7') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q8') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a8') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q9') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a9') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q10') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a10') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q11') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a11') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q12') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a12') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q13') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a13') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q14') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a14') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q15') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a15') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q16') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a16') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q17') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a17') }}
+            </div>
+          </div>
+          <div class="collapse collapse-arrow join-item border border-base-300 rounded-b-xl">
+            <input type="checkbox" />
+            <div class="collapse-title text-md font-medium">{{ $t('faq.q18') }}</div>
+            <div class="collapse-content text-sm opacity-80">
+              {{ $t('faq.a18') }}
             </div>
           </div>
         </div>
