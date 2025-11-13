@@ -28,8 +28,8 @@
               {{ locale.toUpperCase() }}
             </button>
             <ul class="dropdown-content menu bg-base-100 rounded-box z-[1] w-32 p-2 shadow">
-              <li><a @click="switchToEnglish">English</a></li>
-              <li><a @click="switchToGerman">Deutsch</a></li>
+              <li><a @click="setLocale('en')">English</a></li>
+              <li><a @click="setLocale('de')">Deutsch</a></li>
             </ul>
           </div>
           <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.waitlist') }}</a>
@@ -447,20 +447,11 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted } from 'vue'
-import Airtable from 'airtable'
 import PrivacyModal from '../components/PrivacyModal.vue'
 import TermsModal from '../components/TermsModal.vue'
 
 const { setLocale, locale, t } = useI18n()
-
-// Locale switching functions
-async function switchToEnglish() {
-  await setLocale('en')
-}
-
-async function switchToGerman() {
-  await setLocale('de')
-}
+const { $i18n } = useNuxtApp()
 
 /**
  * Props
@@ -474,6 +465,10 @@ const logoToUse = computed(() => props.logoSrc || EMBEDDED_LOGO)
 
 const legacyType = ref('legacy')
 const modernType = ref('modern')
+
+
+
+import Airtable from 'airtable'
 
 // Airtable configuration
 const base = new Airtable({
