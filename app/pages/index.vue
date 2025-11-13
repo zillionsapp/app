@@ -23,7 +23,7 @@
           </ul>
         </div>
         <div class="navbar-end flex gap-2">
-          <div class="dropdown dropdown-end">
+          <!-- <div class="dropdown dropdown-end">
             <button class="btn btn-ghost btn-sm">
               {{ locale.toUpperCase() }}
             </button>
@@ -31,7 +31,7 @@
               <li><a @click="setLocale('en')">English</a></li>
               <li><a @click="setLocale('de')">Deutsch</a></li>
             </ul>
-          </div>
+          </div> -->
           <div v-if="hasInvite" class="flex gap-2">
             <NuxtLink to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.signUp') }}</NuxtLink>
             <NuxtLink to="/sign-in" class="btn btn-ghost btn-sm">{{ $t('nav.signIn') }}</NuxtLink>
@@ -74,19 +74,19 @@
         <div class="grid grid-cols-2 md:grid-cols-4 gap-4 animate-fade-in">
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.noExpertise') }}</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">{{ $t('stats.noExpertiseValue') }}</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 text-base-content">{{ $t('stats.noExpertiseValue') }}</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.onChain') }}</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">{{ $t('stats.onChainValue') }}</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 text-base-content">{{ $t('stats.onChainValue') }}</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.adaptive') }}</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">{{ $t('stats.adaptiveValue') }}</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 text-base-content">{{ $t('stats.adaptiveValue') }}</div>
           </div>
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 border border-base-300/50 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.handsFree') }}</div>
-            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 bg-clip-text text-transparent whitespace-nowrap">{{ $t('stats.handsFreeValue') }}</div>
+            <div class="stat-value text-lg md:text-2xl mt-1 font-bold bg-white/70 text-base-content">{{ $t('stats.handsFreeValue') }}</div>
           </div>
         </div>
       </div>
