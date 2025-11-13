@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
 
     const records = await base(tableName)
       .select({
-        filterByFormula: `{Referrer Email} = '${query.email}'`,
+        filterByFormula: `{Referrer Wallet} = '${userId}'`,
         maxRecords: 1
       })
       .all()
@@ -80,12 +80,10 @@ export default defineEventHandler(async (event) => {
       'Referrer Wallet': userId,
       'Referrer Email': query.email || '',
       'Referral Code': referralCode,
-      'Reward Earned': 0,
-      'Created At': new Date().toISOString()
+      'Reward Earned': 0
     }
 
-    const createdRecords = await base(tableName).create([recordData])
-    const createdRecord = createdRecords[0]
+    await base(tableName).create(recordData)
 
     return {
       success: true,

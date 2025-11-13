@@ -30,8 +30,18 @@
           </button>
         </div>
 
-        <div v-else class="text-center py-4">
+        <div v-else-if="loading" class="text-center py-4">
           <p class="text-gray-500">Loading referral code...</p>
+        </div>
+
+        <div v-else-if="error" class="text-center py-4">
+          <p class="text-red-500">{{ error }}</p>
+          <button
+            @click="loadReferralData"
+            class="mt-2 bg-blue-600 hover:bg-blue-700 text-white font-medium py-2 px-4 rounded-md transition-colors"
+          >
+            Retry
+          </button>
         </div>
       </div>
 
@@ -225,6 +235,8 @@ const userLevel = ref(1)
 const totalEarnings = ref(0)
 const referrals = ref([])
 const copied = ref(false)
+const loading = ref(true)
+const error = ref('')
 
 const referralLink = computed(() => {
   if (!referralCode.value) return ''
@@ -283,25 +295,34 @@ const resetDefaults = () => {
 const loadReferralData = async () => {
   if (!user.value?.id) return
 
-  try {
-    const userEmail = user.value.primaryEmailAddress?.emailAddress || ''
+  loading.value = true
+  error.value = ''
 
+  try {
     // Load referral code
-    const codeResponse = await $fetch(`/api/referrals/code?userId=${user.value.id}&email=${encodeURIComponent(userEmail)}`)
+    const codeResponse = await $fetch(`/api/referrals/code?userId=${user.value.id}`)
     if (codeResponse.success) {
       referralCode.value = codeResponse.referralCode
       userLevel.value = codeResponse.level
       totalEarnings.value = codeResponse.totalEarnings
+    } else {
+      error.value = 'Failed to load referral code'
     }
 
     // Load referrals
-    const listResponse = await $fetch(`/api/referrals/list?userId=${user.value.id}&email=${encodeURIComponent(userEmail)}`)
+    const listResponse = await $fetch(`/api/referrals/list?userId=${user.value.id}`)
     if (listResponse.success) {
       referrals.value = listResponse.referrals
-      totalEarnings.value = listResponse.totalEarnings
+      // Use the totalEarnings from list if it's available
+      if (listResponse.totalEarnings !== undefined) {
+        totalEarnings.value = listResponse.totalEarnings
+      }
     }
-  } catch (error) {
-    console.error('Error loading referral data:', error)
+  } catch (err) {
+    console.error('Error loading referral data:', err)
+    error.value = err.message || 'Failed to load referral data'
+  } finally {
+    loading.value = false
   }
 }
 

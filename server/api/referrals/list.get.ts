@@ -4,7 +4,6 @@ import { getAuth } from '@clerk/nuxt/server'
 
 interface ListRequest {
   userId: string
-  email?: string
 }
 
 export default defineEventHandler(async (event) => {
@@ -50,30 +49,27 @@ export default defineEventHandler(async (event) => {
       })
       .all()
 
-    // Since there's no hierarchy field, just use direct referrals
-    const referralMap = new Map()
-    const allReferralRecords = directReferrals
+    // Filter to only referee records (records that have Referee Wallet)
+    const refereeRecords = directReferrals.filter(record => record.fields['Referee Wallet'])
 
-    allReferralRecords.forEach(record => {
-      if (!referralMap.has(record.id)) {
-        referralMap.set(record.id, {
-          id: record.id,
-          userId: record.fields['Referee Wallet'] as string,
-          email: record.fields['Referee Email'] as string,
-          level: 1, // Default level since field doesn't exist
-          referralCode: record.fields['Referral Code'] as string,
-          totalEarnings: record.fields['Reward Earned'] as number || 0,
-          createdAt: record.fields['Created At'] as string,
-          referrerId: record.fields['Referrer Wallet'] as string,
-          referrerEmail: record.fields['Referrer Email'] as string
-        })
-      }
-    })
+    const referrals = refereeRecords.map(record => ({
+      id: record.id,
+      userId: record.fields['Referee Wallet'] as string,
+      email: record.fields['Referee Email'] as string,
+      level: 1, // Default level since field doesn't exist
+      referralCode: record.fields['Referral Code'] as string,
+      totalEarnings: record.fields['Reward Earned'] as number || 0,
+      createdAt: record.fields['Created At'] as string,
+      referrerId: record.fields['Referrer Wallet'] as string,
+      referrerEmail: record.fields['Referrer Email'] as string
+    }))
 
-    const referrals = Array.from(referralMap.values())
-
-    // Calculate total earnings from all referrals
-    const totalEarnings = referrals.reduce((sum, referral) => sum + referral.totalEarnings, 0)
+    // Get total earnings from the referrer's record
+    let totalEarnings = 0
+    if (directReferrals.length > 0) {
+      // All records for this referrer should have the same Reward Earned
+      totalEarnings = directReferrals[0].fields['Reward Earned'] as number || 0
+    }
 
     return {
       success: true,

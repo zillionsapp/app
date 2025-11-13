@@ -46,33 +46,42 @@ export default defineEventHandler(async (event) => {
 
     const tableName = process.env.AIRTABLE_REFERRAL_TABLE || 'Referrals'
 
-    // Generate unique referral code
-    const referralCode = uuidv4().substring(0, 8).toUpperCase()
-
-    // Create referral record - since there's no hierarchy, just create a basic record
-    const recordData: any = {
-      'Referrer Wallet': userId,
-      'Referrer Email': email,
-      'Referral Code': referralCode,
-      'Reward Earned': 0,
-      'Created At': new Date().toISOString()
-    }
-
-    // If this is a referral from someone else, we need to create a referee record
+    // If this is a referral from someone else
     if (referrerId) {
-      // This means someone referred this user, so we need to create a referee record
-      // But since the table structure is different, we might need to create a separate record
-      // For now, just create the referrer record
-    }
+      // Create a referee record linked to the referrer
+      const recordData: any = {
+        'Referrer Wallet': referrerId,
+        'Referrer Email': referrerEmail || '',
+        'Referee Wallet': userId,
+        'Referee Email': email,
+        'Reward Earned': 0
+      }
 
-    const createdRecords = await base(tableName).create([recordData])
-    const createdRecord = createdRecords[0]
+      await base(tableName).create(recordData)
 
-    return {
-      success: true,
-      referralCode,
-      level: 1,
-      recordId: createdRecord.id
+      return {
+        success: true,
+        level: 1
+      }
+    } else {
+      // Generate unique referral code for the new user
+      const referralCode = uuidv4().substring(0, 8).toUpperCase()
+
+      // Create a referrer record for the user
+      const recordData: any = {
+        'Referrer Wallet': userId,
+        'Referrer Email': email,
+        'Referral Code': referralCode,
+        'Reward Earned': 0
+      }
+
+      await base(tableName).create(recordData)
+
+      return {
+        success: true,
+        referralCode,
+        level: 1
+      }
     }
   } catch (error: any) {
     console.error('Create referral API error:', error)
