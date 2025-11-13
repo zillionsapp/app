@@ -32,10 +32,9 @@
               <li><a @click="setLocale('de')">Deutsch</a></li>
             </ul>
           </div>
-          <div class="flex gap-2">
-            <NuxtLink v-if="hasInvite" to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.signUp') }}</NuxtLink>
-            <NuxtLink v-if="hasInvite" to="/sign-in" class="btn btn-ghost btn-sm">{{ $t('nav.signIn') }}</NuxtLink>
-            <a v-if="!hasInvite" href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.waitlist') }}</a>
+          <div v-if="hasInvite" class="flex gap-2">
+            <NuxtLink to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.signUp') }}</NuxtLink>
+            <NuxtLink to="/sign-in" class="btn btn-ghost btn-sm">{{ $t('nav.signIn') }}</NuxtLink>
           </div>
         </div>
       </header>
@@ -53,15 +52,9 @@
             {{ $t('hero.description') }}
           </p>
 
-          <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
-            <div v-if="hasInvite" class="flex gap-4">
-              <NuxtLink to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('nav.signUp') }}</NuxtLink>
-              <NuxtLink to="/sign-in" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('nav.signIn') }}</NuxtLink>
-            </div>
-            <div v-else class="flex gap-4">
-              <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('hero.cta') }}</a>
-              <a href="#how" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('hero.secondary') }}</a>
-            </div>
+          <div v-if="hasInvite" class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
+            <NuxtLink to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('nav.signUp') }}</NuxtLink>
+            <NuxtLink to="/sign-in" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('nav.signIn') }}</NuxtLink>
           </div>
 
         </div>
@@ -165,7 +158,7 @@
           </div>
         </div>
         <div class="mt-10">
-          <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 rounded-xl">{{ $t('howItWorks.cta') }}</a>
+          <!-- CTA button removed - no waitlist section -->
         </div>
       </div>
     </section>
@@ -332,65 +325,7 @@
       </div>
     </section>
 
-    <!-- Waitlist -->
-    <section v-if="!hasInvite" id="waitlist" class="py-24 lg:py-32 relative overflow-hidden">
-      <div class="max-w-3xl mx-auto px-4 lg:px-6 relative z-10">
-        <div class="card  transition-all duration-500 rounded-3xl">
-          <div class="card-body text-center">
-            <!-- Heading -->
-            <h2 class="text-3xl md:text-4xl font-bold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-primary via-secondary to-accent animate-gradient">
-              {{ $t('waitlist.title') }}
-            </h2>
-            <p class="mt-3 text-base md:text-lg opacity-80">
-              {{ $t('waitlist.subtitle') }}
-            </p>
 
-            <!-- Waitlist form -->
-            <form @submit.prevent="submitWaitlist" class="mt-8 flex flex-col justify-center">
-              <input
-                v-model="email"
-                type="email"
-                required
-                placeholder="email@example.com"
-                class="input input-lg w-full rounded-2xl bg-base-100/70 backdrop-blur-sm border border-base-300/60 focus:border-primary focus:ring-2 focus:ring-primary/30 text-lg"
-              />
-              <button
-                class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-2xl shadow-lg hover:shadow-primary/40 transition-all duration-300 flex items-center gap-2 justify-center mt-2"
-                :class="{ 'btn-disabled loading': isSubmitting }"
-                :disabled="isSubmitting"
-              >
-                <span v-if="!isSubmitting">{{ $t('waitlist.cta') }}</span>
-                <span v-else>{{ $t('waitlist.joining') }}</span>
-              </button>
-            </form>
-
-            <!-- Consent -->
-            <label class="label cursor-pointer justify-center gap-2 mt-3">
-              <input type="checkbox" class="checkbox checkbox-sm" v-model="consent" />
-              <span class="label-text text-xs opacity-70">
-                {{ $t('waitlist.consent') }}
-              </span>
-            </label>
-
-            <!-- Toast -->
-            <div v-if="toast.message" class="toast toast-end">
-              <div :class="['alert', toast.type === 'success' ? 'alert-success' : 'alert-error']">
-                <span>{{ toast.message }}</span>
-              </div>
-            </div>
-
-            <!-- Fine print -->
-            <div class="text-xs opacity-60 mt-4">
-              {{ $t('waitlist.finePrint') }} <button @click="showTermsModal = true" class="link">{{ $t('waitlist.terms') }}</button> & <button @click="showPrivacyModal = true" class="link">{{ $t('waitlist.privacy') }}</button>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Modals -->
-      <PrivacyModal v-model="showPrivacyModal" />
-      <TermsModal v-model="showTermsModal" />
-    </section>
 
 
     <!-- FAQ -->
@@ -573,8 +508,18 @@ const props = defineProps<{ logoSrc?: string }>()
 const EMBEDDED_LOGO = '/logo.jpg'
 const logoToUse = computed(() => props.logoSrc || EMBEDDED_LOGO)
 
-// Check if user has an invite code in the URL
-const hasInvite = computed(() => !!route.query.invite)
+// Check if user has an invite code in the URL or localStorage
+const hasInvite = computed(() => {
+  const urlInvite = route.query.invite
+  const storedInvite = process.client ? localStorage.getItem('inviteCode') : null
+
+  // If there's an invite in the URL, store it
+  if (urlInvite && process.client) {
+    localStorage.setItem('inviteCode', urlInvite as string)
+  }
+
+  return !!(urlInvite || storedInvite)
+})
 
 const legacyType = ref('legacy')
 const modernType = ref('modern')
