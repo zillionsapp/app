@@ -100,7 +100,7 @@ const navigationItems = [
   { name: 'Wallet', path: '/Wallet', icon: 'wallet' },
   { name: 'Dash', path: '/dash', icon: 'dashboard', disabled: true },
   { name: 'Backtest', path: '/backtest', icon: 'backtest' },
-  { name: 'Simulation', path: '/simulation', icon: 'simulation' }
+  { name: 'Commission', path: '/commission', icon: 'simulation' }
 ]
 
 const sidebarOpen = ref(false)
