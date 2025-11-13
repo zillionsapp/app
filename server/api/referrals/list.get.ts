@@ -4,6 +4,7 @@ import { getAuth } from '@clerk/nuxt/server'
 
 interface ListRequest {
   userId: string
+  email?: string
 }
 
 export default defineEventHandler(async (event) => {
@@ -45,22 +46,22 @@ export default defineEventHandler(async (event) => {
     // Find all referrals where this user is the referrer (direct referrals)
     const directReferrals = await base(tableName)
       .select({
-        filterByFormula: `{Referrer Wallet} = '${userId}'`
+        filterByFormula: `{Referrer Email} = '${query.email}'`
       })
       .all()
 
-    // Filter to only referee records (records that have Referee Wallet)
-    const refereeRecords = directReferrals.filter(record => record.fields['Referee Wallet'])
+    // Filter to only referee records (records that have Referee Email but no Referral Code)
+    const refereeRecords = directReferrals.filter(record => record.fields['Referee Email'] && !record.fields['Referral Code'])
 
     const referrals = refereeRecords.map(record => ({
       id: record.id,
-      userId: record.fields['Referee Wallet'] as string,
+      userId: '', // No user ID stored
       email: record.fields['Referee Email'] as string,
       level: 1, // Default level since field doesn't exist
-      referralCode: record.fields['Referral Code'] as string,
+      referralCode: '', // No code for referees
       totalEarnings: record.fields['Reward Earned'] as number || 0,
-      createdAt: record.fields['Created At'] as string,
-      referrerId: record.fields['Referrer Wallet'] as string,
+      createdAt: '', // No created at
+      referrerId: '', // No referrer ID
       referrerEmail: record.fields['Referrer Email'] as string
     }))
 

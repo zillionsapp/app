@@ -45,7 +45,7 @@ export default defineEventHandler(async (event) => {
 
     const records = await base(tableName)
       .select({
-        filterByFormula: `{Referrer Wallet} = '${userId}'`,
+        filterByFormula: `{Referrer Email} = '${query.email}'`,
         maxRecords: 1
       })
       .all()
@@ -64,20 +64,11 @@ export default defineEventHandler(async (event) => {
     // This allows users to access the commission page and get a referral code
     const { v4: uuidv4 } = await import('uuid')
 
-    // Check if user is already a referrer (has referred others)
-    const referrerRecords = await base(tableName)
-      .select({
-        filterByFormula: `{Referrer Wallet} = '${userId}'`,
-        maxRecords: 1
-      })
-      .all()
-
     // Generate unique referral code
     const referralCode = uuidv4().substring(0, 8).toUpperCase()
 
     // Create referral record (email will be updated later if needed)
     const recordData: any = {
-      'Referrer Wallet': userId,
       'Referrer Email': query.email || '',
       'Referral Code': referralCode,
       'Reward Earned': 0

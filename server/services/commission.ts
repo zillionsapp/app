@@ -77,7 +77,7 @@ export async function updateReferralEarnings(userId: string, earnings: number) {
   // Find the user's referral record
   const records = await base(tableName)
     .select({
-      filterByFormula: `{Referrer Wallet} = '${userId}'`,
+      filterByFormula: `{Referrer Email} = '${userId}'`,
       maxRecords: 1
     })
     .all()

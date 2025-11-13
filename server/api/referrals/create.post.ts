@@ -49,18 +49,27 @@ export default defineEventHandler(async (event) => {
     // If this is a referral from someone else
     if (referrerId) {
       // Create a referee record linked to the referrer
-      const recordData: any = {
-        'Referrer Wallet': referrerId,
+      const refereeRecordData: any = {
         'Referrer Email': referrerEmail || '',
-        'Referee Wallet': userId,
         'Referee Email': email,
         'Reward Earned': 0
       }
 
-      await base(tableName).create(recordData)
+      await base(tableName).create(refereeRecordData)
+
+      // Also create a referrer record for the new user with their own code
+      const referralCode = uuidv4().substring(0, 8).toUpperCase()
+      const referrerRecordData: any = {
+        'Referrer Email': email,
+        'Referral Code': referralCode,
+        'Reward Earned': 0
+      }
+
+      await base(tableName).create(referrerRecordData)
 
       return {
         success: true,
+        referralCode,
         level: 1
       }
     } else {
@@ -69,7 +78,6 @@ export default defineEventHandler(async (event) => {
 
       // Create a referrer record for the user
       const recordData: any = {
-        'Referrer Wallet': userId,
         'Referrer Email': email,
         'Referral Code': referralCode,
         'Reward Earned': 0

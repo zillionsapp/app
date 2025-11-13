@@ -192,10 +192,7 @@
                   <div class="text-sm text-base-content/70">L{{ referral.level }}</div>
                 </div>
                 <div class="text-sm text-green-400">
-                  Earned: ${{ referral.totalEarnings.toLocaleString() }}
-                </div>
-                <div class="text-xs text-base-content/50 mt-1">
-                  {{ new Date(referral.createdAt).toLocaleDateString() }}
+                  Referred by: {{ referral.referrerEmail }}
                 </div>
               </div>
             </div>
@@ -299,8 +296,10 @@ const loadReferralData = async () => {
   error.value = ''
 
   try {
+    const userEmail = user.value.primaryEmailAddress?.emailAddress || ''
+
     // Load referral code
-    const codeResponse = await $fetch(`/api/referrals/code?userId=${user.value.id}`)
+    const codeResponse = await $fetch(`/api/referrals/code?userId=${user.value.id}&email=${encodeURIComponent(userEmail)}`)
     if (codeResponse.success) {
       referralCode.value = codeResponse.referralCode
       userLevel.value = codeResponse.level
@@ -310,7 +309,7 @@ const loadReferralData = async () => {
     }
 
     // Load referrals
-    const listResponse = await $fetch(`/api/referrals/list?userId=${user.value.id}`)
+    const listResponse = await $fetch(`/api/referrals/list?userId=${user.value.id}&email=${encodeURIComponent(userEmail)}`)
     if (listResponse.success) {
       referrals.value = listResponse.referrals
       // Use the totalEarnings from list if it's available
