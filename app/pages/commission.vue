@@ -238,7 +238,7 @@ const error = ref('')
 const referralLink = computed(() => {
   if (!referralCode.value) return ''
   const baseUrl = window.location.origin
-  return `${baseUrl}/sign-up?invite=${referralCode.value}`
+  return `${baseUrl}?invite=${referralCode.value}`
 })
 
 const calculateCommissions = () => {

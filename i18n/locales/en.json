@@ -4,7 +4,9 @@
     "how": "How it works",
     "tech": "Technology",
     "faq": "FAQ",
-    "waitlist": "Join the waitlist"
+    "waitlist": "Join the waitlist",
+    "signUp": "Sign Up",
+    "signIn": "Sign In"
   },
   "hero": {
     "badge": "On‑chain • Non‑custodial • AI‑driven",

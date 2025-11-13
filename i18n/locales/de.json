@@ -4,7 +4,9 @@
     "how": "So funktioniert es",
     "tech": "Technologie",
     "faq": "Häufig gestellte Fragen",
-    "waitlist": "Zur Warteliste hinzufügen"
+    "waitlist": "Zur Warteliste hinzufügen",
+    "signUp": "Registrieren",
+    "signIn": "Anmelden"
   },
   "hero": {
     "badge": "On‑Chain • Nicht‑verwahrend • KI‑gesteuert",

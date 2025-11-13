@@ -32,7 +32,11 @@
               <li><a @click="setLocale('de')">Deutsch</a></li>
             </ul>
           </div>
-          <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.waitlist') }}</a>
+          <div class="flex gap-2">
+            <NuxtLink v-if="hasInvite" to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.signUp') }}</NuxtLink>
+            <NuxtLink v-if="hasInvite" to="/sign-in" class="btn btn-ghost btn-sm">{{ $t('nav.signIn') }}</NuxtLink>
+            <a v-if="!hasInvite" href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-sm rounded-xl">{{ $t('nav.waitlist') }}</a>
+          </div>
         </div>
       </header>
      </div>
@@ -50,8 +54,14 @@
           </p>
 
           <div class="mt-8 flex flex-wrap items-center gap-4 animate-slide-up">
-            <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('hero.cta') }}</a>
-            <a href="#how" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('hero.secondary') }}</a>
+            <div v-if="hasInvite" class="flex gap-4">
+              <NuxtLink to="/sign-up" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('nav.signUp') }}</NuxtLink>
+              <NuxtLink to="/sign-in" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('nav.signIn') }}</NuxtLink>
+            </div>
+            <div v-else class="flex gap-4">
+              <a href="#waitlist" class="btn bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 border-0 btn-lg rounded-xl shadow-lg hover:shadow-xl transition-all duration-300">{{ $t('hero.cta') }}</a>
+              <a href="#how" class="btn btn-ghost btn-lg hover:underline transition-all duration-300">{{ $t('hero.secondary') }}</a>
+            </div>
           </div>
 
         </div>
@@ -323,7 +333,7 @@
     </section>
 
     <!-- Waitlist -->
-    <section id="waitlist" class="py-24 lg:py-32 relative overflow-hidden">
+    <section v-if="!hasInvite" id="waitlist" class="py-24 lg:py-32 relative overflow-hidden">
       <div class="max-w-3xl mx-auto px-4 lg:px-6 relative z-10">
         <div class="card  transition-all duration-500 rounded-3xl">
           <div class="card-body text-center">
@@ -545,11 +555,13 @@
 
 <script setup lang="ts">
 import { ref, computed, reactive, onMounted } from 'vue'
+import { useRoute } from 'vue-router'
 import PrivacyModal from '../components/PrivacyModal.vue'
 import TermsModal from '../components/TermsModal.vue'
 
 const { setLocale, locale, t } = useI18n()
 const { $i18n } = useNuxtApp()
+const route = useRoute()
 
 /**
  * Props
@@ -560,6 +572,9 @@ const { $i18n } = useNuxtApp()
 const props = defineProps<{ logoSrc?: string }>()
 const EMBEDDED_LOGO = '/logo.jpg'
 const logoToUse = computed(() => props.logoSrc || EMBEDDED_LOGO)
+
+// Check if user has an invite code in the URL
+const hasInvite = computed(() => !!route.query.invite)
 
 const legacyType = ref('legacy')
 const modernType = ref('modern')
