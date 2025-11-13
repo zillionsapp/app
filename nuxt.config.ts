@@ -4,8 +4,8 @@ export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
   devtools: { enabled: true },
   app: {
-    baseURL: '/',            // keep '/' for zillions.app or username.github.io root
-    // buildAssetsDir: 'assets/' // optional workaround if you don't want to use .nojekyll
+    baseURL: '/',                 // keep '/' for zillions.app or username.github.io root
+    // buildAssetsDir: 'assets/'  // optional workaround if you don't want to use .nojekyll
   },
   ssr: true,
   // Make Nitro target Vercel Node functions (not edge)
@@ -36,17 +36,12 @@ export default defineNuxtConfig({
     '@nuxtjs/i18n'
   ],
   i18n: {
+    //  defaultLocale: 'en',
     locales: [
       { code: 'en', file: 'en.json' },
       { code: 'de', file: 'de.json' }
     ],
-    defaultLocale: 'en',
-    detectBrowserLanguage: {
-      useCookie: true,
-      cookieKey: 'i18n_redirected',
-      redirectOn: 'root',
-      alwaysRedirect: false
-    },
+    detectBrowserLanguage: false
   },
   runtimeConfig: {
     // Private keys (only available on server-side)
