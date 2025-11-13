@@ -14,6 +14,25 @@
           </div>
         </div>
 
+        <!-- Language Toggle -->
+        <div v-if="referralCode" class="flex items-center space-x-4 mb-4">
+          <label class="text-sm font-medium">Link Language:</label>
+          <div class="flex items-center space-x-2">
+            <button
+              @click="linkLanguage = 'en'"
+              :class="['px-3 py-1 rounded-md text-sm font-medium transition-colors', linkLanguage === 'en' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300']"
+            >
+              English
+            </button>
+            <button
+              @click="linkLanguage = 'de'"
+              :class="['px-3 py-1 rounded-md text-sm font-medium transition-colors', linkLanguage === 'de' ? 'bg-blue-600 text-white' : 'bg-gray-200 text-gray-700 hover:bg-gray-300']"
+            >
+              Deutsch
+            </button>
+          </div>
+        </div>
+
         <div v-if="referralCode" class="flex items-center space-x-4">
           <div class="flex-1">
             <input
@@ -234,11 +253,13 @@ const referrals = ref([])
 const copied = ref(false)
 const loading = ref(true)
 const error = ref('')
+const linkLanguage = ref('en') // 'en' or 'de'
 
 const referralLink = computed(() => {
   if (!referralCode.value) return ''
   const baseUrl = window.location.origin
-  return `${baseUrl}?invite=${referralCode.value}`
+  const languagePrefix = linkLanguage.value === 'de' ? '/de' : ''
+  return `${baseUrl}${languagePrefix}?invite=${referralCode.value}`
 })
 
 const calculateCommissions = () => {
