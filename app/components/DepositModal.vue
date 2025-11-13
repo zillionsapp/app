@@ -20,6 +20,13 @@
           </button>
         </div>
 
+        <!-- Info Text -->
+        <div class="mb-6 p-3 bg-info/10 border border-info/20 rounded-lg">
+          <div class="text-sm text-base-content/80">
+            Paper Trading Mode - Test with virtual funds. No real money required.
+          </div>
+        </div>
+
         <!-- User Info -->
         <div class="mb-6 p-3 bg-base-200 rounded-lg">
           <div class="text-sm text-base-content/60 mb-1">Depositing to:</div>
