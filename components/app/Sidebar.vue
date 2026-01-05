@@ -30,12 +30,6 @@ const logout = async () => {
       <ul class="menu menu-compact w-full px-6">
         <li class="w-full">
           <NuxtLink to="/app" exact-active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app' ? 'bg-base-200' : '']">
-            <svg data-src="https://unpkg.com/heroicons/20/solid/home.svg" class="h-5 w-5 flex-shrink-0"></svg>
-            <span>{{ $t('app.nav.dashboard') }}</span>
-          </NuxtLink>
-        </li>
-        <li class="w-full">
-          <NuxtLink to="/app/wallet" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/wallet' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/wallet.svg" class="h-5 w-5 flex-shrink-0"></svg>
             <span>{{ $t('app.nav.wallet') }}</span>
           </NuxtLink>
@@ -50,6 +44,12 @@ const logout = async () => {
           <NuxtLink to="/app/referrals" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/referrals' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/user-plus.svg" class="h-5 w-5 flex-shrink-0"></svg>
             <span>{{ $t('app.nav.referrals') }}</span>
+          </NuxtLink>
+        </li>
+        <li class="w-full">
+          <NuxtLink to="/app/core" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/core' ? 'bg-base-200' : '']">
+            <svg data-src="https://unpkg.com/heroicons/20/solid/home.svg" class="h-5 w-5 flex-shrink-0"></svg>
+            <span>{{ $t('app.nav.dashboard') }}</span>
           </NuxtLink>
         </li>
         <li class="w-full">

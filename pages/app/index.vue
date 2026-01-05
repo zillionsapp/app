@@ -4,316 +4,358 @@ definePageMeta({
   middleware: 'auth'
 })
 
-// Simple reactive data
-const portfolioData = ref(null)
-const chartData = ref(null)
-const tradesData = ref(null)
-const currentPrices = ref<Record<string, number>>({})
-const loading = ref(true)
+const currentPeriod = ref('1w')
 
-// Pagination
-const currentPage = ref(1)
-const pageSize = ref(10)
-const totalTrades = ref(0)
+// Modal states
+const showDepositModal = ref(false)
+const showWithdrawModal = ref(false)
+const showSendModal = ref(false)
 
-// Load data on mount
-onMounted(async () => {
-  await refreshData()
+// Form data
+const depositAmount = ref('')
+const withdrawAmount = ref('')
+const sendAmount = ref('')
+const sendRecipient = ref('')
 
-  // Set up real-time refresh every 10 seconds
-  setInterval(refreshData, 10000)
+// Loading states
+const depositLoading = ref(false)
+const withdrawLoading = ref(false)
+const sendLoading = ref(false)
+
+const { data: walletData, pending: summaryPending, refresh: refreshSummary } = await useFetch('/api/wallet/summary')
+const { data: chartData, pending: chartPending, refresh: refreshChart } = await useFetch('/api/wallet/chart', {
+  query: computed(() => ({ period: currentPeriod.value }))
 })
 
-// Refresh all dashboard data
-const refreshData = async () => {
+const refreshData = async (period = currentPeriod.value) => {
+  currentPeriod.value = period
+  // Wait a bit for the query to update, then refresh
+  await nextTick()
+  await refreshChart()
+}
+
+// Chart data for performance
+const performanceData = computed(() => {
+  if (!chartData.value?.data) return []
+  return chartData.value.data.map((point: any) => ({
+    date: new Date(point.timestamp).toISOString().split('T')[0],
+    equity: point.equity
+  }))
+})
+
+const equityCategories = computed(() => ({
+  equity: {
+    name: 'Equity',
+    color: (walletData.value?.pnl ?? 0) >= 0 ? '#00ff9d' : '#ff006e', // Green for profit, red for loss
+  },
+}))
+
+const xFormatter = (tick: number): string => {
+  const date = new Date(performanceData.value[tick]?.date || '')
+  return date.toLocaleDateString()
+}
+
+// Modal functions
+const closeModals = () => {
+  showDepositModal.value = false
+  showWithdrawModal.value = false
+  showSendModal.value = false
+  depositAmount.value = ''
+  withdrawAmount.value = ''
+  sendAmount.value = ''
+  sendRecipient.value = ''
+}
+
+const handleDeposit = async () => {
+  if (!depositAmount.value || parseFloat(depositAmount.value) <= 0) return
+
+  depositLoading.value = true
   try {
-    const [portfolio, chart, trades] = await Promise.all([
-      $fetch('/api/trading/portfolio'),
-      $fetch('/api/trading/chart'),
-      loadTrades()
-    ])
+    const response = await $fetch('/api/wallet/deposit', {
+      method: 'POST',
+      body: { amount: parseFloat(depositAmount.value) }
+    })
 
-    portfolioData.value = portfolio
-    chartData.value = chart
-
-    // Fetch current prices for unrealized PnL calculations
-    await fetchCurrentPrices()
-  } catch (error) {
-    console.error('Failed to refresh dashboard data:', error)
+    if (response.success) {
+      await refreshSummary()
+      closeModals()
+      // You could add a toast notification here
+    }
+  } catch (error: any) {
+    console.error('Deposit error:', error)
+    // You could add error handling/toast here
   } finally {
-    loading.value = false
+    depositLoading.value = false
   }
 }
 
-// Fetch current prices from Binance
-const fetchCurrentPrices = async () => {
-  if (!tradesData.value?.trades?.length) return
+const handleWithdraw = async () => {
+  if (!withdrawAmount.value || parseFloat(withdrawAmount.value) <= 0) return
 
-  const symbols = [...new Set(tradesData.value.trades.map((trade: any) => trade.symbol))]
-  if (symbols.length === 0) return
-
+  withdrawLoading.value = true
   try {
-    const prices = await $fetch(`/api/prices?symbols=${symbols.join(',')}`)
-    currentPrices.value = prices as Record<string, number>
-  } catch (error) {
-    console.error('Failed to fetch current prices:', error)
+    const response = await $fetch('/api/wallet/withdraw', {
+      method: 'POST',
+      body: { amount: parseFloat(withdrawAmount.value) }
+    })
+
+    if (response.success) {
+      await refreshSummary()
+      closeModals()
+      // You could add a toast notification here
+    }
+  } catch (error: any) {
+    console.error('Withdraw error:', error)
+    // You could add error handling/toast here
+  } finally {
+    withdrawLoading.value = false
   }
 }
 
-// Calculate unrealized PnL for a trade
-const calculateUnrealizedPnL = (trade: any) => {
-  if (trade.status !== 'OPEN' || !currentPrices.value[trade.symbol]) {
-    return { dollar: 0, percentage: 0 }
-  }
+const handleSend = async () => {
+  if (!sendAmount.value || !sendRecipient.value || parseFloat(sendAmount.value) <= 0) return
 
-  const entryPrice = trade.price
-  const currentPrice = currentPrices.value[trade.symbol]
-  const quantity = trade.quantity
-  const leverage = trade.leverage || 1
-
-  // Calculate dollar PnL
-  const dollarPnL = trade.side === 'BUY'
-    ? (currentPrice - entryPrice) * quantity
-    : (entryPrice - currentPrice) * quantity
-
-  // Calculate percentage PnL (based on margin used)
-  const entryValue = entryPrice * quantity
-  const margin = entryValue / leverage
-  const percentagePnL = margin !== 0 ? (dollarPnL / margin) * 100 : 0
-
-  return { dollar: dollarPnL, percentage: percentagePnL }
-}
-
-// Calculate total unrealized PnL
-const totalUnrealizedPnL = computed(() => {
-  if (!tradesData.value?.trades?.length) return { dollar: 0, percentage: 0 }
-
-  let totalDollar = 0
-  const openTrades = tradesData.value.trades.filter((trade: any) => trade.status === 'OPEN')
-
-  openTrades.forEach((trade: any) => {
-    const pnl = calculateUnrealizedPnL(trade)
-    totalDollar += pnl.dollar
-  })
-
-  const walletBalance = portfolioData.value?.currentBalance || 0
-  const percentage = walletBalance > 0 ? (totalDollar / walletBalance) * 100 : 0
-
-  return { dollar: totalDollar, percentage }
-})
-
-// Load trades with pagination
-const loadTrades = async () => {
+  sendLoading.value = true
   try {
-    const response = await $fetch(`/api/trading/trades?limit=${pageSize.value}&offset=${(currentPage.value - 1) * pageSize.value}`)
-    tradesData.value = response
-    totalTrades.value = response.total || 0
-    return response
-  } catch (error) {
-    console.error('Failed to load trades:', error)
-    return null
-  }
-}
+    const response = await $fetch('/api/wallet/send', {
+      method: 'POST',
+      body: {
+        amount: parseFloat(sendAmount.value),
+        recipientEmail: sendRecipient.value
+      }
+    })
 
-// Pagination methods
-const nextPage = async () => {
-  if (currentPage.value * pageSize.value < totalTrades.value) {
-    currentPage.value++
-    await loadTrades()
+    if (response.success) {
+      await refreshSummary()
+      closeModals()
+      // You could add a toast notification here
+    }
+  } catch (error: any) {
+    console.error('Send error:', error)
+    // You could add error handling/toast here
+  } finally {
+    sendLoading.value = false
   }
-}
-
-const prevPage = async () => {
-  if (currentPage.value > 1) {
-    currentPage.value--
-    await loadTrades()
-  }
-}
-
-const goToPage = async (page: number) => {
-  currentPage.value = page
-  await loadTrades()
 }
 </script>
 
 <template>
-  <div class="col-span-12">
-    <!-- Loading State -->
-    <div v-if="loading" class="flex justify-center items-center min-h-96">
-      <div class="text-center">
-        <span class="loading loading-spinner loading-lg"></span>
-        <p class="mt-4">{{ $t('app.dashboard.loading') }}</p>
+  <!-- stats -->
+  <section class="stats stats-vertical col-span-12 w-full xl:stats-horizontal bg-base-100 rounded-box">
+    <div class="stat">
+      <div class="stat-title text-primary uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.total_deposited') }}</div>
+      <div class="stat-value text-2xl">${{ (walletData?.totalDeposited ?? 0).toLocaleString() }}</div>
+      <div class="stat-desc mt-1">{{ $t('app.wallet.paper_money_invested') }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title text-secondary uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.balance_left') }}</div>
+      <div class="stat-value text-2xl">${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
+      <div class="stat-desc mt-1">{{ $t('app.wallet.available_to_trade') }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title text-accent uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.total_equity') }}</div>
+      <div class="stat-value text-2xl">${{ (walletData?.totalEquity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
+      <div class="stat-desc mt-1">{{ $t('app.wallet.current_portfolio_value') }}</div>
+    </div>
+    <div class="stat">
+      <div class="stat-title text-info uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.total_pnl') }}</div>
+      <div class="stat-value text-2xl" :class="(walletData?.pnl ?? 0) >= 0 ? 'text-success' : 'text-error'">
+        {{ (walletData?.pnl ?? 0) >= 0 ? '+' : '-' }}${{ Math.abs(walletData?.pnl ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+      </div>
+      <div class="stat-desc mt-1" :class="(walletData?.pnl ?? 0) >= 0 ? 'text-success' : 'text-error'">
+        {{ (walletData?.pnlPercentage ?? 0) >= 0 ? '+' : '-' }}{{ Math.abs(walletData?.pnlPercentage ?? 0).toFixed(2) }}%
+      </div>
+    </div>
+  </section>
+
+  <!-- Performance Chart -->
+  <div class="card bg-base-100 rounded-box col-span-12">
+    <div class="card-body">
+      <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+        <h2 class="card-title">{{ $t('app.wallet.portfolio_performance') }}</h2>
+        <div class="flex gap-2 flex-wrap">
+          <button
+            v-for="period in ['1d', '1w', '1m', '1y', 'all']"
+            :key="period"
+            @click="refreshData(period)"
+            class="btn btn-xs"
+            :class="currentPeriod === period ? 'btn-active btn-primary' : 'btn-outline'"
+          >
+            {{ period.toUpperCase() }}
+          </button>
+        </div>
+      </div>
+      <AreaChart
+        v-if="performanceData.length > 0"
+        :data="performanceData"
+        :height="300"
+        :categories="equityCategories"
+        :y-grid-line="true"
+        :x-formatter="xFormatter"
+        :curve-type="CurveType.MonotoneX"
+        :legend-position="LegendPosition.BottomCenter"
+        :hide-legend="true"
+      />
+      <div v-else class="flex items-center justify-center h-80 text-base-content/50">
+        <div class="text-center">
+          <div class="text-4xl mb-2">📈</div>
+          <p>{{ $t('app.wallet.no_performance_data') }}</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Additional Info -->
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 col-span-12">
+    <div class="card bg-base-100 rounded-box">
+      <div class="card-body">
+        <h3 class="card-title">{{ $t('app.wallet.wallet_overview') }}</h3>
+        <div class="space-y-4">
+          <div class="flex justify-between">
+            <span>{{ $t('app.wallet.current_shares') }}</span>
+            <span class="font-mono">{{ (walletData?.currentShares ?? 0).toLocaleString() }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>{{ $t('app.wallet.portfolio_value') }}</span>
+            <span class="font-mono">${{ (walletData?.totalEquity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
+          </div>
+          <div class="flex justify-between">
+            <span>{{ $t('app.wallet.available_balance') }}</span>
+            <span class="font-mono">${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
+          </div>
+        </div>
       </div>
     </div>
 
-    <!-- Dashboard Content -->
-    <div v-else>
-      <!-- Trading Stats -->
-      <section class="stats stats-vertical w-full xl:stats-horizontal bg-base-100 rounded-box mb-8">
-        <div class="stat">
-          <div class="stat-title">{{ $t('app.dashboard.current_balance') }}</div>
-          <div class="stat-value">${{ (portfolioData?.currentBalance || 0).toLocaleString() }}</div>
-          <div class="stat-desc">{{ $t('app.dashboard.available_cash') }}</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-title">{{ $t('app.dashboard.current_equity') }}</div>
-          <div class="stat-value">${{ (portfolioData?.currentEquity || 0).toLocaleString() }}</div>
-          <div class="stat-desc">
-            <span :class="totalUnrealizedPnL.dollar >= 0 ? 'text-success' : 'text-error'">
-              {{ totalUnrealizedPnL.dollar >= 0 ? '+' : '-' }}${{ Math.abs(totalUnrealizedPnL.dollar).toFixed(2) }}
-              ({{ totalUnrealizedPnL.percentage >= 0 ? '+' : '-' }}{{ Math.abs(totalUnrealizedPnL.percentage).toFixed(2) }}%)
-            </span>
-            {{ $t('app.dashboard.unrealized_pnl') }}
-          </div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-title">{{ $t('app.dashboard.win_rate') }}</div>
-          <div class="stat-value">{{ ((portfolioData?.winRate || 0) * 100).toFixed(1) }}%</div>
-          <div class="stat-desc">{{ $t('app.dashboard.based_on_closed_trades') }}</div>
-        </div>
-
-        <div class="stat">
-          <div class="stat-title">{{ $t('app.dashboard.profit_factor') }}</div>
-          <div class="stat-value">{{ (portfolioData?.profitFactor || 0).toFixed(2) }}</div>
-          <div class="stat-desc">{{ $t('app.dashboard.gross_profit_gross_loss') }}</div>
-        </div>
-      </section>
-
-      <!-- Additional Metrics -->
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="card bg-base-100 shadow-lg">
-          <div class="card-body">
-            <h3 class="card-title text-lg">{{ $t('app.dashboard.total_pnl') }}</h3>
-            <p class="text-3xl font-bold" :class="(portfolioData?.totalPnL || 0) >= 0 ? 'text-success' : 'text-error'">
-              {{ (portfolioData?.totalPnL || 0) >= 0 ? '+' : '-' }}${{ Math.abs(portfolioData?.totalPnL || 0).toFixed(2) }}
-            </p>
-            <p class="text-sm opacity-70">
-              {{ (portfolioData?.totalPnLPercentage || 0).toFixed(2) }}% {{ $t('app.dashboard.realized_pnl') }}
-            </p>
-          </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-lg">
-          <div class="card-body">
-            <h3 class="card-title text-lg">{{ $t('app.dashboard.open_positions') }}</h3>
-            <p class="text-3xl font-bold text-info">{{ portfolioData?.openTradesCount || 0 }}</p>
-            <p class="text-sm opacity-70">
-              ${{ (portfolioData?.totalMarginUsed || 0).toLocaleString() }} {{ $t('app.dashboard.margin_used') }}
-            </p>
-          </div>
-        </div>
-
-        <div class="card bg-base-100 shadow-lg">
-          <div class="card-body">
-            <h3 class="card-title text-lg">{{ $t('app.dashboard.closed_trades') }}</h3>
-            <p class="text-3xl font-bold text-warning">{{ portfolioData?.closedTrades || 0 }}</p>
-            <p class="text-sm opacity-70">
-              {{ portfolioData?.winningTrades || 0 }}W / {{ portfolioData?.losingTrades || 0 }}L
-            </p>
-          </div>
+    <div class="card bg-base-100 rounded-box">
+      <div class="card-body">
+        <h3 class="card-title">{{ $t('app.wallet.quick_actions') }}</h3>
+        <div class="space-y-2">
+          <button class="btn btn-primary btn-block" @click="showDepositModal = true">
+            <svg data-src="https://unpkg.com/heroicons/20/solid/plus.svg" class="h-5 w-5"></svg>
+            {{ $t('app.wallet.deposit_funds') }}
+          </button>
+          <button class="btn btn-outline btn-block" @click="showWithdrawModal = true">
+            <svg data-src="https://unpkg.com/heroicons/20/solid/minus.svg" class="h-5 w-5"></svg>
+            {{ $t('app.wallet.withdraw_funds') }}
+          </button>
+          <button class="btn btn-secondary btn-block" @click="showSendModal = true">
+            <svg data-src="https://unpkg.com/heroicons/20/solid/paper-airplane.svg" class="h-5 w-5"></svg>
+            {{ $t('app.wallet.send_funds') }}
+          </button>
         </div>
       </div>
+    </div>
+  </div>
 
-      <!-- Recent Trades -->
-      <div class="card bg-base-100 shadow-xl">
-        <div class="card-body">
-          <h2 class="card-title">{{ $t('app.dashboard.recent_trades') }}</h2>
+  <!-- Deposit Modal -->
+  <div v-if="showDepositModal" class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">{{ $t('app.wallet.deposit_funds') }}</h3>
+      <p class="py-4">{{ $t('app.wallet.deposit_funds_desc') }}</p>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">{{ $t('app.wallet.amount_dollar') }}</span>
+        </label>
+        <input
+          v-model="depositAmount"
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="100.00"
+          class="input input-bordered"
+          @keydown.enter="handleDeposit"
+        />
+      </div>
+      <div class="modal-action">
+        <button class="btn" @click="closeModals">{{ $t('app.wallet.cancel') }}</button>
+        <button
+          class="btn btn-primary"
+          :disabled="!depositAmount || parseFloat(depositAmount) <= 0 || depositLoading"
+          @click="handleDeposit"
+        >
+          <span v-if="depositLoading" class="loading loading-spinner loading-sm"></span>
+          {{ $t('app.wallet.deposit') }}
+        </button>
+      </div>
+    </div>
+  </div>
 
-          <div class="overflow-x-auto">
-            <table class="table table-zebra w-full">
-              <thead>
-                <tr class="bg-base-200">
-                  <th>{{ $t('app.dashboard.status') }}</th>
-                  <th>{{ $t('app.dashboard.symbol') }}</th>
-                  <th>{{ $t('app.dashboard.side') }}</th>
-                  <th>{{ $t('app.dashboard.entry_price') }}</th>
-                  <th>{{ $t('app.dashboard.exit_price') }}</th>
-                  <th>{{ $t('app.dashboard.pnl_dollar') }}</th>
-                  <th>{{ $t('app.dashboard.pnl_percentage') }}</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr v-for="trade in (tradesData?.trades || [])" :key="trade.id">
-                  <td>
-                    <span :class="trade.status === 'OPEN' ? 'badge badge-warning' : 'badge badge-success'">
-                      {{ trade.status === 'OPEN' ? $t('app.dashboard.open') : $t('app.dashboard.closed') }}
-                    </span>
-                  </td>
-                  <td class="font-bold">{{ trade.symbol }}</td>
-                  <td>
-                    <span :class="trade.side === 'BUY' ? 'badge badge-success' : 'badge badge-error'">
-                      {{ trade.side === 'BUY' ? $t('app.dashboard.buy') : $t('app.dashboard.sell') }}
-                    </span>
-                  </td>
-                  <td>${{ trade.price?.toFixed(2) || '0.00' }}</td>
-                  <td>
-                    <span v-if="trade.exitPrice">${{ trade.exitPrice.toFixed(2) }}</span>
-                    <span v-else>-</span>
-                  </td>
-                  <td>
-                    <span v-if="trade.status === 'CLOSED'" :class="trade.pnl >= 0 ? 'text-success' : 'text-error'">
-                      {{ trade.pnl >= 0 ? '+' : '' }}{{ trade.pnl.toFixed(2) }}
-                    </span>
-                    <span v-else-if="trade.status === 'OPEN'">
-                      <span :class="calculateUnrealizedPnL(trade).dollar >= 0 ? 'text-success' : 'text-error'">
-                        {{ calculateUnrealizedPnL(trade).dollar >= 0 ? '+' : '' }}{{ calculateUnrealizedPnL(trade).dollar.toFixed(2) }}
-                      </span>
-                    </span>
-                    <span v-else>-</span>
-                  </td>
-                  <td>
-                    <span v-if="trade.status === 'CLOSED'" :class="trade.pnlPercentage >= 0 ? 'text-success' : 'text-error'">
-                      {{ trade.pnlPercentage >= 0 ? '+' : '' }}{{ trade.pnlPercentage.toFixed(2) }}%
-                    </span>
-                    <span v-else-if="trade.status === 'OPEN'">
-                      <span :class="calculateUnrealizedPnL(trade).percentage >= 0 ? 'text-success' : 'text-error'">
-                        {{ calculateUnrealizedPnL(trade).percentage >= 0 ? '+' : '' }}{{ calculateUnrealizedPnL(trade).percentage.toFixed(2) }}%
-                      </span>
-                    </span>
-                    <span v-else>-</span>
-                  </td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
+  <!-- Withdraw Modal -->
+  <div v-if="showWithdrawModal" class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">{{ $t('app.wallet.withdraw_funds') }}</h3>
+      <p class="py-4">{{ $t('app.wallet.withdraw_funds_desc') }} ${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">{{ $t('app.wallet.amount_dollar') }}</span>
+        </label>
+        <input
+          v-model="withdrawAmount"
+          type="number"
+          step="0.01"
+          min="0"
+          :max="walletData?.balanceLeft ?? 0"
+          placeholder="50.00"
+          class="input input-bordered"
+          @keydown.enter="handleWithdraw"
+        />
+      </div>
+      <div class="modal-action">
+        <button class="btn" @click="closeModals">{{ $t('app.wallet.cancel') }}</button>
+        <button
+          class="btn btn-outline"
+          :disabled="!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > (walletData?.balanceLeft ?? 0) || withdrawLoading"
+          @click="handleWithdraw"
+        >
+          <span v-if="withdrawLoading" class="loading loading-spinner loading-sm"></span>
+          {{ $t('app.wallet.withdraw') }}
+        </button>
+      </div>
+    </div>
+  </div>
 
-          <!-- Pagination -->
-          <div v-if="totalTrades > pageSize" class="flex justify-center mt-6">
-            <div class="join">
-              <button
-                class="join-item btn btn-primary"
-                :disabled="currentPage <= 1"
-                @click="prevPage"
-              >
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
-                </svg>
-                {{ $t('app.dashboard.previous') }}
-              </button>
-
-              <button class="join-item btn btn-outline btn-active px-6">
-                {{ $t('app.dashboard.page') }} {{ currentPage }} {{ $t('app.dashboard.of') }} {{ Math.ceil(totalTrades / pageSize) }}
-              </button>
-
-              <button
-                class="join-item btn btn-primary"
-                :disabled="currentPage >= Math.ceil(totalTrades / pageSize)"
-                @click="nextPage"
-              >
-                {{ $t('app.dashboard.next') }}
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
-                </svg>
-              </button>
-            </div>
-          </div>
-
-          <div v-if="!(tradesData?.trades || []).length" class="text-center py-8 opacity-60">
-            <p>{{ $t('app.dashboard.no_trades_yet') }}</p>
-          </div>
-        </div>
+  <!-- Send Modal -->
+  <div v-if="showSendModal" class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">{{ $t('app.wallet.send_funds') }}</h3>
+      <p class="py-4">{{ $t('app.wallet.send_funds_desc') }} ${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">{{ $t('app.wallet.recipient_email') }}</span>
+        </label>
+        <input
+          v-model="sendRecipient"
+          type="email"
+          placeholder="user@example.com"
+          class="input input-bordered"
+        />
+      </div>
+      <div class="form-control mt-4">
+        <label class="label">
+          <span class="label-text">{{ $t('app.wallet.amount_dollar') }}</span>
+        </label>
+        <input
+          v-model="sendAmount"
+          type="number"
+          step="0.01"
+          min="0"
+          :max="walletData?.balanceLeft ?? 0"
+          placeholder="25.00"
+          class="input input-bordered"
+          @keydown.enter="handleSend"
+        />
+      </div>
+      <div class="modal-action">
+        <button class="btn" @click="closeModals">{{ $t('app.wallet.cancel') }}</button>
+        <button
+          class="btn btn-secondary"
+          :disabled="!sendAmount || !sendRecipient || parseFloat(sendAmount) <= 0 || parseFloat(sendAmount) > (walletData?.balanceLeft ?? 0) || sendLoading"
+          @click="handleSend"
+        >
+          <span v-if="sendLoading" class="loading loading-spinner loading-sm"></span>
+          {{ $t('app.wallet.send') }}
+        </button>
       </div>
     </div>
   </div>

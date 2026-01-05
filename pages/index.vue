@@ -83,14 +83,14 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
 
         </div>
 
-        <div class="relative">
+        <!-- <div class="relative">
           <div class="mockup-window border border-base-300 rounded-3xl overflow-hidden shadow-2xl bg-base-100">
             <WalletPreview/>
           </div>
           <div class="absolute -right-6 -bottom-6 hidden md:block">
             <div class="badge badge-outline">Preview</div>
           </div>
-        </div>
+        </div> -->
       </div>
 
       <!-- Stats -->
