@@ -16,7 +16,16 @@ interface InviteCode {
   }
 }
 
+interface CommissionSummary {
+  total_earned: number
+  invited_users_count: number
+  last_commission_date?: string
+  monthly_earned: number
+  pending_payments: number
+}
+
 const inviteCodes = ref<InviteCode[]>([])
+const commissionSummary = ref<CommissionSummary | null>(null)
 const loading = ref(false)
 const copiedCode = ref('')
 const showShareModal = ref(false)
@@ -29,6 +38,16 @@ const loadInviteCodes = async () => {
     inviteCodes.value = response.inviteCodes
   } catch (error) {
     console.error('Failed to load invite codes:', error)
+  }
+}
+
+const loadCommissionSummary = async () => {
+  try {
+    const response = await $fetch('/api/commissions/summary') as any
+    commissionSummary.value = response.summary
+  } catch (error) {
+    console.error('Failed to load commission summary:', error)
+    // Don't fail if commission data isn't available yet
   }
 }
 
@@ -101,8 +120,11 @@ const formatDate = (dateString: string) => {
   return new Date(dateString).toLocaleDateString()
 }
 
-onMounted(() => {
-  loadInviteCodes()
+onMounted(async () => {
+  await Promise.all([
+    loadInviteCodes(),
+    loadCommissionSummary()
+  ])
 })
 </script>
 
@@ -120,7 +142,7 @@ onMounted(() => {
   </section>
 
   <!-- Stats Row -->
-  <div class="col-span-12 grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
+  <div class="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
     <div class="card bg-base-100 shadow-lg">
       <div class="card-body">
         <div class="flex items-center gap-3">
@@ -164,6 +186,22 @@ onMounted(() => {
           <div>
             <div class="text-2xl font-bold">{{ inviteCodes.filter(c => c.used_by).length }}</div>
             <div class="text-sm text-base-content/70">Codes Used</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100 shadow-lg">
+      <div class="card-body">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-warning/10 rounded-full">
+            <svg class="w-6 h-6 text-warning" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="text-2xl font-bold">${{ commissionSummary?.total_earned?.toFixed(2) || '0.00' }}</div>
+            <div class="text-sm text-base-content/70">Total Commissions</div>
           </div>
         </div>
       </div>
