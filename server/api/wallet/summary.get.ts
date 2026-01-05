@@ -51,36 +51,12 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Calculate total vault shares
-  let totalVaultShares = 0
-  for (const tx of allTransactions || []) {
-    if (tx.type === 'DEPOSIT') {
-      totalVaultShares += Number(tx.shares)
-    } else if (tx.type === 'WITHDRAWAL') {
-      totalVaultShares -= Number(tx.shares)
-    }
-  }
+  console.log('Calculated: totalDeposited =', totalDeposited, 'currentUserShares =', currentUserShares)
 
-  console.log('Calculated: totalDeposited =', totalDeposited, 'currentUserShares =', currentUserShares, 'totalVaultShares =', totalVaultShares)
-
-  // Get current vault state
-  const { data: vaultState, error: vaultError } = await (supabase as any)
-    .from('vault_state')
-    .select('total_assets, total_shares')
-    .single()
-
-  if (vaultError) {
-    console.error('Error fetching vault state:', vaultError)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to fetch vault state'
-    })
-  }
-
-  // Get latest portfolio snapshot
+  // Get latest portfolio snapshot for current market value (includes trading P&L)
   const { data: snapshot, error: snapError } = await (supabase as any)
     .from('portfolio_snapshots')
-    .select('currentEquity, walletBalance')
+    .select('currentEquity, walletBalance, initialBalance')
     .order('timestamp', { ascending: false })
     .limit(1)
     .single()
@@ -93,17 +69,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const totalAssets = Number((vaultState as any).total_assets)
-  const totalShares = Number((vaultState as any).total_shares)
   const currentEquity = Number((snapshot as any).currentEquity)
   const walletBalance = Number((snapshot as any).walletBalance)
+  const initialBalance = Number((snapshot as any).initialBalance)
 
-  console.log('Vault state: totalAssets =', totalAssets, 'totalShares =', totalShares)
-  console.log('Latest snapshot: currentEquity =', currentEquity, 'walletBalance =', walletBalance)
+  console.log('Portfolio snapshot: currentEquity =', currentEquity, 'initialBalance =', initialBalance)
 
-  // Calculate user's metrics
-  const userEquity = totalVaultShares > 0 ? (currentUserShares / totalVaultShares) * currentEquity : 0
-  const userBalance = totalVaultShares > 0 ? (currentUserShares / totalVaultShares) * walletBalance : 0
+  // Calculate user's proportional equity based on initial investment ratio
+  // User gets their proportional share of the current vault value
+  const userEquity = initialBalance > 0 ? (totalDeposited / initialBalance) * currentEquity : 0
+  const userBalance = initialBalance > 0 ? (totalDeposited / initialBalance) * walletBalance : 0
 
   // Calculate PnL: current equity - total deposited
   const pnl = userEquity - totalDeposited

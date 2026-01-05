@@ -6,6 +6,22 @@ definePageMeta({
 
 const currentPeriod = ref('1w')
 
+// Modal states
+const showDepositModal = ref(false)
+const showWithdrawModal = ref(false)
+const showSendModal = ref(false)
+
+// Form data
+const depositAmount = ref('')
+const withdrawAmount = ref('')
+const sendAmount = ref('')
+const sendRecipient = ref('')
+
+// Loading states
+const depositLoading = ref(false)
+const withdrawLoading = ref(false)
+const sendLoading = ref(false)
+
 const { data: walletData, pending: summaryPending, refresh: refreshSummary } = await useFetch('/api/wallet/summary')
 const { data: chartData, pending: chartPending, refresh: refreshChart } = await useFetch('/api/wallet/chart', {
   query: computed(() => ({ period: currentPeriod.value }))
@@ -37,6 +53,89 @@ const equityCategories = computed(() => ({
 const xFormatter = (tick: number): string => {
   const date = new Date(performanceData.value[tick]?.date || '')
   return date.toLocaleDateString()
+}
+
+// Modal functions
+const closeModals = () => {
+  showDepositModal.value = false
+  showWithdrawModal.value = false
+  showSendModal.value = false
+  depositAmount.value = ''
+  withdrawAmount.value = ''
+  sendAmount.value = ''
+  sendRecipient.value = ''
+}
+
+const handleDeposit = async () => {
+  if (!depositAmount.value || parseFloat(depositAmount.value) <= 0) return
+
+  depositLoading.value = true
+  try {
+    const response = await $fetch('/api/wallet/deposit', {
+      method: 'POST',
+      body: { amount: parseFloat(depositAmount.value) }
+    })
+
+    if (response.success) {
+      await refreshSummary()
+      closeModals()
+      // You could add a toast notification here
+    }
+  } catch (error: any) {
+    console.error('Deposit error:', error)
+    // You could add error handling/toast here
+  } finally {
+    depositLoading.value = false
+  }
+}
+
+const handleWithdraw = async () => {
+  if (!withdrawAmount.value || parseFloat(withdrawAmount.value) <= 0) return
+
+  withdrawLoading.value = true
+  try {
+    const response = await $fetch('/api/wallet/withdraw', {
+      method: 'POST',
+      body: { amount: parseFloat(withdrawAmount.value) }
+    })
+
+    if (response.success) {
+      await refreshSummary()
+      closeModals()
+      // You could add a toast notification here
+    }
+  } catch (error: any) {
+    console.error('Withdraw error:', error)
+    // You could add error handling/toast here
+  } finally {
+    withdrawLoading.value = false
+  }
+}
+
+const handleSend = async () => {
+  if (!sendAmount.value || !sendRecipient.value || parseFloat(sendAmount.value) <= 0) return
+
+  sendLoading.value = true
+  try {
+    const response = await $fetch('/api/wallet/send', {
+      method: 'POST',
+      body: {
+        amount: parseFloat(sendAmount.value),
+        recipientEmail: sendRecipient.value
+      }
+    })
+
+    if (response.success) {
+      await refreshSummary()
+      closeModals()
+      // You could add a toast notification here
+    }
+  } catch (error: any) {
+    console.error('Send error:', error)
+    // You could add error handling/toast here
+  } finally {
+    sendLoading.value = false
+  }
 }
 </script>
 
@@ -132,18 +231,131 @@ const xFormatter = (tick: number): string => {
       <div class="card-body">
         <h3 class="card-title">Quick Actions</h3>
         <div class="space-y-2">
-          <button class="btn btn-primary btn-block" disabled>
+          <button class="btn btn-primary btn-block" @click="showDepositModal = true">
             <svg data-src="https://unpkg.com/heroicons/20/solid/plus.svg" class="h-5 w-5"></svg>
             Deposit Funds
           </button>
-          <button class="btn btn-outline btn-block" disabled>
+          <button class="btn btn-outline btn-block" @click="showWithdrawModal = true">
             <svg data-src="https://unpkg.com/heroicons/20/solid/minus.svg" class="h-5 w-5"></svg>
             Withdraw Funds
           </button>
+          <button class="btn btn-secondary btn-block" @click="showSendModal = true">
+            <svg data-src="https://unpkg.com/heroicons/20/solid/paper-airplane.svg" class="h-5 w-5"></svg>
+            Send Funds
+          </button>
         </div>
-        <p class="text-xs opacity-70 mt-4">
-          Deposit and withdrawal features coming soon
-        </p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Deposit Modal -->
+  <div v-if="showDepositModal" class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Deposit Funds</h3>
+      <p class="py-4">Enter the amount you want to deposit as paper money.</p>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Amount ($)</span>
+        </label>
+        <input
+          v-model="depositAmount"
+          type="number"
+          step="0.01"
+          min="0"
+          placeholder="100.00"
+          class="input input-bordered"
+          @keydown.enter="handleDeposit"
+        />
+      </div>
+      <div class="modal-action">
+        <button class="btn" @click="closeModals">Cancel</button>
+        <button
+          class="btn btn-primary"
+          :disabled="!depositAmount || parseFloat(depositAmount) <= 0 || depositLoading"
+          @click="handleDeposit"
+        >
+          <span v-if="depositLoading" class="loading loading-spinner loading-sm"></span>
+          Deposit
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Withdraw Modal -->
+  <div v-if="showWithdrawModal" class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Withdraw Funds</h3>
+      <p class="py-4">Enter the amount you want to withdraw. Available balance: ${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Amount ($)</span>
+        </label>
+        <input
+          v-model="withdrawAmount"
+          type="number"
+          step="0.01"
+          min="0"
+          :max="walletData?.balanceLeft ?? 0"
+          placeholder="50.00"
+          class="input input-bordered"
+          @keydown.enter="handleWithdraw"
+        />
+      </div>
+      <div class="modal-action">
+        <button class="btn" @click="closeModals">Cancel</button>
+        <button
+          class="btn btn-outline"
+          :disabled="!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > (walletData?.balanceLeft ?? 0) || withdrawLoading"
+          @click="handleWithdraw"
+        >
+          <span v-if="withdrawLoading" class="loading loading-spinner loading-sm"></span>
+          Withdraw
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Send Modal -->
+  <div v-if="showSendModal" class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg">Send Funds</h3>
+      <p class="py-4">Send paper money to another user. Available balance: ${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Recipient Email</span>
+        </label>
+        <input
+          v-model="sendRecipient"
+          type="email"
+          placeholder="user@example.com"
+          class="input input-bordered"
+        />
+      </div>
+      <div class="form-control mt-4">
+        <label class="label">
+          <span class="label-text">Amount ($)</span>
+        </label>
+        <input
+          v-model="sendAmount"
+          type="number"
+          step="0.01"
+          min="0"
+          :max="walletData?.balanceLeft ?? 0"
+          placeholder="25.00"
+          class="input input-bordered"
+          @keydown.enter="handleSend"
+        />
+      </div>
+      <div class="modal-action">
+        <button class="btn" @click="closeModals">Cancel</button>
+        <button
+          class="btn btn-secondary"
+          :disabled="!sendAmount || !sendRecipient || parseFloat(sendAmount) <= 0 || parseFloat(sendAmount) > (walletData?.balanceLeft ?? 0) || sendLoading"
+          @click="handleSend"
+        >
+          <span v-if="sendLoading" class="loading loading-spinner loading-sm"></span>
+          Send
+        </button>
       </div>
     </div>
   </div>
