@@ -5,7 +5,6 @@ export default defineNuxtConfig({
     '@nuxtjs/tailwindcss',
     '@nuxtjs/supabase',
     '@nuxtjs/i18n',
-    '@pinia/nuxt',
     ...(process.env.NODE_ENV !== 'test' ? ['@nuxtjs/color-mode'] : []),
     '@nuxt/test-utils/module',
     'nuxt-charts',
@@ -18,8 +17,8 @@ export default defineNuxtConfig({
   },
   supabase: {
     redirect: false,
-    url: process.env.SUPABASE_URL || 'https://example.supabase.co',
-    key: process.env.SUPABASE_KEY || 'test-key',
+    url: process.env.SUPABASE_URL,
+    key: process.env.SUPABASE_KEY,
   },
   i18n: {
     locales: [
@@ -54,9 +53,9 @@ export default defineNuxtConfig({
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
-      name: 'Boilerplate App',
-      short_name: 'Boilerplate',
-      description: 'A Nuxt 4 web application',
+      name: 'Zillions App',
+      short_name: 'Crypto Trading Bot App',
+      description: 'Zillions is an on‑chain, autonomous "meta‑trading" app designed to help more people participate in markets - without needing to be a pro.',
       theme_color: '#4A90E2',
       icons: [
         {

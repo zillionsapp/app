@@ -1,5 +1,5 @@
 {
-  "name": "boilerplate",
+  "name": "zillions",
   "type": "module",
   "private": true,
   "scripts": {
@@ -15,7 +15,6 @@
     "animejs": "^3.2.2",
     "nuxt": "^4.2.2",
     "nuxt-charts": "^2.0.0",
-    "pinia": "^3.0.4",
     "vue": "^3.5.26",
     "vue-router": "^4.6.4"
   },
@@ -25,7 +24,6 @@
     "@nuxtjs/i18n": "^10.2.1",
     "@nuxtjs/supabase": "^2.0.3",
     "@nuxtjs/tailwindcss": "^6.14.0",
-    "@pinia/nuxt": "^0.11.3",
     "@types/animejs": "^3.1.13",
     "@vue/test-utils": "^2.4.6",
     "daisyui": "^5.5.14",
