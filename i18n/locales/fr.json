@@ -1,0 +1,198 @@
+{
+  "nav": {
+    "features": "Fonctionnalités",
+    "how": "Comment ça marche",
+    "tech": "Technologie",
+    "faq": "FAQ",
+    "waitlist": "Rejoindre la liste d'attente",
+    "signUp": "S'inscrire",
+    "signIn": "Se connecter"
+  },
+  "hero": {
+    "badge": "Le chemin silencieux vers la richesse",
+    "title": "Devenez un",
+    "titleHighlight": "Zillionaire",
+    "description": "Un bot de trading autonome exclusif sur chaîne qui vous aide à participer aux marchés sans avoir besoin d'être un professionnel du trading.",
+    "cta": "Rejoindre la liste d'attente",
+    "secondary": "Voir comment ça marche"
+  },
+  "stats": {
+    "noExpertise": "Aucune expertise requise",
+    "noExpertiseValue": "Pour tout le monde",
+    "onChain": "Sur chaîne",
+    "onChainValue": "Transparent",
+    "adaptive": "Concept",
+    "adaptiveValue": "Smart Money",
+    "handsFree": "Mains libres",
+    "handsFreeValue": "Pilote automatique"
+  },
+  "features": {
+    "title": "Pourquoi Zillions est différent",
+    "subtitle": "Un bot de trading autonome exclusif sur chaîne qui vous aide à participer aux marchés sans avoir besoin d'être un professionnel du trading.",
+    "metaTrading": {
+      "badge": "Smart Money",
+      "title": "Algorithme unique Smart Money",
+      "description": "Contrairement aux algos de trading typiques utilisant des indicateurs standards, notre stratégie exclusive est basée sur des concepts Smart Money avec Orderblocks HTF, Fair Value Gaps et Liquidity Zones."
+    },
+    "onChainTransparent": {
+      "badge": "Sur chaîne",
+      "title": "Complètement sur chaîne et transparent",
+      "description": "Tout est sur chaîne : exécution, historique, performance de vault. Voyez non seulement votre wallet, mais la performance complète du système avec transparence totale."
+    },
+    "handsFreeSimplicity": {
+      "badge": "Comme wallet",
+      "title": "Se sent comme une wallet",
+      "description": "Connectez-vous, voyez les fonds, déposez, retirez, recevez ou envoyez des fonds. Pas de configurations avancées nécessaires - sélectionnez simplement l'appétit de risque et laissez le bot trader."
+    },
+    "riskAware": {
+      "badge": "Gestion du risque",
+      "title": "Gestion appropriée du risque",
+      "description": "Dimensionnement avancé de positions et protection du capital. Le bot définit des Trailing Stop Loss et Take Profits professionnels."
+    }
+  },
+  "howItWorks": {
+    "title": "Trois étapes, zéro devinette",
+    "step1": {
+      "badge": "1",
+      "title": "Connecter le wallet",
+      "description": "Non custodial par conception. Vous gardez le contrôle."
+    },
+    "step2": {
+      "badge": "2",
+      "title": "Financer le vault",
+      "description": "Allouer du capital à un vault Zillions. Frais transparents, exécution sur chaîne."
+    },
+    "step3": {
+      "badge": "3",
+      "title": "Algorithme Smart Money opère automatiquement",
+      "description": "Le moteur identifie les Orderblocks HTF, Fair Value Gaps et Liquidity Zones pour trouver des entrées parfaites."
+    },
+    "cta": "Obtenir un accès anticipé"
+  },
+  "technology": {
+    "title": "À l'intérieur du moteur Smart Money",
+    "subtitle": "Contrairement aux algorithmes de trading typiques utilisant des indicateurs standards, notre stratégie exclusive est basée sur des concepts Smart Money pour identifier les patterns de trading institutionnel et trouver des entrées parfaites.",
+    "trend": {
+      "badge": "Tendance",
+      "title": "Détection d'Orderblocks HTF",
+      "description": "Identifie les Orderblocks de High Timeframe où les traders institutionnels ont placé de gros ordres, créant des zones significatives de support et résistance.",
+      "benefits": {
+        "1": "Scanne plusieurs timeframes pour des clusters d'ordres institutionnels (1h, 4h, 1d, 1w)",
+        "2": "Détecte les orderblocks formés par les gros participants du marché",
+        "3": "Identifie les zones où le smart money a accumulé des positions",
+        "4": "Fournit des zones de renversement hautement probables basées sur l'activité institutionnelle",
+        "5": "Filtre le bruit retail pour se concentrer sur les patterns de trading professionnel"
+      },
+      "alert": "Les orderblocks représentent des zones où de gros traders institutionnels ont placé des ordres significatifs, créant des niveaux puissants de support/résistance qui impulsent la direction du marché."
+    },
+    "signals": {
+      "badge": "Signaux",
+      "title": "Fair Value Gaps",
+      "description": "Détecte les Fair Value Gaps créés pendant des périodes de haute volatilité où les gaps de prix du orderflow institutionnel créent des zones magnétiques futures.",
+      "benefits": {
+        "1": "Identifie les gaps de prix créés par de gros ordres institutionnels",
+        "2": "Suit les zones où le prix doit revenir pour l'équilibre",
+        "3": "Fournit des points d'entrée hautement probables quand le prix revisite les gaps",
+        "4": "Combine avec l'analyse orderflow pour confirmation",
+        "5": "Crée des zones magnétiques qui attirent le mouvement de prix"
+      },
+      "alert": "Les Fair Value Gaps surviennent quand le prix bouge rapidement à cause de gros ordres, créant des déséquilibres que le prix doit éventuellement corriger, fournissant des opportunités d'entrée prévisibles."
+    },
+    "confirm": {
+      "badge": "Confirmer",
+      "title": "Liquidity Zones",
+      "description": "Cartographie les zones de liquidité où les stops losses et ordres limit cluster, permettant à l'algorithme d'anticiper les hunts de stop institutionnels.",
+      "benefits": {
+        "1": "Identifie les zones où les traders retail placent des stops losses",
+        "2": "Cartographie les sweeps de liquidité institutionnelle et hunts de stop",
+        "3": "Fournit un timing d'entrée optimal autour des zones de liquidité",
+        "4": "Évite d'entrer dans des trades pendant les sweeps de liquidité à haut risque",
+        "5": "Maximise le potentiel de profit en comprenant les tactiques des market makers"
+      },
+      "alert": "Les zones de liquidité représentent des zones où les market makers peuvent déclencher des stops losses et créer de la liquidité pour leurs gros ordres, créant des mouvements de prix prévisibles."
+    },
+    "risk": {
+      "badge": "Risque",
+      "title": "Confirmations LTF",
+      "description": "Utilise des confirmations de Lower Timeframe pour trouver un timing d'entrée parfait après que les setups HTF soient identifiés, assurant des ratios optimaux de risk-reward.",
+      "benefits": {
+        "1": "Attend la confirmation de timeframe inférieur après les setups HTF",
+        "2": "Fournit un timing précis d'entrée avec slippage minimal",
+        "3": "Assure que les trades s'alignent avec la structure macro et micro du marché",
+        "4": "Réduit les signaux faux à travers la validation multi-timeframe",
+        "5": "Optimise les points d'entrée pour le potentiel de profit maximal"
+      },
+      "alert": "Les confirmations LTF assurent que nous entrons dans des trades aux niveaux de prix les plus optimaux, combinant la puissance de l'analyse HTF avec un timing précis LTF."
+    },
+    "size": {
+      "badge": "Taille",
+      "title": "Dimensionnement intelligent de position",
+      "description": "Implémente un dimensionnement intelligent de position basé sur l'appétit de risque, la volatilité du marché et la qualité du setup pour protéger le capital tout en maximisant les retours.",
+      "benefits": {
+        "1": "Ajuste la taille de position basée sur l'appétit de risque sélectionné",
+        "2": "Met à l'échelle l'exposition selon les conditions de volatilité du marché",
+        "3": "Augmente la taille sur des setups de qualité supérieure, réduit sur des setups plus faibles",
+        "4": "Implémente une protection maximale de drawdown à travers le portefeuille",
+        "5": "Soutient la croissance de compounding tout en maintenant le contrôle de risque"
+      },
+      "alert": "Le dimensionnement intelligent de position assure une allocation optimale de capital, ajustant l'exposition basée sur les conditions de marché et la qualité du setup pour maximiser les retours tout en protégeant votre investissement."
+    }
+  },
+  "comparison": {
+    "title": "Construit pour les nombreux - pas seulement pour les professionnels",
+    "legacy": {
+      "badge": "Legacy",
+      "title": "App de trading typique",
+      "items": [
+        "S'attend à ce que vous sélectionniez et ajustiez des stratégies.",
+        "Logique opaque, exécution off‑chain.",
+        "Difficile à intégrer ; facile de faire des erreurs.",
+        "Trading manuel est dur - vous ne pouvez pas surpasser les maîtres et algorithmes."
+      ]
+    },
+    "modern": {
+      "badge": "Moderne",
+      "title": "Zillions",
+      "items": [
+        "Moteur de trading méta s'aligne avec le régime dominant.",
+        "Vaults sur‑chaîne, transparents ; simple par défaut.",
+        "Conçu pour tout le monde. Vous n'avez pas besoin d'être un pro.",
+        "Algorithme de trading institutionnel."
+      ]
+    }
+  },
+  "waitlist": {
+    "title": "Soyez parmi les premiers à trader plus intelligemment",
+    "subtitle": "Rejoignez la liste d'attente Zillions et débloquez l'accès anticipé au meta-trader sur chaîne. Simple, adaptatif, transparent.",
+    "cta": "Rejoindre la liste d'attente",
+    "joining": "Rejoindre…",
+    "consent": "J'accepte de recevoir des emails sur Zillions et comprends que ce n'est pas un conseil financier.",
+    "finePrint": "En rejoignant vous acceptez nos Termes et Confidentialité. Se désabonner à tout moment.",
+    "terms": "Termes",
+    "privacy": "Confidentialité",
+    "success": "Vous êtes sur la liste ! Nous vous contacterons bientôt.",
+    "errorEmail": "Veuillez saisir une adresse email valide.",
+    "errorConsent": "Veuillez accepter de recevoir des emails pour que nous puissions vous contacter.",
+    "errorSubmit": "Quelque chose s'est mal passé. Veuillez réessayer plus tard."
+  },
+  "faq": {
+    "title": "FAQ",
+    "subtitle": "Questions communes sur Zillions",
+    "q1": "Ai-je besoin d'expérience en trading ?",
+    "a1": "Non. Zillions est construit pour que n'importe qui puisse participer. Le moteur s'adapte aux marchés pour vous.",
+    "q2": "Est-ce custodial ?",
+    "a2": "Non - c'est sur chaîne et non custodial. Vous pouvez suivre l'exécution et l'historique de manière transparente.",
+    "q3": "Les retours sont-ils garantis ?",
+    "a3": "Non. Les marchés impliquent un risque. Le système vise à faire croître le capital en s'alignant avec les régimes dominants, mais des pertes sont possibles.",
+    "q4": "Qu'est-ce que le Concept Smart Money ?",
+    "a4": "Le Concept Smart Money (SMC) ou méthodologie Inner Circle Trader (ICT) analyse les patterns de trading institutionnel. Il identifie les zones où de gros traders institutionnels placent des ordres, incluant les Orderblocks HTF (zones de support/résistance), Fair Value Gaps (déséquilibres de prix) et Liquidity Zones (où les stops retail cluster). Notre algorithme utilise ces concepts pour trouver des points d'entrée optimaux qui s'alignent avec le comportement de trading professionnel.",
+    "q5": "Comment obtenir l'accès ?",
+    "a5": "Sur invitation seulement. Vous devez être invité par quelqu'un que vous connaissez."
+  },
+  "footer": {
+    "description": "Zillions est une app \"méta‑trading\" autonome sur chaîne conçue pour aider plus de personnes à participer aux marchés - sans avoir besoin d'être un pro.",
+    "copyright": "© {year} Zillions. Tous droits réservés.",
+    "disclosures": "Divulgations",
+    "disclaimer": "Le trading implique un risque, incluant une possible perte de capital. La performance passée ne garantit pas les résultats futurs. Disponibilité soumise à juridiction et screening de conformité."
+  }
+}

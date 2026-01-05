@@ -9,7 +9,7 @@
     "signIn": "Sign In"
   },
   "hero": {
-    "badge": "Invite Only",
+    "badge": "The silent path to wealth",
     "title": "Become a",
     "titleHighlight": "Zillionaire",
     "description": "An exlusive on‑chain, autonomous trading bot designed to help you participate in markets without needing to be a trading pro.",
@@ -21,33 +21,33 @@
     "noExpertiseValue": "For everyone",
     "onChain": "On‑chain",
     "onChainValue": "Transparent",
-    "adaptive": "Adaptive",
-    "adaptiveValue": "Regime‑aware",
+    "adaptive": "Concept",
+    "adaptiveValue": "Smart Money",
     "handsFree": "Hands‑off",
     "handsFreeValue": "Auto‑pilot"
   },
   "features": {
     "title": "Why Zillions is different",
-    "subtitle": "Not another \"trading bot\" app. Zillions detects market strategies in real-time - and adapts.",
+    "subtitle": "An exclusive on-chain, autonomous trading bot designed to help you participate in markets without needing to be a trading pro.",
     "metaTrading": {
-      "badge": "Core",
-      "title": "Meta‑trading engine",
-      "description": "Aligns with the currently dominant strategy regime instead of running blind or fixed logic."
+      "badge": "Smart Money",
+      "title": "Unique Smart Money Algorithm",
+      "description": "Unlike typical trading algos using standard indicators, our exclusive strategy is based on Smart Money Concepts with HTF Orderblocks, Fair Value Gaps, and Liquidity Zones."
     },
     "onChainTransparent": {
-      "badge": "Security",
-      "title": "On‑chain & transparent",
-      "description": "Execution, history, and parameters live on chain for auditability. No black box custody."
+      "badge": "On-Chain",
+      "title": "Fully On-Chain & Transparent",
+      "description": "Everything is on-chain: execution, history, vault performance. See not just your wallet, but the entire system performance with full transparency."
     },
     "handsFreeSimplicity": {
-      "badge": "UX",
-      "title": "Hands‑off simplicity",
-      "description": "No knobs, no charts to study. Fund a vault and let the algorithm adapt 24/7."
+      "badge": "Wallet-Like",
+      "title": "Feels Like a Wallet",
+      "description": "Login, see funds, deposit, withdraw, receive or send funds. No advanced settings needed - just select risk appetite and let the bot trade."
     },
     "riskAware": {
-      "badge": "Safety",
-      "title": "Risk‑aware",
-      "description": "Position sizing & regime‑specific risk controls aim to protect during adverse phases."
+      "badge": "Risk Management",
+      "title": "Proper Risk Management",
+      "description": "Advanced position sizing and capital protection. The bot sets professional Trailing Stop Loss & Take Profits."
     }
   },
   "howItWorks": {
@@ -64,73 +64,78 @@
     },
     "step3": {
       "badge": "3",
-      "title": "AI adapts in real time",
-      "description": "The engine follows the dominant regime - momentum, mean‑reversion, liquidity hunts and more."
+      "title": "Smart Money algorithm trades automatically",
+      "description": "The engine identifies HTF Orderblocks, Fair Value Gaps, and Liquidity Zones to find perfect entries."
     },
     "cta": "Get early access"
   },
   "technology": {
-    "title": "Inside the engine",
-    "subtitle": "Our trading system analyzes market trends, signals, and risk to find the best opportunities. It adapts to changing conditions automatically.",
+    "title": "Inside the Smart Money Engine",
+    "subtitle": "Unlike typical trading algorithms using standard indicators, our exclusive strategy is based on Smart Money Concepts to identify institutional trading patterns and find perfect entries.",
     "trend": {
-      "title": "Multi-Timeframe Trend Analysis",
-      "description": "Uses ROC (Rate of Change) and EMA indicators to identify the overall trend direction and strength across different timeframes.",
+      "badge": "Setup",
+      "title": "HTF Orderblocks Detection",
+      "description": "Identifies High Timeframe Orderblocks where institutional traders have placed large orders, creating significant support and resistance zones.",
       "benefits": {
-        "1": "Analyzes trends across multiple timeframes simultaneously (1m, 5m, 15m, 1h, 4h, 1d)",
-        "2": "Uses Rate of Change (ROC) to measure momentum strength and direction",
-        "3": "Exponential Moving Averages (EMA) identify primary trend direction",
-        "4": "Filters out market noise while preserving significant trend movements",
-        "5": "Provides trend strength scoring from 0-100 for position confidence"
+        "1": "Scans multiple timeframes for institutional order clusters (1h, 4h, 1d, 1w)",
+        "2": "Detects orderblocks formed by large market participants",
+        "3": "Identifies areas where smart money has accumulated positions",
+        "4": "Provides high-probability reversal zones based on institutional activity",
+        "5": "Filters out retail noise to focus on professional trading patterns"
       },
-      "alert": "Our trend analysis engine examines price movements across multiple timeframes to identify the dominant market direction, filtering out short-term noise while capturing significant trend changes."
+      "alert": "Orderblocks represent areas where large institutional traders have placed significant orders, creating powerful support/resistance levels that drive market direction."
     },
     "signals": {
-      "title": "OBOS Signals",
-      "description": "Detects overbought/oversold conditions using RSI and pivot points to find potential entry opportunities when momentum diverges from price.",
+      "badge": "Setup",
+      "title": "Fair Value Gaps",
+      "description": "Detects Fair Value Gaps created during high volatility periods where price gaps from institutional order flow create future magnet areas.",
       "benefits": {
-        "1": "RSI divergence detection identifies momentum shifts before price confirms",
-        "2": "Pivot point analysis finds key support/resistance levels automatically",
-        "3": "Overbought (>70 RSI) and oversold (<30 RSI) condition monitoring",
-        "4": "Volume-price divergence analysis for signal confirmation",
-        "5": "Multi-indicator convergence increases signal reliability to 78%"
+        "1": "Identifies price gaps created by large institutional orders",
+        "2": "Tracks areas where price needs to return for balance",
+        "3": "Provides high-probability entry points when price revisits gaps",
+        "4": "Combines with orderflow analysis for confirmation",
+        "5": "Creates magnetic zones that attract price movement"
       },
-      "alert": "Advanced signal detection combines RSI, pivot points, and volume analysis to identify high-probability entry points when momentum diverges from price direction."
+      "alert": "Fair Value Gaps occur when price moves rapidly due to large orders, creating imbalances that price must eventually correct, providing predictable entry opportunities."
     },
     "confirm": {
-      "title": "HTF Confirmation",
-      "description": "Requires higher timeframe alignment before entering trades, reducing false signals and improving accuracy.",
+      "badge": "Target",
+      "title": "Liquidity Zones",
+      "description": "Maps out liquidity zones where stop losses and limit orders cluster, allowing the algorithm to anticipate institutional stop hunts.",
       "benefits": {
-        "1": "Requires 4-hour and daily timeframe alignment before execution",
-        "2": "Reduces false signal rate by 65% compared to single timeframe",
-        "3": "Eliminates trades against the broader market trend",
-        "4": "Provides confidence scoring based on timeframe alignment",
-        "5": "Prevents entries during uncertain or choppy market conditions"
+        "1": "Identifies areas where retail traders place stop losses",
+        "2": "Maps institutional liquidity sweeps and stop hunts",
+        "3": "Provides optimal entry timing around liquidity zones",
+        "4": "Avoids entering trades during high-risk liquidity sweeps",
+        "5": "Maximizes profit potential by understanding market maker tactics"
       },
-      "alert": "Higher timeframe confirmation ensures trades align with the broader market structure, dramatically reducing false signals and improving overall accuracy."
+      "alert": "Liquidity zones represent areas where market makers can trigger stop losses and create liquidity for their large orders, creating predictable price movements."
     },
     "risk": {
-      "title": "Risk Management",
-      "description": "Implements trailing stops and take-profit levels to lock in gains while protecting against downside risk.",
+      "badge": "Entry",
+      "title": "LTF Confirmations",
+      "description": "Uses Lower Timeframe confirmations to find perfect entry timing after HTF setups are identified, ensuring optimal risk-reward ratios.",
       "benefits": {
-        "1": "Dynamic trailing stops adjust based on market volatility (ATR-based)",
-        "2": "Take-profit levels set at 2:1 reward-to-risk minimum ratios",
-        "3": "Position sizing adjusts based on win rate and volatility",
-        "4": "Maximum drawdown protection with circuit breakers",
-        "5": "Risk-adjusted position sizing prevents overexposure"
+        "1": "Waits for lower timeframe confirmation after HTF setups",
+        "2": "Provides precise entry timing with minimal slippage",
+        "3": "Ensures trades align with both macro and micro market structure",
+        "4": "Reduces false signals through multi-timeframe validation",
+        "5": "Optimizes entry points for maximum profit potential"
       },
-      "alert": "Sophisticated risk management system uses trailing stops, take-profit optimization, and dynamic position sizing to protect capital while maximizing returns."
+      "alert": "LTF confirmations ensure we enter trades at the most optimal price levels, combining the power of higher timeframe analysis with precise lower timeframe timing."
     },
     "size": {
-      "title": "Position Sizing",
-      "description": "Uses percentage-based position sizing to maintain consistent risk exposure across different trade sizes.",
+      "badge": "Risk",
+      "title": "Smart Position Sizing",
+      "description": "Implements intelligent position sizing based on risk appetite, market volatility, and setup quality to protect capital while maximizing returns.",
       "benefits": {
-        "1": "Percentage-based sizing maintains consistent risk exposure",
-        "2": "Volatility-adjusted sizing reduces exposure in turbulent markets",
-        "3": "Win rate optimization adjusts size based on recent performance",
-        "4": "Portfolio heat management prevents over-concentration",
-        "5": "Compounding-friendly sizing supports long-term growth"
+        "1": "Adjusts position size based on selected risk appetite",
+        "2": "Scales exposure according to market volatility conditions",
+        "3": "Increases size on higher-quality setups, reduces on weaker ones",
+        "4": "Implements maximum drawdown protection across the portfolio",
+        "5": "Supports compounding growth while maintaining risk control"
       },
-      "alert": "Position sizing algorithm ensures optimal capital allocation across different market conditions and strategy performance levels."
+      "alert": "Smart position sizing ensures optimal capital allocation, adjusting exposure based on market conditions and setup quality to maximize returns while protecting your investment."
     }
   },
   "comparison": {
@@ -152,7 +157,7 @@
         "Meta‑trading engine aligns with the dominant regime.",
         "On‑chain, transparent vaults; simple by default.",
         "Designed for everyone. No need to be a pro.",
-        "AI & Scoring algo detects which stratagies works the best."
+        "Institutional trading like algorithm."
       ]
     }
   },
@@ -179,36 +184,10 @@
     "a2": "No - it's on‑chain and non‑custodial. You can track execution and history transparently.",
     "q3": "Are returns guaranteed?",
     "a3": "No. Markets involve risk. The system aims to grow capital by aligning to dominant regimes, but losses are possible.",
-    "q4": "What chains and assets will you support?",
-    "a4": "We'll announce supported chains and assets to waitlisters first.",
-    "q5": "What is Zillions?",
-    "a5": "Zillions is an AI-powered, on-chain crypto trading platform that uses a meta-trading engine to adapt to market conditions automatically. It helps everyday people participate in markets without needing trading expertise.",
-    "q6": "How does Zillions differ from other trading bots?",
-    "a6": "Unlike traditional bots with fixed strategies, Zillions uses a meta-trading engine that detects and adapts to the currently dominant market regime (momentum, mean-reversion, etc.) in real-time. It's on-chain, transparent, and designed for simplicity.",
-    "q7": "How does the AI/meta-trading engine work?",
-    "a7": "The engine analyzes multi-timeframe trends, signals, and confirmations using indicators like ROC, EMA, RSI, and pivot points. It automatically switches strategies based on market conditions, manages risk with trailing stops and position sizing, and executes trades on-chain.",
-    "q8": "What risk management features does Zillions have?",
-    "a8": "Zillions implements dynamic trailing stops, take-profit levels at 2:1 reward-to-risk ratios, volatility-adjusted position sizing, maximum drawdown protection, and regime-specific risk controls to protect capital during adverse market phases.",
-    "q9": "What are the fees?",
-    "a9": "Zillions charges transparent, on-chain fees for vault funding and trading execution. Specific fee structures will be announced to waitlisters, but we aim for competitive rates compared to traditional trading platforms.",
-    "q10": "What performance can I expect?",
-    "a10": "Performance varies with market conditions. The system aims to grow capital by aligning with dominant regimes, but crypto markets are volatile. Historical backtesting shows potential for consistent returns, but past performance doesn't guarantee future results.",
-    "q11": "How do I deposit funds?",
-    "a11": "Connect your non-custodial wallet, select a vault, and fund it with supported assets. Deposits are processed on-chain with full transparency and control remaining in your wallet.",
-    "q12": "How do I withdraw funds?",
-    "a12": "Withdrawals can be initiated from your wallet dashboard. Funds are returned to your connected wallet on-chain, maintaining non-custodial control throughout the process.",
-    "q13": "How do I select trading strategies?",
-    "a13": "You don't need to select strategies manually. The meta-trading engine automatically detects and adapts to the best-performing regime. You can view strategy performance and backtest results in your dashboard.",
-    "q14": "What is backtesting?",
-    "a14": "Backtesting allows you to simulate strategies on historical data to analyze performance, risk metrics, and potential returns before live trading. Zillions provides tools to improve and optimize strategies based on backtest results.",
-    "q15": "Is my money safe?",
-    "a15": "Zillions is non-custodial - you maintain control of your funds at all times. All execution, history, and parameters are on-chain for full auditability. We implement multiple security measures, but crypto investments carry inherent risks.",
-    "q16": "How do I get started?",
-    "a16": "Join the waitlist for early access. Once available, connect your wallet, complete verification, fund a vault with supported assets, and let the AI engine handle the trading automatically.",
-    "q17": "Is Zillions available now?",
-    "a17": "Zillions is currently in development. Join the waitlist to be among the first to access the platform when it launches. We'll provide updates and early access to waitlisters.",
-    "q18": "What if I have more questions?",
-    "a18": "Check our documentation or contact our support team. We're here to help you understand how Zillions can work for you."
+    "q4": "What is Smart Money Concept?",
+    "a4": "Smart Money Concept (SMC) or Inner Circle Trader (ICT) methodology analyzes institutional trading patterns. It identifies areas where large institutional traders place orders, including HTF Orderblocks (support/resistance zones), Fair Value Gaps (price imbalances), and Liquidity Zones (where retail stops cluster). Our algorithm uses these concepts to find optimal entry points that align with professional trading behavior.",
+    "q5": "How do I get access?",
+    "a5": "Invitation Only. You have to get invited by someone you know."
   },
   "footer": {
     "description": "Zillions is an on‑chain, autonomous \"meta‑trading\" app designed to help more people participate in markets - without needing to be a pro.",

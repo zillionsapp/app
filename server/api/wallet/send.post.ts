@@ -1,172 +1,149 @@
-// server/api/wallet/send.post.ts
-import Airtable from 'airtable'
-
-interface SendRequest {
-  amount: number
-  fromEmail: string
-  toEmail: string
-}
-
-interface TransactionDetail {
-  email: string
-  amount: number
-  timestamp: string
-}
+import { serverSupabaseClient } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
-  try {
-    const body = await readBody<SendRequest>(event)
-    const { amount, fromEmail, toEmail } = body
+  const supabase = await serverSupabaseClient(event)
 
-    // Validate input
-    if (!amount || amount <= 0) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Amount must be greater than 0'
-      })
-    }
+  // Get the current user
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-    if (!fromEmail || !toEmail) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Both sender and recipient emails are required'
-      })
-    }
+  if (userError || !user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized'
+    })
+  }
 
-    if (fromEmail === toEmail) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Cannot send money to yourself'
-      })
-    }
+  const body = await readBody(event)
+  const { amount, recipientEmail } = body
 
-    // Initialize Airtable
-    const base = new Airtable({
-      apiKey: process.env.AIRTABLE_API_KEY
-    }).base(process.env.AIRTABLE_BASE_ID || '')
+  if (!amount || amount <= 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid amount'
+    })
+  }
 
-    const tableName = process.env.AIRTABLE_WALLET_TABLE || 'Wallets'
+  if (!recipientEmail || recipientEmail === user.email) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid recipient email'
+    })
+  }
 
-    // Get current wallet records for both users
-    const [fromRecords, toRecords] = await Promise.all([
-      base(tableName)
-        .select({
-          filterByFormula: `{Email} = '${fromEmail}'`,
-          maxRecords: 1
-        })
-        .all(),
-      base(tableName)
-        .select({
-          filterByFormula: `{Email} = '${toEmail}'`,
-          maxRecords: 1
-        })
-        .all()
-    ])
+  const senderEmail = user.email!
 
-    const fromRecord = fromRecords[0]
-    const toRecord = toRecords[0]
+  // Note: In a production system, you'd validate the recipient exists
+  // For paper money demo, we'll skip this validation
 
-    // Check if sender has sufficient funds
-    const fromCurrentAmount = fromRecord ? (fromRecord.fields.Cash as number || 0) : 0
-    if (fromCurrentAmount < amount) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Insufficient funds'
-      })
-    }
+  // Get current vault state
+  const { data: vaultState, error: vaultError } = await (supabase as any)
+    .from('vault_state')
+    .select('total_assets, total_shares')
+    .single()
 
-    const now = new Date().toISOString()
-
-    // Update sender's amount (subtract) and add transaction history
-    const fromNewAmount = fromCurrentAmount - amount
-    if (fromRecord && fromRecord.id) {
-      // Get current sentTo history or initialize empty array
-      let currentSentTo: TransactionDetail[] = []
-      try {
-        const sentToField = fromRecord.fields.sentTo as string
-        if (sentToField) {
-          currentSentTo = JSON.parse(sentToField)
-        }
-      } catch (parseError) {
-        console.error(`Error parsing sentTo for ${fromEmail}:`, parseError)
-        currentSentTo = []
-      }
-
-      // Add new transaction with email, amount, and timestamp
-      const newTransaction: TransactionDetail = {
-        email: toEmail,
-        amount: amount,
-        timestamp: now
-      }
-
-      await base(tableName).update(fromRecord.id, {
-        Cash: fromNewAmount,
-        sentTo: JSON.stringify([...currentSentTo, newTransaction]),
-        'Updated At': now
-      })
-    }
-
-    // Update or create receiver's amount (add) and add transaction history
-    if (toRecord) {
-      const toCurrentAmount = toRecord.fields.Cash as number || 0
-      const toNewAmount = toCurrentAmount + amount
-      // Get current receivedFrom history or initialize empty array
-      let currentReceivedFrom: TransactionDetail[] = []
-      try {
-        const receivedFromField = toRecord.fields.receivedFrom as string
-        if (receivedFromField) {
-          currentReceivedFrom = JSON.parse(receivedFromField)
-        }
-      } catch (parseError) {
-        console.error(`Error parsing receivedFrom for ${toEmail}:`, parseError)
-        currentReceivedFrom = []
-      }
-
-      // Add new transaction with email, amount, and timestamp
-      const newReceivedTransaction: TransactionDetail = {
-        email: fromEmail,
-        amount: amount,
-        timestamp: now
-      }
-
-      await base(tableName).update(toRecord.id, {
-        Cash: toNewAmount,
-        receivedFrom: JSON.stringify([...currentReceivedFrom, newReceivedTransaction]),
-        'Updated At': now
-      })
-    } else {
-      // Create new wallet record for receiver
-      const newReceivedTransaction: TransactionDetail = {
-        email: fromEmail,
-        amount: amount,
-        timestamp: now
-      }
-
-      await base(tableName).create({
-        Email: toEmail,
-        Deposit: amount,
-        Cash: amount,
-        receivedFrom: JSON.stringify([newReceivedTransaction]),
-        'Created At': now,
-        'Updated At': now
-      })
-    }
-
-    return {
-      success: true,
-      fromEmail,
-      toEmail,
-      amount,
-      fromNewBalance: fromNewAmount,
-      toNewBalance: toRecord
-        ? (toRecord.fields.Cash as number || 0) + amount
-        : amount
-    }
-  } catch (error: any) {
-    console.error('Send API error:', error)
+  if (vaultError) {
+    console.error('Error fetching vault state:', vaultError)
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || 'Failed to send funds'
+      statusMessage: 'Failed to fetch vault state'
     })
+  }
+
+  // Get sender's current balance
+  const { data: senderTransactions, error: senderTxError } = await (supabase as any)
+    .from('vault_transactions')
+    .select('amount, shares, type')
+    .eq('email', senderEmail)
+
+  if (senderTxError) {
+    console.error('Error fetching sender transactions:', senderTxError)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to fetch sender transactions'
+    })
+  }
+
+  // Calculate sender's current balance and shares
+  let senderTotalShares = 0
+
+  for (const tx of senderTransactions || []) {
+    if (tx.type === 'DEPOSIT') {
+      senderTotalShares += Number(tx.shares)
+    } else if (tx.type === 'WITHDRAWAL') {
+      senderTotalShares -= Number(tx.shares)
+    }
+  }
+
+  // Calculate sender's current equity
+  const currentTotalAssets = Number(vaultState.total_assets)
+  const currentTotalShares = Number(vaultState.total_shares)
+  const senderEquity = currentTotalShares > 0 ? (senderTotalShares / currentTotalShares) * currentTotalAssets : 0
+
+  if (amount > senderEquity) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: `Insufficient balance. You have $${senderEquity.toFixed(2)} available.`
+    })
+  }
+
+  // Calculate shares to transfer
+  const sharePrice = currentTotalShares > 0 ? currentTotalAssets / currentTotalShares : 1
+  const sharesToTransfer = sharePrice > 0 ? amount / sharePrice : amount
+
+  if (sharesToTransfer > senderTotalShares) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Insufficient shares for transfer'
+    })
+  }
+
+  const timestamp = Date.now()
+
+  // Create withdrawal transaction for sender
+  const { error: senderWithdrawError } = await (supabase as any)
+    .from('vault_transactions')
+    .insert({
+      email: senderEmail,
+      amount: amount,
+      shares: sharesToTransfer,
+      type: 'WITHDRAWAL',
+      timestamp: timestamp
+    })
+
+  if (senderWithdrawError) {
+    console.error('Error creating sender withdrawal:', senderWithdrawError)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to create sender transaction'
+    })
+  }
+
+  // Create deposit transaction for recipient
+  const { error: recipientDepositError } = await (supabase as any)
+    .from('vault_transactions')
+    .insert({
+      email: recipientEmail,
+      amount: amount,
+      shares: sharesToTransfer,
+      type: 'DEPOSIT',
+      timestamp: timestamp
+    })
+
+  if (recipientDepositError) {
+    console.error('Error creating recipient deposit:', recipientDepositError)
+    // Note: In a real system, you'd want to rollback the sender transaction
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to create recipient transaction'
+    })
+  }
+
+  // Vault state remains unchanged - total assets and shares stay the same
+  // Only ownership changes
+
+  return {
+    success: true,
+    message: `Successfully sent $${amount.toLocaleString()} to ${recipientEmail}`,
+    sharesTransferred: sharesToTransfer
   }
 })

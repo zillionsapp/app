@@ -1,219 +1,198 @@
 {
   "nav": {
     "features": "Funktionen",
-    "how": "So funktioniert es",
+    "how": "Wie es funktioniert",
     "tech": "Technologie",
-    "faq": "Häufig gestellte Fragen",
-    "waitlist": "Zur Warteliste hinzufügen",
+    "faq": "FAQ",
+    "waitlist": "Warteliste beitreten",
     "signUp": "Registrieren",
     "signIn": "Anmelden"
   },
   "hero": {
-    "badge": "Invite-Only",
-    "title": "Werde ein",
+    "badge": "Der stille Weg zum Reichtum",
+    "title": "Werden Sie ein",
     "titleHighlight": "Zillionär",
-    "description": "Ein On‑Chain, autonomer Trading-Bot, der dir dabei hilft, an Märkten teilzunehmen, ohne ein Trading-Profi sein zu müssen.",
-    "cta": "Zur Warteliste hinzufügen",
-    "secondary": "So funktioniert es"
+    "description": "Ein exklusiver On‑Chain, autonomer Trading-Bot, der Ihnen hilft, an Märkten teilzunehmen, ohne ein Trading-Profi sein zu müssen.",
+    "cta": "Warteliste beitreten",
+    "secondary": "Sehen Sie, wie es funktioniert"
   },
   "stats": {
-    "noExpertise": "Keine Erfahrung erforderlich",
-    "noExpertiseValue": "Für jeden",
+    "noExpertise": "Keine Expertise erforderlich",
+    "noExpertiseValue": "Für alle",
     "onChain": "On‑Chain",
     "onChainValue": "Transparent",
-    "adaptive": "Adaptiv",
-    "adaptiveValue": "Regime‑bewusst",
-    "handsFree": "Hände frei",
-    "handsFreeValue": "Autopilot"
+    "adaptive": "Konzept",
+    "adaptiveValue": "Smart Money",
+    "handsFree": "Hände‑frei",
+    "handsFreeValue": "Auto‑Pilot"
   },
   "features": {
     "title": "Warum Zillions anders ist",
-    "subtitle": "Nicht nur eine weitere \"Trading-Bot\"-App. Zillions erkennt Marktstrategien in Echtzeit - und passt sich an.",
+    "subtitle": "Ein exklusiver On-Chain, autonomer Trading-Bot, der Ihnen hilft, an Märkten teilzunehmen, ohne ein Trading-Profi sein zu müssen.",
     "metaTrading": {
-      "badge": "Kern",
-      "title": "Meta-Trading-Engine",
-      "description": "Richtet sich nach dem aktuell dominanten Strategieregime, anstatt blind oder mit fester Logik zu arbeiten."
+      "badge": "Smart Money",
+      "title": "Einzigartiger Smart Money Algorithmus",
+      "description": "Im Gegensatz zu typischen Trading-Algos mit Standardindikatoren basiert unsere exklusive Strategie auf Smart Money Konzepten mit HTF Orderblocks, Fair Value Gaps und Liquidity Zones."
     },
     "onChainTransparent": {
-      "badge": "Sicherheit",
-      "title": "On‑Chain & transparent",
-      "description": "Ausführung, Verlauf und Parameter sind auf der Blockchain für Überprüfbarkeit. Keine Black-Box-Verwahrung."
+      "badge": "On-Chain",
+      "title": "Vollständig On-Chain & Transparent",
+      "description": "Alles ist on-chain: Ausführung, Historie, Vault-Performance. Sehen Sie nicht nur Ihre Wallet, sondern die gesamte System-Performance mit voller Transparenz."
     },
     "handsFreeSimplicity": {
-      "badge": "UX",
-      "title": "Mühelose Einfachheit",
-      "description": "Keine Knöpfe, keine Charts zum Studieren. Finanziere einen Vault und lass den Algorithmus 24/7 arbeiten."
+      "badge": "Wallet-ähnlich",
+      "title": "Fühlt sich wie eine Wallet an",
+      "description": "Anmelden, Guthaben sehen, einzahlen, abheben, empfangen oder senden. Keine erweiterten Einstellungen nötig - einfach Risiko-Appetit wählen und den Bot traden lassen."
     },
     "riskAware": {
-      "badge": "Sicherheit",
-      "title": "Risikobewusst",
-      "description": "Positionsgröße & regimespezifische Risikokontrollen sollen während ungünstiger Phasen schützen."
+      "badge": "Risikomanagement",
+      "title": "Ordentliches Risikomanagement",
+      "description": "Fortschrittliche Positionsgrößen und Kapitalschutz. Der Bot setzt professionelle Trailing Stop Loss & Take Profits."
     }
   },
   "howItWorks": {
-    "title": "Drei Schritte, null Raterei",
+    "title": "Drei Schritte, null Ratespiel",
     "step1": {
       "badge": "1",
-      "title": "Verbinde dein Wallet",
-      "description": "Von Grund auf nicht-verwahrend. Du behältst die Kontrolle."
+      "title": "Wallet verbinden",
+      "description": "Non‑custodial by design. Sie behalten die Kontrolle."
     },
     "step2": {
       "badge": "2",
-      "title": "Finanziere deinen Vault",
-      "description": "Allokiere Kapital zu einem Zillions Vault. Transparente Gebühren, On‑Chain-Ausführung."
+      "title": "Vault finanzieren",
+      "description": "Kapital in einen Zillions-Vault zuweisen. Transparente Gebühren, on‑chain Ausführung."
     },
     "step3": {
       "badge": "3",
-      "title": "KI passt sich in Echtzeit an",
-      "description": "Die Engine folgt dem dominanten Regime - Momentum, Mean-Reversion, Liquiditätsjagden und mehr."
+      "title": "Smart Money Algorithmus handelt automatisch",
+      "description": "Die Engine identifiziert HTF Orderblocks, Fair Value Gaps und Liquidity Zones für perfekte Einträge."
     },
     "cta": "Frühen Zugang erhalten"
   },
   "technology": {
-    "title": "Innerhalb der Engine",
-    "subtitle": "Unser Handelssystem analysiert Markttrends, Signale und Risiken, um die besten Chancen zu finden. Es passt sich automatisch an verändernde Bedingungen an.",
+    "title": "Im Inneren der Smart Money Engine",
+    "subtitle": "Im Gegensatz zu typischen Trading-Algorithmen mit Standardindikatoren basiert unsere exklusive Strategie auf Smart Money Konzepten, um institutionelle Trading-Muster zu identifizieren und perfekte Einträge zu finden.",
     "trend": {
-      "title": "Multi-Timeframe-Trendanalyse",
-      "description": "Verwendet ROC (Rate of Change) und EMA-Indikatoren, um die Gesamttrendrichtung und -stärke über verschiedene Zeitrahmen hinweg zu identifizieren.",
+      "badge": "Setup",
+      "title": "HTF Orderblocks Erkennung",
+      "description": "Identifiziert High Timeframe Orderblocks, wo institutionelle Trader große Orders platziert haben, wodurch signifikante Support- und Resistance-Zonen entstehen.",
       "benefits": {
-        "1": "Analysiert Trends gleichzeitig über mehrere Zeitrahmen (1m, 5m, 15m, 1h, 4h, 1d)",
-        "2": "Verwendet Rate of Change (ROC), um Momentum-Stärke und -Richtung zu messen",
-        "3": "Exponentielle gleitende Durchschnitte (EMA) identifizieren die primäre Trendrichtung",
-        "4": "Filtert Marktlärm heraus, während bedeutende Trendbewegungen erhalten bleiben",
-        "5": "Bietet Trend-Stärke-Bewertung von 0-100 für Positionsvertrauen"
+        "1": "Scannt mehrere Zeitrahmen nach institutionellen Order-Clustern (1h, 4h, 1d, 1w)",
+        "2": "Erkennt Orderblocks, die von großen Markt-Teilnehmern geformt wurden",
+        "3": "Identifiziert Bereiche, wo Smart Money Positionen akkumuliert hat",
+        "4": "Bietet hoch-probable Umkehrzonen basierend auf institutioneller Aktivität",
+        "5": "Filtert Retail-Geräusche heraus, um sich auf professionelle Trading-Muster zu konzentrieren"
       },
-      "alert": "Unsere Trendanalyse-Engine untersucht Preisbewegungen über mehrere Zeitrahmen, um die dominante Marktrichtung zu identifizieren, filtert kurzfristige Geräusche heraus und erfasst gleichzeitig bedeutende Trendänderungen."
+      "alert": "Orderblocks repräsentieren Bereiche, wo große institutionelle Trader signifikante Orders platziert haben, wodurch mächtige Support/Resistance-Niveaus entstehen, die die Marktrichtung antreiben."
     },
     "signals": {
-      "title": "OBOS-Signale",
-      "description": "Erkennt überkaufte/überverkaufte Bedingungen mit RSI und Pivot-Punkten, um potenzielle Einstiegsmöglichkeiten zu finden, wenn sich Momentum von Preis unterscheidet.",
+      "badge": "Setup",
+      "title": "Fair Value Gaps",
+      "description": "Erkennt Fair Value Gaps, die während hochvolatiler Perioden entstehen, wo Preis-Lücken vom institutionellen Orderflow zukünftige Magnetbereiche schaffen.",
       "benefits": {
-        "1": "RSI-Divergenzerkennung identifiziert Momentum-Verschiebungen, bevor der Preis bestätigt",
-        "2": "Pivot-Punkt-Analyse findet automatisch wichtige Unterstützungs-/Widerstandsniveaus",
-        "3": "Überkauft (>70 RSI) und überverkauft (<30 RSI) Bedingungsüberwachung",
-        "4": "Volumen-Preis-Divergenzanalyse zur Signalbestätigung",
-        "5": "Multi-Indikator-Konvergenz erhöht die Signalzuverlässigkeit auf 78%"
+        "1": "Identifiziert Preis-Lücken, die von großen institutionellen Orders erstellt wurden",
+        "2": "Verfolgt Bereiche, wo Preis für Balance zurückkehren muss",
+        "3": "Bietet hoch-probable Einstiegspunkte, wenn Preis Lücken revisited",
+        "4": "Kombiniert mit Orderflow-Analyse für Bestätigung",
+        "5": "Erstellt magnetische Zonen, die Preisbewegung anziehen"
       },
-      "alert": "Die erweiterte Signalerkennung kombiniert RSI, Pivot-Punkte und Volumenanalyse, um hochwahrscheinliche Einstiegspunkte zu identifizieren, wenn sich Momentum von der Preisrichtung unterscheidet."
+      "alert": "Fair Value Gaps entstehen, wenn Preis sich schnell aufgrund großer Orders bewegt, wodurch Ungleichgewichte entstehen, die Preis letztendlich korrigieren muss, was vorhersehbare Einstiegsmöglichkeiten bietet."
     },
     "confirm": {
-      "title": "HTF-Bestätigung",
-      "description": "Erfordert Ausrichtung auf höheren Zeitrahmen vor dem Eintritt in Trades, um falsche Signale zu reduzieren und die Genauigkeit zu verbessern.",
+      "badge": "Ziel",
+      "title": "Liquidity Zones",
+      "description": "Karten von Liquidity-Zonen, wo Stop-Losses und Limit-Orders cluster, wodurch der Algorithmus institutionelle Stop-Hunts antizipieren kann.",
       "benefits": {
-        "1": "Erfordert Ausrichtung auf 4-Stunden- und Tages-Zeitrahmen vor der Ausführung",
-        "2": "Reduziert die falsche Signalrate um 65% im Vergleich zu einem einzelnen Zeitrahmen",
-        "3": "Eliminiert Trades gegen den breiteren Markttrend",
-        "4": "Bietet Vertrauensbewertung basierend auf Zeitrahmen-Ausrichtung",
-        "5": "Verhindert Einträge während unsicherer oder choppy Marktbedingungen"
+        "1": "Identifiziert Bereiche, wo Retail-Trader Stop-Losses platzieren",
+        "2": "Karten institutionelle Liquidity-Sweeps und Stop-Hunts",
+        "3": "Bietet optimales Entry-Timing um Liquidity-Zonen herum",
+        "4": "Vermeidet Eintritte während hoch-riskanten Liquidity-Sweeps",
+        "5": "Maximiert Profit-Potenzial durch Verständnis von Market-Maker-Taktiken"
       },
-      "alert": "Die Bestätigung auf höheren Zeitrahmen stellt sicher, dass Trades mit der breiteren Marktstruktur übereinstimmen, reduziert falsche Signale drastisch und verbessert die Gesamtgenauigkeit."
+      "alert": "Liquidity-Zonen repräsentieren Bereiche, wo Market-Maker Stop-Losses triggern und Liquidity für ihre großen Orders erstellen können, wodurch vorhersehbare Preisbewegungen entstehen."
     },
     "risk": {
-      "title": "Risikomanagement",
-      "description": "Implementiert Trailing Stops und Take-Profit-Niveaus, um Gewinne zu sichern und gleichzeitig vor Abwärtsrisiken zu schützen.",
+      "badge": "Eintieg",
+      "title": "LTF Bestätigungen",
+      "description": "Verwendet Lower Timeframe Bestätigungen, um perfektes Entry-Timing zu finden, nachdem HTF-Setups identifiziert wurden, was optimale Risk-Reward-Verhältnisse sicherstellt.",
       "benefits": {
-        "1": "Dynamische Trailing Stops passen sich basierend auf Marktvolatilität an (ATR-basiert)",
-        "2": "Take-Profit-Niveaus auf mindestens 2:1 Gewinn-zu-Risiko-Verhältnis gesetzt",
-        "3": "Positionsgröße passt sich basierend auf Gewinnquote und Volatilität an",
-        "4": "Maximaler Drawdown-Schutz mit Circuit Breakern",
-        "5": "Risikoangepasste Positionsgröße verhindert Überexposition"
+        "1": "Wartet auf Lower-Timeframe-Bestätigung nach HTF-Setups",
+        "2": "Bietet präzises Entry-Timing mit minimalem Slippage",
+        "3": "Stellt sicher, dass Trades mit sowohl makro als auch mikro Marktstruktur übereinstimmen",
+        "4": "Reduziert falsche Signale durch Multi-Timeframe-Validierung",
+        "5": "Optimiert Entry-Punkte für maximales Profit-Potenzial"
       },
-      "alert": "Ausgefeiltes Risikomanagement-System nutzt Trailing Stops, Take-Profit-Optimierung und dynamische Positionsgröße, um Kapital zu schützen und gleichzeitig Renditen zu maximieren."
+      "alert": "LTF-Bestätigungen stellen sicher, dass wir Trades an den optimalsten Preis-Niveaus eingehen, kombinierend die Power von Higher-Timeframe-Analyse mit präzisem Lower-Timeframe-Timing."
     },
     "size": {
-      "title": "Positionsgröße",
-      "description": "Verwendet prozentuale Positionsgröße, um konsistente Risikoexposition über verschiedene Handelsgrößen hinweg zu gewährleisten.",
+      "badge": "Risk",
+      "title": "Intelligente Positionsgrößen",
+      "description": "Implementiert intelligente Positionsgrößen basierend auf Risiko-Appetit, Marktvolatilität und Setup-Qualität, um Kapital zu schützen und gleichzeitig Renditen zu maximieren.",
       "benefits": {
-        "1": "Prozentuale Größe gewährleistet konsistente Risikoexposition",
-        "2": "Volatilitätsangepasste Größe reduziert Exposition in turbulenten Märkten",
-        "3": "Gewinnquoten-Optimierung passt Größe basierend auf jüngster Leistung an",
-        "4": "Portfolio-Heat-Management verhindert Überkonzentration",
-        "5": "Compounding-freundliche Größe unterstützt langfristiges Wachstum"
+        "1": "Passt Positionsgröße basierend auf ausgewähltem Risiko-Appetit an",
+        "2": "Skaliert Exposition entsprechend Marktvolatilitäts-Bedingungen",
+        "3": "Erhöht Größe bei höher-qualitativen Setups, reduziert bei schwächeren",
+        "4": "Implementiert maximalen Drawdown-Schutz über das Portfolio",
+        "5": "Unterstützt Compounding-Wachstum bei gleichzeitiger Risikokontrolle"
       },
-      "alert": "Der Positionsgrößen-Algorithmus stellt optimale Kapitalallokation über verschiedene Marktbedingungen und Strategie-Leistungsniveaus hinweg sicher."
+      "alert": "Intelligente Positionsgrößen stellen optimale Kapitalallokation sicher, passt Exposition basierend auf Marktbedingungen und Setup-Qualität an, um Renditen zu maximieren und Ihre Investition zu schützen."
     }
   },
   "comparison": {
-    "title": "Gebaut für viele - nicht nur Profis",
+    "title": "Gebaut für die vielen - nicht nur für Profis",
     "legacy": {
-      "badge": "Vermächtnis",
+      "badge": "Legacy",
       "title": "Typische Trading-App",
-      "items": {
-        "1": "Erwartet, dass du Strategien auswählst und abstimmst.",
-        "2": "Undurchsichtige Logik, Off-Chain-Ausführung.",
-        "3": "Schwer zu verstehen; leicht Fehler zu machen.",
-        "4": "Manuelles Trading ist schwierig - du kannst nicht besser als Meister & Algos sein."
-      }
+      "items": [
+        "Erwartet, dass Sie Strategien auswählen & optimieren.",
+        "Undurchsichtige Logik, off‑chain Ausführung.",
+        "Schwer zu onboarden; leicht, Fehler zu machen.",
+        "Manueller Handel ist hart - Sie können keine Meister & Algos übertreffen."
+      ]
     },
     "modern": {
       "badge": "Modern",
       "title": "Zillions",
-      "items": {
-        "1": "Meta-Trading-Engine richtet sich nach dem dominanten Regime.",
-        "2": "On-Chain, transparente Vaults; standardmäßig einfach.",
-        "3": "Für jeden konzipiert. Kein Profi erforderlich.",
-        "4": "KI & Scoring-Algo erkennt, welche Strategien am besten funktionieren."
-      }
+      "items": [
+        "Meta‑Trading Engine richtet sich nach dem dominanten Regime aus.",
+        "On‑Chain, transparente Vaults; standardmäßig einfach.",
+        "Für alle designed. Sie müssen kein Pro sein.",
+        "Institutioneller Handelsalgorithmus."
+      ]
     }
   },
   "waitlist": {
-    "title": "Sei einer der Ersten, der intelligenter handelt",
-    "subtitle": "Tritt der Zillions-Warteliste bei und erhalte frühen Zugang zum On-Chain-Meta-Trader. Einfach, adaptiv, transparent.",
-    "cta": "Zur Warteliste hinzufügen",
-    "joining": "Wird hinzugefügt…",
-    "consent": "Ich stimme zu, E-Mails über Zillions zu erhalten und verstehe, dass dies keine Finanzberatung ist.",
-    "finePrint": "Durch das Beitreten stimmst du unseren Bedingungen & Datenschutz zu. Jederzeit abmelden.",
+    "title": "Seien Sie einer der ersten, die intelligenter traden",
+    "subtitle": "Treten Sie der Zillions-Warteliste bei und erhalten Sie frühzeitigen Zugang zur on-chain Meta-Trader. Einfach, adaptiv, transparent.",
+    "cta": "Warteliste beitreten",
+    "joining": "Beitreten…",
+    "consent": "Ich stimme zu, E-Mails über Zillions zu erhalten und verstehe, dass dies kein Finanzrat ist.",
+    "finePrint": "Durch Beitritt stimmen Sie unseren Bedingungen & Datenschutz zu. Jederzeit abmelden.",
     "terms": "Bedingungen",
     "privacy": "Datenschutz",
-    "success": "Du bist auf der Liste! Wir werden dich bald kontaktieren.",
-    "errorEmail": "Bitte gib eine gültige E-Mail-Adresse ein.",
-    "errorConsent": "Bitte stimme zu, E-Mails zu erhalten, damit wir dich kontaktieren können.",
-    "errorSubmit": "Etwas ist schief gelaufen. Bitte versuche es später erneut."
+    "success": "Sie sind auf der Liste! Wir melden uns bald.",
+    "errorEmail": "Bitte geben Sie eine gültige E-Mail-Adresse ein.",
+    "errorConsent": "Bitte stimmen Sie zu, E-Mails zu erhalten, damit wir Sie kontaktieren können.",
+    "errorSubmit": "Etwas ist schiefgelaufen. Bitte versuchen Sie es später erneut."
   },
   "faq": {
-    "title": "Häufig gestellte Fragen",
+    "title": "FAQ",
     "subtitle": "Häufige Fragen zu Zillions",
     "q1": "Brauche ich Trading-Erfahrung?",
-    "a1": "Nein. Zillions ist so konzipiert, dass jeder teilnehmen kann. Die Engine passt sich für dich an die Märkte an.",
-    "q2": "Ist dies verwahrend?",
-    "a2": "Nein - es ist On-Chain und nicht-verwahrend. Du kannst Ausführung und Verlauf transparent verfolgen.",
+    "a1": "Nein. Zillions ist so gebaut, dass jeder teilnehmen kann. Die Engine passt sich für Sie an Märkte an.",
+    "q2": "Ist das custodial?",
+    "a2": "Nein - es ist on‑chain und non‑custodial. Sie können Ausführung und Historie transparent verfolgen.",
     "q3": "Sind Renditen garantiert?",
-    "a3": "Nein. Märkte beinhalten Risiken. Das System zielt darauf ab, Kapital zu vermehren, indem es sich an dominante Regime anpasst, aber Verluste sind möglich.",
-    "q4": "Welche Chains und Assets werden unterstützt?",
-    "a4": "Wir werden unterstützte Chains und Assets zuerst den Wartelisten-Mitgliedern ankündigen.",
-    "q5": "Was ist Zillions?",
-    "a5": "Zillions ist eine KI-gestützte, On-Chain-Krypto-Trading-Plattform, die eine Meta-Trading-Engine verwendet, um sich automatisch an Marktbedingungen anzupassen. Sie hilft normalen Menschen, an Märkten teilzunehmen, ohne Trading-Expertise zu benötigen.",
-    "q6": "Wie unterscheidet sich Zillions von anderen Trading-Bots?",
-    "a6": "Im Gegensatz zu traditionellen Bots mit festen Strategien verwendet Zillions eine Meta-Trading-Engine, die das aktuell dominante Marktregime (Momentum, Mean-Reversion usw.) in Echtzeit erkennt und sich anpasst. Es ist On-Chain, transparent und für Einfachheit konzipiert.",
-    "q7": "Wie funktioniert die KI/Meta-Trading-Engine?",
-    "a7": "Die Engine analysiert Multi-Timeframe-Trends, Signale und Bestätigungen mit Indikatoren wie ROC, EMA, RSI und Pivot-Punkten. Sie schaltet automatisch Strategien basierend auf Marktbedingungen, verwaltet Risiken mit Trailing Stops und Positionsgröße und führt Trades On-Chain aus.",
-    "q8": "Welche Risikomanagement-Funktionen hat Zillions?",
-    "a8": "Zillions implementiert dynamische Trailing Stops, Take-Profit-Niveaus bei 2:1 Gewinn-zu-Risiko-Verhältnissen, volatilitätsangepasste Positionsgröße, maximalen Drawdown-Schutz und regimespezifische Risikokontrollen, um Kapital während ungünstiger Marktphasen zu schützen.",
-    "q9": "Was sind die Gebühren?",
-    "a9": "Zillions erhebt transparente, On-Chain-Gebühren für Vault-Finanzierung und Trading-Ausführung. Spezifische Gebührenstrukturen werden den Wartelisten-Mitgliedern angekündigt, aber wir zielen auf wettbewerbsfähige Raten im Vergleich zu traditionellen Trading-Plattformen ab.",
-    "q10": "Welche Leistung kann ich erwarten?",
-    "a10": "Die Leistung variiert mit Marktbedingungen. Das System zielt darauf ab, Kapital zu vermehren, indem es sich an dominante Regime anpasst, aber Krypto-Märkte sind volatil. Historisches Backtesting zeigt Potenzial für konsistente Renditen, aber vergangene Leistung garantiert keine zukünftigen Ergebnisse.",
-    "q11": "Wie zahle ich Geld ein?",
-    "a11": "Verbinde dein nicht-verwahrendes Wallet, wähle einen Vault und finanziere ihn mit unterstützten Assets. Einzahlungen werden On-Chain verarbeitet mit voller Transparenz und Kontrolle bleibt in deinem Wallet.",
-    "q12": "Wie hebe ich Geld ab?",
-    "a12": "Abhebungen können von deinem Wallet-Dashboard initiiert werden. Gelder werden On-Chain an dein verbundenes Wallet zurückgegeben, wobei die nicht-verwahrende Kontrolle während des gesamten Prozesses erhalten bleibt.",
-    "q13": "Wie wähle ich Trading-Strategien?",
-    "a13": "Du musst Strategien nicht manuell auswählen. Die Meta-Trading-Engine erkennt und passt sich automatisch an das bestleistende Regime an. Du kannst Strategieleistung und Backtest-Ergebnisse in deinem Dashboard anzeigen.",
-    "q14": "Was ist Backtesting?",
-    "a14": "Backtesting ermöglicht es dir, Strategien auf historischen Daten zu simulieren, um Leistung, Risikokennzahlen und potenzielle Renditen vor dem Live-Trading zu analysieren. Zillions bietet Tools, um Strategien basierend auf Backtest-Ergebnissen zu verbessern und zu optimieren.",
-    "q15": "Ist mein Geld sicher?",
-    "a15": "Zillions ist nicht-verwahrend - du behältst die Kontrolle über deine Gelder zu jeder Zeit. Alle Ausführung, Historie und Parameter sind On-Chain für volle Überprüfbarkeit. Wir implementieren mehrere Sicherheitsmaßnahmen, aber Krypto-Investitionen tragen inhärente Risiken.",
-    "q16": "Wie fange ich an?",
-    "a16": "Tritt der Warteliste für frühen Zugang bei. Sobald verfügbar, verbinde dein Wallet, schließe die Verifizierung ab, finanziere einen Vault mit unterstützten Assets und lass die KI-Engine das Trading automatisch handhaben.",
-    "q17": "Ist Zillions jetzt verfügbar?",
-    "a17": "Zillions ist derzeit in Entwicklung. Tritt der Warteliste bei, um zu den Ersten zu gehören, die Zugang zur Plattform erhalten, wenn sie startet. Wir werden Updates und frühen Zugang für Wartelisten-Mitglieder bereitstellen.",
-    "q18": "Was, wenn ich weitere Fragen habe?",
-    "a18": "Überprüfe unsere Dokumentation oder kontaktiere unser Support-Team. Wir sind hier, um dir zu helfen, zu verstehen, wie Zillions für dich funktionieren kann."
+    "a3": "Nein. Märkte beinhalten Risiko. Das System zielt darauf ab, Kapital zu vermehren, indem es sich an dominante Regime anpasst, aber Verluste sind möglich.",
+    "q4": "Was ist das Smart Money Konzept?",
+    "a4": "Das Smart Money Konzept (SMC) oder Inner Circle Trader (ICT) Methodologie analysiert institutionelle Trading-Muster. Es identifiziert Bereiche, wo große institutionelle Trader Orders platzieren, einschließlich HTF Orderblocks (Support/Resistance-Zonen), Fair Value Gaps (Preisungleichgewichte) und Liquidity Zones (wo Retail-Stops cluster). Unser Algorithmus verwendet diese Konzepte, um optimale Einstiegspunkte zu finden, die sich mit professionellem Trading-Verhalten ausrichten.",
+    "q5": "Wie bekomme ich Zugang?",
+    "a5": "Nur auf Einladung. Sie müssen von jemandem eingeladen werden, den Sie kennen."
   },
   "footer": {
-    "description": "Zillions ist eine On-Chain, autonome \"Meta-Trading\"-App, die mehr Menschen hilft, an Märkten teilzunehmen - ohne ein Profi sein zu müssen.",
+    "description": "Zillions ist eine on‑chain, autonome \"meta‑trading\" App, die dazu entwickelt wurde, mehr Menschen zu helfen, an Märkten teilzunehmen - ohne ein Pro sein zu müssen.",
     "copyright": "© {year} Zillions. Alle Rechte vorbehalten.",
     "disclosures": "Offenlegungen",
-    "disclaimer": "Trading beinhaltet Risiken, einschließlich möglicher Kapitalverluste. Frühere Leistung garantiert keine zukünftigen Ergebnisse. Verfügbarkeit unterliegt Gerichtsbarkeit und Compliance-Überprüfung."
+    "disclaimer": "Trading beinhaltet Risiko, einschließlich möglichen Kapitalverlusts. Vergangene Performance garantiert keine zukünftigen Ergebnisse. Verfügbarkeit unterliegt Gerichtsbarkeit und Compliance-Screening."
   }
 }

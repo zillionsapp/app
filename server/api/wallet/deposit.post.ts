@@ -1,104 +1,95 @@
-// server/api/wallet/deposit.post.ts
-import Airtable from 'airtable'
-
-interface DepositRequest {
-  amount: number
-  email: string
-}
-
-interface TransactionRecord {
-  id?: string
-  email: string
-  amount: number
-  type: 'deposit' | 'send' | 'receive'
-  sentTo?: string
-  receivedFrom?: string
-  relatedEmail?: string
-  created_at: string
-  updated_at: string
-}
+import { serverSupabaseClient } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
-  try {
-    const body = await readBody<DepositRequest>(event)
-    const { amount, email } = body
+  const supabase = await serverSupabaseClient(event)
 
-    // Validate input
-    if (!amount || amount <= 0) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Amount must be greater than 0'
-      })
-    }
+  // Get the current user
+  const { data: { user }, error: userError } = await supabase.auth.getUser()
 
-    if (!email) {
-      throw createError({
-        statusCode: 400,
-        statusMessage: 'Email is required'
-      })
-    }
-    
-    // Initialize Airtable
-    const base = new Airtable({
-      apiKey: process.env.AIRTABLE_API_KEY
-    }).base(process.env.AIRTABLE_BASE_ID || '')
+  if (userError || !user) {
+    throw createError({
+      statusCode: 401,
+      statusMessage: 'Unauthorized'
+    })
+  }
 
-    const tableName = process.env.AIRTABLE_WALLET_TABLE || 'Wallets'
+  const body = await readBody(event)
+  const { amount } = body
 
-    // Check if user already has a wallet record
-    const existingRecords = await base(tableName)
-      .select({
-        filterByFormula: `{Email} = '${email}'`,
-        maxRecords: 1
-      })
-      .all()
+  if (!amount || amount <= 0) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'Invalid amount'
+    })
+  }
 
-    const now = new Date().toISOString()
+  const userEmail = user.email!
 
-    if (existingRecords.length > 0) {
-      // Update existing record
-      const existingRecord = existingRecords[0]
-      if (existingRecord) {
-        const currentDeposit = existingRecord.fields.Deposit as number || 0
-        const currentCash = existingRecord.fields.Cash as number || 0
-        const newDeposit = currentDeposit + amount
-        const newCash = currentCash + amount
+  // Get current vault state to calculate shares
+  const { data: vaultState, error: vaultError } = await (supabase as any)
+    .from('vault_state')
+    .select('total_assets, total_shares')
+    .single()
 
-        await base(tableName).update(existingRecord.id, {
-          Deposit: newDeposit,
-          Cash: newCash,
-          'Updated At': now
-        })
-
-        return {
-          success: true,
-          action: 'updated',
-          newBalance: newCash,
-          email
-        }
-      }
-    } else {
-      // Create new wallet record
-      await base(tableName).create({
-        Email: email,
-        Deposit: amount,
-        Cash: amount,
-        'Created At': now,
-        'Updated At': now
-      })
-
-      return {
-        success: true,
-        action: 'created',
-        newBalance: amount,
-        email
-      }
-    }
-  } catch (error: any) {
-    console.error('Deposit API error:', error)
+  if (vaultError) {
+    console.error('Error fetching vault state:', vaultError)
     throw createError({
       statusCode: 500,
-      statusMessage: error.message || 'Failed to deposit funds'
+      statusMessage: 'Failed to fetch vault state'
     })
+  }
+
+  const currentTotalAssets = Number(vaultState.total_assets)
+  const currentTotalShares = Number(vaultState.total_shares)
+
+  // Calculate shares for the deposit amount
+  // Share price = total_assets / total_shares
+  const sharePrice = currentTotalShares > 0 ? currentTotalAssets / currentTotalShares : 1
+  const sharesToIssue = sharePrice > 0 ? amount / sharePrice : amount
+
+  // Create deposit transaction
+  const { error: txError } = await (supabase as any)
+    .from('vault_transactions')
+    .insert({
+      email: userEmail,
+      amount: amount,
+      shares: sharesToIssue,
+      type: 'DEPOSIT',
+      timestamp: Date.now()
+    })
+
+  if (txError) {
+    console.error('Error creating deposit transaction:', txError)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to create deposit transaction'
+    })
+  }
+
+  // Update vault state
+  const newTotalAssets = currentTotalAssets + amount
+  const newTotalShares = currentTotalShares + sharesToIssue
+
+  const { error: updateError } = await (supabase as any)
+    .from('vault_state')
+    .update({
+      total_assets: newTotalAssets,
+      total_shares: newTotalShares,
+      updated_at: new Date().toISOString()
+    })
+    .eq('id', 1)
+
+  if (updateError) {
+    console.error('Error updating vault state:', updateError)
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Failed to update vault state'
+    })
+  }
+
+  return {
+    success: true,
+    message: `Successfully deposited $${amount.toLocaleString()}`,
+    sharesIssued: sharesToIssue
   }
 })
