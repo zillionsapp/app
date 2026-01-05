@@ -73,6 +73,7 @@
     "title": "À l'intérieur du moteur Smart Money",
     "subtitle": "Contrairement aux algorithmes de trading typiques utilisant des indicateurs standards, notre stratégie exclusive est basée sur des concepts Smart Money pour identifier les patterns de trading institutionnel et trouver des entrées parfaites.",
     "trend": {
+      "badge": "Tendance",
       "title": "Détection d'Orderblocks HTF",
       "description": "Identifie les Orderblocks de High Timeframe où les traders institutionnels ont placé de gros ordres, créant des zones significatives de support et résistance.",
       "benefits": {
@@ -85,6 +86,7 @@
       "alert": "Les orderblocks représentent des zones où de gros traders institutionnels ont placé des ordres significatifs, créant des niveaux puissants de support/résistance qui impulsent la direction du marché."
     },
     "signals": {
+      "badge": "Signaux",
       "title": "Fair Value Gaps",
       "description": "Détecte les Fair Value Gaps créés pendant des périodes de haute volatilité où les gaps de prix du orderflow institutionnel créent des zones magnétiques futures.",
       "benefits": {
@@ -97,6 +99,7 @@
       "alert": "Les Fair Value Gaps surviennent quand le prix bouge rapidement à cause de gros ordres, créant des déséquilibres que le prix doit éventuellement corriger, fournissant des opportunités d'entrée prévisibles."
     },
     "confirm": {
+      "badge": "Confirmer",
       "title": "Liquidity Zones",
       "description": "Cartographie les zones de liquidité où les stops losses et ordres limit cluster, permettant à l'algorithme d'anticiper les hunts de stop institutionnels.",
       "benefits": {
@@ -109,6 +112,7 @@
       "alert": "Les zones de liquidité représentent des zones où les market makers peuvent déclencher des stops losses et créer de la liquidité pour leurs gros ordres, créant des mouvements de prix prévisibles."
     },
     "risk": {
+      "badge": "Risque",
       "title": "Confirmations LTF",
       "description": "Utilise des confirmations de Lower Timeframe pour trouver un timing d'entrée parfait après que les setups HTF soient identifiés, assurant des ratios optimaux de risk-reward.",
       "benefits": {
@@ -121,6 +125,7 @@
       "alert": "Les confirmations LTF assurent que nous entrons dans des trades aux niveaux de prix les plus optimaux, combinant la puissance de l'analyse HTF avec un timing précis LTF."
     },
     "size": {
+      "badge": "Taille",
       "title": "Dimensionnement intelligent de position",
       "description": "Implémente un dimensionnement intelligent de position basé sur l'appétit de risque, la volatilité du marché et la qualité du setup pour protéger le capital tout en maximisant les retours.",
       "benefits": {

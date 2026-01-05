@@ -73,6 +73,7 @@
     "title": "Inside the Smart Money Engine",
     "subtitle": "Unlike typical trading algorithms using standard indicators, our exclusive strategy is based on Smart Money Concepts to identify institutional trading patterns and find perfect entries.",
     "trend": {
+      "badge": "Setup",
       "title": "HTF Orderblocks Detection",
       "description": "Identifies High Timeframe Orderblocks where institutional traders have placed large orders, creating significant support and resistance zones.",
       "benefits": {
@@ -85,6 +86,7 @@
       "alert": "Orderblocks represent areas where large institutional traders have placed significant orders, creating powerful support/resistance levels that drive market direction."
     },
     "signals": {
+      "badge": "Setup",
       "title": "Fair Value Gaps",
       "description": "Detects Fair Value Gaps created during high volatility periods where price gaps from institutional order flow create future magnet areas.",
       "benefits": {
@@ -97,6 +99,7 @@
       "alert": "Fair Value Gaps occur when price moves rapidly due to large orders, creating imbalances that price must eventually correct, providing predictable entry opportunities."
     },
     "confirm": {
+      "badge": "Target",
       "title": "Liquidity Zones",
       "description": "Maps out liquidity zones where stop losses and limit orders cluster, allowing the algorithm to anticipate institutional stop hunts.",
       "benefits": {
@@ -109,6 +112,7 @@
       "alert": "Liquidity zones represent areas where market makers can trigger stop losses and create liquidity for their large orders, creating predictable price movements."
     },
     "risk": {
+      "badge": "Entry",
       "title": "LTF Confirmations",
       "description": "Uses Lower Timeframe confirmations to find perfect entry timing after HTF setups are identified, ensuring optimal risk-reward ratios.",
       "benefits": {
@@ -121,6 +125,7 @@
       "alert": "LTF confirmations ensure we enter trades at the most optimal price levels, combining the power of higher timeframe analysis with precise lower timeframe timing."
     },
     "size": {
+      "badge": "Risk",
       "title": "Smart Position Sizing",
       "description": "Implements intelligent position sizing based on risk appetite, market volatility, and setup quality to protect capital while maximizing returns.",
       "benefits": {

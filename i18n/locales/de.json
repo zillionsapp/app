@@ -73,6 +73,7 @@
     "title": "Im Inneren der Smart Money Engine",
     "subtitle": "Im Gegensatz zu typischen Trading-Algorithmen mit Standardindikatoren basiert unsere exklusive Strategie auf Smart Money Konzepten, um institutionelle Trading-Muster zu identifizieren und perfekte Einträge zu finden.",
     "trend": {
+      "badge": "Setup",
       "title": "HTF Orderblocks Erkennung",
       "description": "Identifiziert High Timeframe Orderblocks, wo institutionelle Trader große Orders platziert haben, wodurch signifikante Support- und Resistance-Zonen entstehen.",
       "benefits": {
@@ -85,6 +86,7 @@
       "alert": "Orderblocks repräsentieren Bereiche, wo große institutionelle Trader signifikante Orders platziert haben, wodurch mächtige Support/Resistance-Niveaus entstehen, die die Marktrichtung antreiben."
     },
     "signals": {
+      "badge": "Setup",
       "title": "Fair Value Gaps",
       "description": "Erkennt Fair Value Gaps, die während hochvolatiler Perioden entstehen, wo Preis-Lücken vom institutionellen Orderflow zukünftige Magnetbereiche schaffen.",
       "benefits": {
@@ -97,6 +99,7 @@
       "alert": "Fair Value Gaps entstehen, wenn Preis sich schnell aufgrund großer Orders bewegt, wodurch Ungleichgewichte entstehen, die Preis letztendlich korrigieren muss, was vorhersehbare Einstiegsmöglichkeiten bietet."
     },
     "confirm": {
+      "badge": "Ziel",
       "title": "Liquidity Zones",
       "description": "Karten von Liquidity-Zonen, wo Stop-Losses und Limit-Orders cluster, wodurch der Algorithmus institutionelle Stop-Hunts antizipieren kann.",
       "benefits": {
@@ -109,6 +112,7 @@
       "alert": "Liquidity-Zonen repräsentieren Bereiche, wo Market-Maker Stop-Losses triggern und Liquidity für ihre großen Orders erstellen können, wodurch vorhersehbare Preisbewegungen entstehen."
     },
     "risk": {
+      "badge": "Eintieg",
       "title": "LTF Bestätigungen",
       "description": "Verwendet Lower Timeframe Bestätigungen, um perfektes Entry-Timing zu finden, nachdem HTF-Setups identifiziert wurden, was optimale Risk-Reward-Verhältnisse sicherstellt.",
       "benefits": {
@@ -121,6 +125,7 @@
       "alert": "LTF-Bestätigungen stellen sicher, dass wir Trades an den optimalsten Preis-Niveaus eingehen, kombinierend die Power von Higher-Timeframe-Analyse mit präzisem Lower-Timeframe-Timing."
     },
     "size": {
+      "badge": "Risk",
       "title": "Intelligente Positionsgrößen",
       "description": "Implementiert intelligente Positionsgrößen basierend auf Risiko-Appetit, Marktvolatilität und Setup-Qualität, um Kapital zu schützen und gleichzeitig Renditen zu maximieren.",
       "benefits": {

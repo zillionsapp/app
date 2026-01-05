@@ -194,7 +194,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
           <ul class="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
             <li>
               <div class="timeline-middle">
-                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'trend'">Trend</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'trend'">{{ $t('technology.trend.badge') }}</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'trend' }" @click="selectedStrategy = 'trend'">
                 <div class="font-medium text-lg">{{ $t('technology.trend.title') }}</div>
@@ -204,7 +204,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'signals'">Signals</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'signals'">{{ $t('technology.signals.badge') }}</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'signals' }" @click="selectedStrategy = 'signals'">
                 <div class="font-medium text-lg">{{ $t('technology.signals.title') }}</div>
@@ -214,7 +214,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'confirm'">Confirm</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'confirm'">{{ $t('technology.confirm.badge') }}</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'confirm' }" @click="selectedStrategy = 'confirm'">
                 <div class="font-medium text-lg">{{ $t('technology.confirm.title') }}</div>
@@ -224,7 +224,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'risk'">Risk</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'risk'">{{ $t('technology.risk.badge') }}</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'risk' }" @click="selectedStrategy = 'risk'">
                 <div class="font-medium text-lg">{{ $t('technology.risk.title') }}</div>
@@ -234,7 +234,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
             </li>
             <li>
               <div class="timeline-middle">
-                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'size'">Size</span>
+                <span class="badge bg-gradient-to-r from-primary via-secondary to-accent animate-gradient text-base-100 badge-lg cursor-pointer transition-all duration-300 hover:scale-110" @click="selectedStrategy = 'size'">{{ $t('technology.size.badge') }}</span>
               </div>
               <div class="timeline-end timeline-box bg-base-200/50 border border-base-300 hover:shadow-lg transition-all duration-300 cursor-pointer" :class="{ 'border-primary bg-primary/5': selectedStrategy === 'size' }" @click="selectedStrategy = 'size'">
                 <div class="font-medium text-lg">{{ $t('technology.size.title') }}</div>
@@ -251,7 +251,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
 
               <div class="mt-6 space-y-4">
                 <div class="group">
-                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
                     <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
                       <div class="w-3 h-3 bg-primary rounded-full"></div>
                     </div>
@@ -261,7 +261,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
                   </div>
                 </div>
                 <div class="group">
-                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
                     <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
                       <div class="w-3 h-3 bg-primary rounded-full"></div>
                     </div>
@@ -271,7 +271,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
                   </div>
                 </div>
                 <div class="group">
-                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
                     <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
                       <div class="w-3 h-3 bg-primary rounded-full"></div>
                     </div>
@@ -281,7 +281,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
                   </div>
                 </div>
                 <div class="group">
-                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
                     <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
                       <div class="w-3 h-3 bg-primary rounded-full"></div>
                     </div>
@@ -291,7 +291,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
                   </div>
                 </div>
                 <div class="group">
-                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl border border-base-300/30 hover:border-primary/30 hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
+                  <div class="flex items-start gap-4 p-4 bg-base-100/30 rounded-xl hover:bg-base-100/50 transition-all duration-300 hover:translate-x-2">
                     <div class="flex-shrink-0 w-8 h-8 bg-primary/10 rounded-full flex items-center justify-center mt-1">
                       <div class="w-3 h-3 bg-primary rounded-full"></div>
                     </div>
@@ -303,7 +303,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
               </div>
 
               <!-- Strategy-specific alerts -->
-              <div class="alert alert-info text-base-content bg-base-100/50 backdrop-blur-sm mt-6 border border-info/20">
+              <div class="alert bg-info/50 text-base-content backdrop-blur-sm mt-6 border border-info/20">
                 <span>{{ $t(`technology.${selectedStrategy}.alert`) }}</span>
               </div>
             </div>
@@ -441,5 +441,102 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
 @keyframes float-gentle {
   0%, 100% { transform: translateY(0px); }
   50% { transform: translateY(-10px); }
+}
+
+/* Animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes slideUp {
+  from { transform: translateY(20px); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+
+.animate-fade-in {
+  animation: fadeIn 0.8s ease-out forwards;
+}
+
+.animate-slide-up {
+  animation: slideUp 0.8s ease-out forwards;
+}
+
+/* Enhanced Typography */
+.card-title { 
+  letter-spacing: -0.015em;
+  font-weight: 600;
+}
+
+h1, h2 { 
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+}
+
+/* Component Enhancements */
+.btn {
+  transition: all 0.3s ease;
+}
+
+.btn:hover {
+  transform: translateY(-1px);
+}
+
+.card {
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  transform: translateY(-2px);
+}
+
+.mockup-window {
+  box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+  transition: all 0.3s ease;
+  background: linear-gradient(180deg, rgba(17,45,57,0.08), rgba(17,45,57,0.03));
+}
+
+.mockup-window:hover {
+  transform: translateY(-4px);
+}
+
+/* Focus States */
+a:focus-visible, 
+button:focus-visible, 
+.btn:focus-visible, 
+.input:focus-visible {
+  outline: 2px solid var(--p);
+  outline-offset: 2px;
+}
+
+/* Menu Refinements */
+.menu a {
+  transition: all 0.3s ease;
+  border-radius: 0.75rem;
+}
+
+.menu a:hover {
+  background: rgba(var(--p), 0.1);
+  transform: translateX(4px);
+}
+
+/* Timeline Enhancements */
+.timeline-box {
+  transition: all 0.3s ease;
+}
+
+.timeline-box:hover {
+  transform: translateX(4px);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+
+/* Input Field Polish */
+.input {
+  transition: all 0.3s ease;
+}
+
+.input:focus {
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+  transform: translateY(-1px);
 }
 </style>
