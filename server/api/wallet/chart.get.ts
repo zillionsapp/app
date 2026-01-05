@@ -109,6 +109,43 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Add current/latest data point based on vault state
+  // This ensures the chart shows real-time updates after transactions
+  const { data: vaultState, error: vaultError } = await (supabase as any)
+    .from('vault_state')
+    .select('total_assets, total_shares')
+    .single()
+
+  if (!vaultError && vaultState) {
+    const currentTotalAssets = Number(vaultState.total_assets)
+    const currentTotalShares = Number(vaultState.total_shares)
+
+    // Calculate current user shares (all transactions up to now)
+    let currentUserShares = 0
+    for (const tx of allTransactions || []) {
+      if (tx.email === userEmail) {
+        if (tx.type === 'DEPOSIT') {
+          currentUserShares += Number(tx.shares)
+        } else if (tx.type === 'WITHDRAWAL') {
+          currentUserShares -= Number(tx.shares)
+        }
+      }
+    }
+
+    const currentUserEquity = currentTotalShares > 0 ? (currentUserShares / currentTotalShares) * currentTotalAssets : 0
+
+    // Add current point if it's different from the last historical point or if no historical data
+    const lastPoint = chartData[chartData.length - 1]
+    const currentTime = Date.now()
+
+    if (!lastPoint || Math.abs(currentUserEquity - lastPoint.equity) > 0.01) {
+      chartData.push({
+        timestamp: currentTime,
+        equity: currentUserEquity
+      })
+    }
+  }
+
   return {
     data: chartData
   }
