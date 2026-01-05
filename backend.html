@@ -1,0 +1,774 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#00ff9d">
+    <meta name="description" content="Professional Trading Dashboard">
+    <link rel="icon" type="image/x-icon" href="favicon.ico">
+    <link rel="manifest" href="manifest.json">
+    <title>Zillions Core Dashboard | Professional Trading</title>
+    <!-- DaisyUI + Tailwind CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/daisyui@4.12.10/dist/full.min.css" rel="stylesheet" type="text/css" />
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        @plugin "daisyui";
+
+        @plugin "daisyui/theme" {
+            name: "dark";
+            color-scheme: dark;
+            --color-base-100: #1a1b1e;
+            --color-base-200: #141517;
+            --color-base-300: #0c0c0d;
+            --color-base-content: #ecf0ed;
+            --color-primary: #00ff9d;
+            --color-primary-content: #ecf0ed;
+            --color-secondary: #7c3aed;
+            --color-secondary-content: #ecf0ed;
+            --color-accent: #ff006e;
+            --color-accent-content: #ecf0ed;
+            --color-neutral: #1a1b1e;
+            --color-neutral-content: #ecf0ed;
+        }
+
+        @plugin "daisyui/theme" {
+            name: "light";
+            color-scheme: light;
+            --color-base-100: #ecf0ed;
+            --color-base-200: #fff;
+            --color-base-300: #ecf0ed;
+            --color-base-content: #141517;
+            --color-primary: #00ff9d;
+            --color-primary-content: #141517;
+            --color-secondary: #7c3aed;
+            --color-secondary-content: #141517;
+            --color-accent: #ff006e;
+            --color-accent-content: #141517;
+            --color-neutral: #1a1b1e;
+            --color-neutral-content: #141517;
+        }
+
+        .animate-gradient {
+            background-size: 300% 300%;
+            animation: gradientShift 8s ease infinite;
+        }
+
+        @keyframes gradientShift {
+            0% {
+                background-position: 0% 50%
+            }
+
+            50% {
+                background-position: 100% 50%
+            }
+
+            100% {
+                background-position: 0% 50%
+            }
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+        }
+    </style>
+</head>
+
+<body class="bg-base-300 min-h-screen">
+
+    <!-- Header -->
+    <div class="navbar bg-base-200 shadow-xl px-12 top-0 sticky z-50">
+        <div class="flex-1">
+            <a class="text-2xl font-bold tracking-tighter text-secondary flex items-center gap-2">
+                <img src="https://raw.githubusercontent.com/zillionsapp/app/refs/heads/main/public/logo.jpg"
+                    alt="Zillions Logo" class="w-8 h-8 rounded-full">
+                ZILLIONS <span class="bg-secondary text-secondary-content px-2 py-0.5 rounded text-xs">CORE</span>
+            </a>
+        </div>
+        <div class="flex-none gap-4">
+            <div class="hidden md:bock badge badge-success gap-2 animate-pulse">
+                <div class="w-2 h-2 rounded-full bg-white"></div>
+                SYSTEM LIVE
+            </div>
+            <button id="themeToggle" class="btn btn-ghost btn-circle">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                        d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z">
+                    </path>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <main class="p-8 max-w-7xl mx-auto space-y-8">
+
+        <!-- Stats Grid -->
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div class="stat bg-base-200 rounded-2xl shadow-lg border-l-4 border-secondary">
+                <div class="stat-title text-secondary uppercase text-xs font-bold tracking-widest">Current Balance
+                </div>
+                <div id="currentBalance" class="stat-value text-3xl">-</div>
+                <div class="stat-desc mt-1">Available Cash (USDT)</div>
+            </div>
+            <div class="stat bg-base-200 rounded-2xl shadow-lg border-l-4 border-accent">
+                <div class="stat-title text-accent uppercase text-xs font-bold tracking-widest">Current Equity</div>
+                <div id="currentEquity" class="stat-value text-3xl">-</div>
+                <div id="equityChange" class="stat-desc mt-1 text-success">Including unrealized P&L</div>
+            </div>
+            <div class="stat bg-base-200 rounded-2xl shadow-lg border-l-4 border-primary">
+                <div class="stat-title text-primary uppercase text-xs font-bold tracking-widest">Win Rate</div>
+                <div id="winRate" class="stat-value text-3xl">-</div>
+                <div class="stat-desc mt-1">Based on closed trades</div>
+            </div>
+            <div class="stat bg-base-200 rounded-2xl shadow-lg border-l-4 border-info">
+                <div class="stat-title text-info uppercase text-xs font-bold tracking-widest">Profit Factor</div>
+                <div id="profitFactor" class="stat-value text-3xl">-</div>
+                <div class="stat-desc mt-1">Gross Profit / Gross Loss</div>
+            </div>
+        </div>
+
+        <!-- Additional Portfolio Metrics -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <div class="stat bg-base-200 rounded-2xl shadow-lg border-l-4 border-warning">
+                <div class="stat-title text-warning uppercase text-xs font-bold tracking-widest">Total PnL</div>
+                <div id="totalPnL" class="stat-value text-3xl">-</div>
+                <div id="totalPnLPercentage" class="stat-desc mt-1">Realized profit/loss</div>
+            </div>
+            <div class="stat bg-base-200 rounded-2xl shadow-lg border-l-4 border-success">
+                <div class="stat-title text-success uppercase text-xs font-bold tracking-widest">Open Positions</div>
+                <div id="openPositions" class="stat-value text-3xl">-</div>
+                <div id="openPositionsValue" class="stat-desc mt-1">Total unrealized P&L</div>
+            </div>
+            <div class="stat bg-base-200 rounded-2xl shadow-lg border-l-4 border-error">
+                <div class="stat-title text-error uppercase text-xs font-bold tracking-widest">Closed Trades</div>
+                <div id="closedTrades" class="stat-value text-3xl">-</div>
+                <div class="stat-desc mt-1">Completed transactions</div>
+            </div>
+        </div>
+
+        <!-- Full Width Chart -->
+        <div class="card bg-base-200 shadow-xl h-96">
+            <div class="card-body p-6 flex flex-col">
+                <div class="flex justify-between items-center mb-4 flex-none">
+                    <h3 class="font-bold flex items-center gap-2">
+                        <span class="bg-primary/20 p-2 rounded-lg text-primary text-xs tracking-tighter">LIVE</span>
+                        PERFORMANCE CURVE
+                    </h3>
+                    <div class="flex gap-2">
+                        <button id="period-1d" class="btn btn-xs btn-outline">1D</button>
+                        <button id="period-1w" class="btn btn-xs btn-active btn-primary">1W</button>
+                        <button id="period-1m" class="btn btn-xs btn-outline">1M</button>
+                        <button id="period-1y" class="btn btn-xs btn-outline">1Y</button>
+                        <button id="period-all" class="btn btn-xs btn-outline">ALL</button>
+                    </div>
+                </div>
+                <div class="flex-grow relative min-h-0">
+                    <canvas id="performanceChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <!-- Trade Table - Full Width -->
+        <div class="card bg-base-100 shadow-xl overflow-hidden">
+            <div class="overflow-x-auto">
+                <table class="table table-zebra w-full">
+                    <thead>
+                        <tr class="bg-base-200">
+                            <th class="text-xs font-bold uppercase py-4">Status</th>
+                            <th class="text-xs font-bold uppercase py-4">Strategy</th>
+                            <th class="text-xs font-bold uppercase py-4">Symbol</th>
+                            <th class="text-xs font-bold uppercase py-4">Time</th>
+                            <th class="text-xs font-bold uppercase py-4">Side</th>
+                            <th class="text-xs font-bold uppercase py-4">Lv.</th>
+                            <th class="text-xs font-bold uppercase py-4">Entry</th>
+                            <th class="text-xs font-bold uppercase py-4">Exit / Price</th>
+                            <th class="text-xs font-bold uppercase py-4">SL / TP</th>
+                            <th class="text-xs font-bold uppercase py-4">Duration</th>
+                            <th class="text-xs font-bold uppercase py-4">Exit Reason</th>
+                            <th class="text-xs font-bold uppercase py-4 text-right">Qty / Value</th>
+                            <th class="text-xs font-bold uppercase py-4 text-right">PnL (%)</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tradeBody">
+                        <!-- Dynamic Content -->
+                    </tbody>
+                </table>
+            </div>
+            <div id="noTrades" class="text-center p-12 opacity-40">
+                <div class="text-4xl mb-2">📜</div>
+                <p>No recent trades fetched yet.</p>
+            </div>
+            <!-- Pagination Controls -->
+            <div id="paginationControls" class="flex justify-center items-center p-4 bg-base-200 hidden">
+                <button id="prevPage" class="btn btn-sm btn-outline mr-2" disabled>Previous</button>
+                <span id="pageInfo" class="text-sm mx-4">Page 1 of 1</span>
+                <button id="nextPage" class="btn btn-sm btn-outline ml-2" disabled>Next</button>
+            </div>
+        </div>
+
+        <!-- Testing Hub - Commented Out for Now -->
+        <!--
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div class="lg:col-span-1 space-y-6">
+                <div class="card bg-base-100 shadow-xl overflow-hidden">
+                    <div class="bg-secondary p-4 flex items-center justify-between">
+                        <h3 class="font-bold text-secondary-content">TESTING HUB</h3>
+                        <span class="badge badge-outline text-secondary-content opacity-50">Backtest Runner</span>
+                    </div>
+                    <div class="card-body p-6 space-y-4">
+                        <div class="form-control">
+                            <label class="label"><span class="label-text">Select Strategy</span></label>
+                            <select id="strategySelect" class="select select-bordered w-full">
+                                <option disabled selected>Pick a strategy</option>
+                                <option value="SMA_CROSSOVER">SMA Crossover (Default)</option>
+                                <option value="MACD_STOCH">MACD + Stochastic (Coming Soon)</option>
+                            </select>
+                        </div>
+                        <div class="form-control">
+                            <label class="label"><span class="label-text">Symbol</span></label>
+                            <input id="symbolInput" class="input input-bordered w-full" value="BTC/USDT"
+                                placeholder="BTC/USDT" />
+                        </div>
+                        <div class="form-control">
+                            <label class="label"><span class="label-text">Interval</span></label>
+                            <select id="intervalSelect" class="select select-bordered w-full">
+                                <option value="1m">1 Minute</option>
+                                <option value="5m">5 Minutes</option>
+                                <option value="15m">15 Minutes</option>
+                                <option value="1h" selected>1 Hour</option>
+                                <option value="1d">1 Day</option>
+                            </select>
+                        </div>
+                        <button id="runBacktestBtn" class="btn btn-secondary w-full group mt-4">
+                            RUN BACKTEST
+                            <span class="group-hover:translate-x-1 transition-transform">🚀</span>
+                        </button>
+                    </div>
+                </div>
+
+                <div id="resultModal"
+                    class="hidden card bg-success text-success-content shadow-lg animate-in fade-in slide-in-from-bottom-5">
+                    <div class="card-body p-6">
+                        <h2 class="card-title text-sm">Last Backtest Complete!</h2>
+                        <div class="flex justify-between items-center">
+                            <span id="finalPnl" class="text-2xl font-bold">+$0.00</span>
+                            <span class="text-xs opacity-75">100% accurate simulation</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        -->
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer footer-center p-10 bg-base-300 text-base-content mt-12 rounded">
+        <aside>
+            <p class="font-bold flex items-center gap-2">
+                <img src="https://raw.githubusercontent.com/zillionsapp/app/refs/heads/main/public/logo.jpg"
+                    alt="Zillions Logo" class="w-8 h-8 rounded-full"> Zillions Core <span
+                    class="badge badge-secondary">v1.0.0</span>
+            </p>
+            <p>Copyright © 2026 - All rights reserved by <a href="https://zillions.app/"
+                    target="_blank">Zillions.app</a></p>
+        </aside>
+    </footer>
+
+    <script>
+        const API_BASE = '/api';
+        let currentPeriod = '1w'; // Default period
+
+        // Create gradient for chart background
+        function createGradient(ctx, isProfit) {
+            const gradient = ctx.createLinearGradient(0, 0, 0, 400);
+            if (isProfit) {
+                // Green gradient for profit
+                gradient.addColorStop(0, 'rgba(0, 255, 157, 0.4)');
+                gradient.addColorStop(1, 'rgba(0, 255, 157, 0.05)');
+            } else {
+                // Red gradient for loss
+                gradient.addColorStop(0, 'rgba(255, 0, 110, 0.4)');
+                gradient.addColorStop(1, 'rgba(255, 0, 110, 0.05)');
+            }
+            return gradient;
+        }
+
+        // Update chart colors based on portfolio performance
+        function updateChartColors(isProfit) {
+            const borderColor = isProfit ? '#00ff9d' : '#ff006e';
+            const pointColor = isProfit ? '#00ff9d' : '#ff006e';
+
+            chart.data.datasets[0].borderColor = borderColor;
+            chart.data.datasets[0].backgroundColor = createGradient(chart.ctx, isProfit);
+            chart.data.datasets[0].pointBackgroundColor = pointColor;
+            chart.update('none');
+        }
+
+        // Initialize Chart with theme-aware colors
+        const ctx = document.getElementById('performanceChart').getContext('2d');
+        const chart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: [],
+                datasets: [{
+                    label: 'Equity (USDT)',
+                    data: [],
+                    borderColor: '#00ff9d',
+                    backgroundColor: createGradient(ctx, true), // true for profit (green)
+                    borderWidth: 2,
+                    fill: true,
+                    tension: 0.4,
+                    pointRadius: 0,
+                    pointHoverRadius: 5,
+                    pointBackgroundColor: '#00ff9d',
+                    pointBorderColor: '#1a1b1e',
+                    pointBorderWidth: 2,
+                    pointHoverBorderColor: '#1a1b1e',
+                    pointHoverBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: { display: false },
+                    tooltip: {
+                        backgroundColor: 'hsl(var(--b2))',
+                        titleColor: 'hsl(var(--bc))',
+                        bodyColor: 'hsl(var(--bc))',
+                        borderColor: 'hsl(var(--p))',
+                        borderWidth: 1,
+                        callbacks: {
+                            label: function (context) {
+                                return `$${context.parsed.y.toLocaleString()}`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    x: {
+                        display: true,
+                        grid: { color: 'hsla(var(--bc), 0.1)' },
+                        ticks: {
+                            color: 'hsl(var(--bc))',
+                            font: { size: 10 },
+                            maxTicksLimit: 7
+                        },
+                        border: { display: false }
+                    },
+                    y: {
+                        grid: { color: 'hsla(var(--bc), 0.1)' },
+                        ticks: {
+                            color: 'hsl(var(--bc))',
+                            font: { size: 10 },
+                            callback: function (value) {
+                                return '$' + value.toLocaleString();
+                            }
+                        },
+                        border: { display: false }
+                    }
+                }
+            }
+        });
+
+        async function refreshData(period = currentPeriod) {
+            try {
+                // 1. Fetch Portfolio Snapshot for basic stats
+                const portRes = await fetch(`${API_BASE}/portfolio`);
+                const portData = await portRes.json();
+
+                // 2. Load Trades (this will trigger price fetching and recalculate equity)
+                const tradesData = await loadTradesPage(currentPage);
+
+                if (portData && !portData.error) {
+                    const walletBalance = portData.walletBalance !== undefined ? portData.walletBalance : 0;
+                    const currentBalance = portData.currentBalance !== undefined ? portData.currentBalance : 0;
+                    const initialCapital = portData.initialBalance !== undefined ? portData.initialBalance : 0;
+                    const totalRealizedPnL = portData.pnl ?? 0;
+                    const realizedPnLPercentage = portData.pnlPercentage ?? 0;
+
+                    // 1. Tile: Current Balance -> (Initial + Realized) - Notional
+                    document.getElementById('currentBalance').innerText = `$${currentBalance.toLocaleString()}`;
+
+                    // 2. Tile: Current Equity & Unrealized PnL (Recalculated from trades)
+                    const totalUnrealizedPnL = tradesData.totalUnrealizedPnL || 0;
+                    const realTimeEquity = walletBalance + totalUnrealizedPnL;
+
+                    // Use Wallet Balance (equity) as the base for the Unrealized PnL percentage
+                    // Since unrealized PnL is a sum of individual trade PnLs, it should be compared to total capital
+                    const totalMarginUsed = tradesData.totalMarginUsed || 0;
+                    const unrealizedPnLPercentage = walletBalance > 0 ? (totalUnrealizedPnL / walletBalance) * 100 : 0;
+
+                    document.getElementById('currentEquity').innerText = `$${realTimeEquity.toLocaleString()}`;
+                    const equityChangeEl = document.getElementById('equityChange');
+                    const unrealizedLabel = totalUnrealizedPnL >= 0 ? 'profit' : 'loss';
+                    equityChangeEl.innerText = `${totalUnrealizedPnL >= 0 ? '+' : '-'}${Math.abs(unrealizedPnLPercentage).toFixed(2)}% ($${Math.abs(totalUnrealizedPnL).toFixed(2)}) unrealized ${unrealizedLabel}`;
+                    equityChangeEl.classList.toggle('text-success', totalUnrealizedPnL >= 0);
+                    equityChangeEl.classList.toggle('text-error', totalUnrealizedPnL < 0);
+
+                    // 3. Win Rate & Profit Factor
+                    document.getElementById('winRate').innerText = `${((portData.winRate || 0) * 100).toFixed(1)}%`;
+                    document.getElementById('profitFactor').innerText = (portData.profitFactor || 0).toFixed(2);
+
+                    // 4. Tile: Total PnL -> Total Realized PnL
+                    const totalPnLEl = document.getElementById('totalPnL');
+                    totalPnLEl.innerText = `${totalRealizedPnL >= 0 ? '+' : '-'}$${Math.abs(totalRealizedPnL).toFixed(2)}`;
+                    totalPnLEl.classList.toggle('text-success', totalRealizedPnL >= 0);
+                    totalPnLEl.classList.toggle('text-error', totalRealizedPnL < 0);
+
+                    const pnlPercentageEl = document.getElementById('totalPnLPercentage');
+                    const realizedLabel = realizedPnLPercentage >= 0 ? 'profit' : 'loss';
+                    pnlPercentageEl.innerText = `${realizedPnLPercentage >= 0 ? '+' : '-'}${Math.abs(realizedPnLPercentage).toFixed(2)}% total realized ${realizedLabel}`;
+                    pnlPercentageEl.classList.toggle('text-success', realizedPnLPercentage >= 0);
+                    pnlPercentageEl.classList.toggle('text-error', realizedPnLPercentage < 0);
+
+                    // 5. Tile: Open Positions
+                    const openTradesCount = tradesData.openTradesCount || 0;
+                    const totalNotionalValue = tradesData.totalNotionalValue || 0;
+                    const marginValue = tradesData.totalMarginUsed || 0;
+                    document.getElementById('openPositions').innerText = openTradesCount.toString();
+                    const openPositionsValueEl = document.getElementById('openPositionsValue');
+                    openPositionsValueEl.innerHTML = `<span class="opacity-70">Exposure:</span> $${totalNotionalValue.toLocaleString()} <span class="mx-1 opacity-40">|</span> <span class="opacity-70">Margin:</span> $${marginValue.toLocaleString()}`;
+
+                    // 6. Tile: Closed Trades
+                    const winningTrades = portData.winningTrades || 0;
+                    const losingTrades = portData.losingTrades || 0;
+                    document.getElementById('closedTrades').innerText = (winningTrades + losingTrades).toString();
+
+                    // Update chart colors based on total performance
+                    updateChartColors((realTimeEquity - initialCapital) >= 0);
+                }
+
+                // 3. Fetch Portfolio History for Chart
+                const historyRes = await fetch(`${API_BASE}/portfolio-history?period=${period}`);
+                const history = await historyRes.json();
+
+                if (history && history.length > 0) {
+                    const labels = history.map(snapshot => {
+                        const date = new Date(snapshot.timestamp);
+                        return date.toLocaleDateString() + ' ' + date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                    });
+                    const data = history.map(snapshot => snapshot.currentEquity || snapshot.totalValue);
+
+                    chart.data.labels = labels;
+                    chart.data.datasets[0].data = data;
+                    chart.update('none');
+                }
+
+            } catch (err) {
+                console.error('Failed to refresh data:', err);
+            }
+        }
+
+        // Pagination variables
+        let currentPage = 1;
+        let totalTrades = 0;
+        const pageSize = 20;
+
+        async function getCurrentPrices(symbols) {
+            if (symbols.length === 0) return {};
+
+            try {
+                const symbolsParam = Array.from(symbols).join(',');
+                const response = await fetch(`${API_BASE}/prices?symbols=${symbolsParam}`);
+                const prices = await response.json();
+                return prices;
+            } catch (error) {
+                console.error('Failed to fetch current prices:', error);
+                return {};
+            }
+        }
+
+        function calculatePnL(trade, currentPrices = {}) {
+            const leverage = trade.leverage || 1;
+
+            if (trade.status === 'CLOSED' && trade.exitPrice) {
+                const entryPrice = trade.price;
+                const exitPrice = trade.exitPrice;
+                const quantity = trade.quantity;
+
+                const dollarPnL = trade.side === 'BUY'
+                    ? (exitPrice - entryPrice) * quantity
+                    : (entryPrice - exitPrice) * quantity;
+
+                const entryValue = entryPrice * quantity;
+                const margin = entryValue / leverage;
+                const percentagePnL = margin !== 0 ? (dollarPnL / margin) * 100 : 0;
+
+                return { dollar: dollarPnL, percentage: percentagePnL, isRealized: true };
+            } else if (trade.status === 'OPEN' && currentPrices[trade.symbol]) {
+                const entryPrice = trade.price;
+                const currentPrice = currentPrices[trade.symbol];
+                const quantity = trade.quantity;
+
+                const dollarPnL = trade.side === 'BUY'
+                    ? (currentPrice - entryPrice) * quantity
+                    : (entryPrice - currentPrice) * quantity;
+
+                const entryValue = entryPrice * quantity;
+                const margin = entryValue / leverage;
+                const percentagePnL = margin !== 0 ? (dollarPnL / margin) * 100 : 0;
+
+                return { dollar: dollarPnL, percentage: percentagePnL, isRealized: false };
+            }
+
+            return { dollar: 0, percentage: 0, isRealized: false };
+        }
+
+        function formatDuration(ms) {
+            if (!ms || ms <= 0) return '-';
+            const seconds = Math.floor(ms / 1000);
+            const minutes = Math.floor(seconds / 60);
+            const hours = Math.floor(minutes / 60);
+            const days = Math.floor(hours / 24);
+
+            if (days > 0) return `${days}d ${hours % 24}h`;
+            if (hours > 0) return `${hours}h ${minutes % 60}m`;
+            if (minutes > 0) return `${minutes}m ${seconds % 60}s`;
+            return `${seconds}s`;
+        }
+
+        async function loadTradesPage(page) {
+            try {
+                const offset = (page - 1) * pageSize;
+                const tradesRes = await fetch(`${API_BASE}/trades?limit=${pageSize}&offset=${offset}`);
+                const data = await tradesRes.json();
+
+                const trades = data.trades || [];
+                totalTrades = data.total || 0;
+
+                // 2. Fetch ALL Open Trades for accurate top stats (exposure, etc)
+                const allOpenRes = await fetch(`${API_BASE}/trades?status=OPEN`);
+                const allOpenData = await allOpenRes.json();
+                const allOpenTrades = (allOpenData.trades || []).filter(t => t.status === 'OPEN');
+
+                // 3. Get pricing for current page + all open trades
+                const symbols = new Set([...trades.map(t => t.symbol), ...allOpenTrades.map(t => t.symbol)]);
+                const currentPrices = await getCurrentPrices(symbols);
+
+                const tradeBody = document.getElementById('tradeBody');
+                const noTrades = document.getElementById('noTrades');
+                const paginationControls = document.getElementById('paginationControls');
+
+                // Recalculate stats from ALL OPEN trades
+                let totalUnrealizedPnL = 0;
+                let totalNotionalValue = 0;
+                let totalMarginUsed = 0;
+                let openTradesCount = allOpenTrades.length;
+
+                allOpenTrades.forEach(t => {
+                    const pnl = calculatePnL(t, currentPrices);
+                    totalUnrealizedPnL += pnl.dollar;
+                    totalNotionalValue += (t.quantity * t.price);
+                    totalMarginUsed += (t.margin || (t.quantity * t.price / (t.leverage || 1)));
+                });
+
+                if (trades.length > 0) {
+                    noTrades.classList.add('hidden');
+                    tradeBody.innerHTML = trades.map(t => {
+                        const pnl = calculatePnL(t, currentPrices);
+
+                        const isProfit = pnl.dollar >= 0;
+                        const pnlClass = isProfit ? 'text-success' : 'text-error';
+
+                        let exitPriceDisplay = '-';
+                        if (t.status === 'CLOSED' && t.exitPrice) {
+                            exitPriceDisplay = `$${t.exitPrice.toLocaleString()}`;
+                        } else if (t.status === 'OPEN' && currentPrices[t.symbol]) {
+                            exitPriceDisplay = `$${currentPrices[t.symbol].toLocaleString()} (current)`;
+                        }
+
+                        const pnlDollarDisplay = pnl.dollar !== 0
+                            ? `${isProfit ? '+' : '-'}$${Math.abs(pnl.dollar).toFixed(2)}${pnl.isRealized ? '' : ' (unrealized)'}`
+                            : '-';
+
+                        const pnlPercentDisplay = pnl.percentage !== 0
+                            ? `${isProfit ? '+' : '-'}${Math.abs(pnl.percentage).toFixed(2)}%${pnl.isRealized ? '' : ' (unrealized)'}`
+                            : '-';
+
+                        const entryTime = new Date(t.timestamp).toLocaleString([], { month: 'short', day: 'numeric', hour: '2-digit', minute: '2-digit' });
+                        const duration = t.status === 'CLOSED' ? formatDuration(t.duration) : formatDuration(Date.now() - t.timestamp);
+
+                        const slDisplay = t.stopLossPrice ? `$${t.stopLossPrice.toLocaleString()}` : '-';
+                        const tpDisplay = t.takeProfitPrice ? `$${t.takeProfitPrice.toLocaleString()}` : '-';
+
+                        const exitReasonDisplay = t.status === 'CLOSED' && t.exitReason
+                            ? t.exitReason.replace(/_/g, ' ')
+                            : '-';
+
+                        return `
+                        <tr class="hover text-xs">
+                            <td><span class="badge ${t.status === 'OPEN' ? 'badge-warning' : 'badge-success'} badge-sm font-bold text-[10px]">${t.status}</span></td>
+                            <td class="font-semibold text-secondary">${t.strategyName || 'MANUAL'}</td>
+                            <td class="font-bold">${t.symbol}</td>
+                            <td class="opacity-70">${entryTime}</td>
+                            <td>
+                                <span class="badge badge-outline ${t.side === 'BUY' ? 'badge-success' : 'badge-error'} text-[10px] font-bold px-2 py-0 h-4">
+                                    ${t.side}
+                                </span>
+                            </td>
+                            <td class="font-mono opacity-80">${t.leverage || 1}x</td>
+                            <td class="font-mono">$${t.price.toLocaleString()}</td>
+                            <td class="font-mono">${exitPriceDisplay}</td>
+                            <td class="font-mono text-[10px] leading-tight opacity-70">
+                                SL: ${slDisplay}<br>
+                                TP: ${tpDisplay}
+                            </td>
+                            <td class="font-mono opacity-70">${duration}</td>
+                            <td class="text-[10px] opacity-70">${exitReasonDisplay}</td>
+                            <td class="text-right font-mono">
+                                ${t.quantity}<br>
+                                <span class="text-[10px] opacity-60 font-normal">$${(t.quantity * t.price).toLocaleString()}</span>
+                            </td>
+                            <td class="text-right font-mono ${pnlClass} font-bold">
+                                ${pnlPercentDisplay}<br>
+                                <span class="text-[10px] font-normal opacity-70">${pnlDollarDisplay}</span>
+                            </td>
+                        </tr>
+                    `;
+                    }).join('');
+
+                    if (totalTrades > pageSize) {
+                        paginationControls.classList.remove('hidden');
+                        updatePaginationControls(page);
+                    } else {
+                        paginationControls.classList.add('hidden');
+                    }
+                } else {
+                    noTrades.classList.remove('hidden');
+                    tradeBody.innerHTML = '';
+                    paginationControls.classList.add('hidden');
+                }
+
+                currentPage = page;
+                return { totalUnrealizedPnL, totalNotionalValue, totalMarginUsed, openTradesCount };
+            } catch (err) {
+                console.error('Failed to load trades page:', err);
+                return {};
+            }
+        }
+
+        function updatePaginationControls(page) {
+            const totalPages = Math.ceil(totalTrades / pageSize);
+            const pageInfo = document.getElementById('pageInfo');
+            const prevBtn = document.getElementById('prevPage');
+            const nextBtn = document.getElementById('nextPage');
+
+            pageInfo.innerText = `Page ${page} of ${totalPages}`;
+
+            prevBtn.disabled = page <= 1;
+            nextBtn.disabled = page >= totalPages;
+        }
+
+
+
+        // Theme Management
+        function initTheme() {
+            const savedTheme = localStorage.getItem('theme');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+
+            if (savedTheme) {
+                document.documentElement.setAttribute('data-theme', savedTheme);
+            } else if (systemPrefersDark) {
+                document.documentElement.setAttribute('data-theme', 'dark');
+            } else {
+                document.documentElement.setAttribute('data-theme', 'light');
+            }
+
+            updateThemeIcon();
+        }
+
+        function updateThemeIcon() {
+            const theme = document.documentElement.getAttribute('data-theme');
+            const icon = document.querySelector('#themeToggle svg');
+
+            if (theme === 'dark') {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>';
+            } else {
+                icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>';
+            }
+        }
+
+        // Theme Toggle
+        document.getElementById('themeToggle').addEventListener('click', () => {
+            const currentTheme = document.documentElement.getAttribute('data-theme');
+            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
+
+            document.documentElement.setAttribute('data-theme', newTheme);
+            localStorage.setItem('theme', newTheme);
+            updateThemeIcon();
+        });
+
+        // Listen for system theme changes
+        window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
+            if (!localStorage.getItem('theme')) {
+                const newTheme = e.matches ? 'dark' : 'light';
+                document.documentElement.setAttribute('data-theme', newTheme);
+                updateThemeIcon();
+            }
+        });
+
+        // Pagination event listeners
+        document.getElementById('prevPage').addEventListener('click', () => {
+            if (currentPage > 1) {
+                loadTradesPage(currentPage - 1);
+            }
+        });
+
+        document.getElementById('nextPage').addEventListener('click', () => {
+            const totalPages = Math.ceil(totalTrades / pageSize);
+            if (currentPage < totalPages) {
+                loadTradesPage(currentPage + 1);
+            }
+        });
+
+        // Period filter event listeners
+        function setActivePeriod(period) {
+            currentPeriod = period;
+            // Update button states
+            ['1d', '1w', '1m', '1y', 'all'].forEach(p => {
+                const btn = document.getElementById(`period-${p}`);
+                if (p === period) {
+                    btn.classList.add('btn-active', 'btn-primary');
+                    btn.classList.remove('btn-outline');
+                } else {
+                    btn.classList.remove('btn-active', 'btn-primary');
+                    btn.classList.add('btn-outline');
+                }
+            });
+            // Refresh chart with new period
+            refreshData(period);
+        }
+
+        ['1d', '1w', '1m', '1y', 'all'].forEach(period => {
+            document.getElementById(`period-${period}`).addEventListener('click', () => {
+                setActivePeriod(period);
+            });
+        });
+
+        // Initial Load and Polling
+        initTheme();
+        refreshData();
+        setInterval(refreshData, 10000);
+
+        // PWA Service Worker Registration
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/sw.js')
+                    .then((registration) => {
+                        console.log('SW registered: ', registration);
+                    })
+                    .catch((registrationError) => {
+                        console.log('SW registration failed: ', registrationError);
+                    });
+            });
+        }
+
+    </script>
+</body>
+
+</html>
