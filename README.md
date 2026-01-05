@@ -16,10 +16,67 @@ The trading bot ships with many enhanced algorithmic trading strategies, while t
 - **Smart Money Algorithm**: Proprietary trading strategy based on institutional trading patterns
 - **On-Chain Transparency**: All executions, history, and vault performance are fully transparent on-chain
 - **Non-Custodial**: Users maintain full control of their funds
+- **Referral System**: Invite friends and earn 10% commission on their trading profits
+- **Commission Tracking**: Real-time earnings dashboard with detailed commission history
+- **Invite Management**: Create, share, and track referral codes with full analytics
 - **Multi-Language Support**: Available in English, French, German, and Spanish
 - **Progressive Web App**: Installable PWA with offline capabilities
 - **Dark/Light Mode**: Automatic theme switching based on system preferences
 - **Responsive Design**: Optimized for desktop and mobile devices
+
+## Referral & Commission System
+
+Zillions includes a comprehensive referral system where users can invite friends and earn commissions from their trading profits.
+
+### How It Works
+
+1. **Invite Creation**: Users generate unique invite codes from their dashboard
+2. **Code Sharing**: Invite links direct friends to registration with pre-filled codes
+3. **Commission Earning**: Inviters earn 10% of their invited users' daily trading profits
+4. **Automatic Calculation**: Daily commission snapshots are calculated via API endpoint
+
+### API Endpoints
+
+#### Commission Calculation (External Cron)
+```http
+POST /api/commissions/calculate
+Authorization: Bearer YOUR_COMMISSION_API_KEY
+```
+
+**Environment Setup:**
+```env
+COMMISSION_API_KEY=your-secure-api-key-here
+```
+
+**Usage with cron-job.org:**
+- URL: `https://your-app.vercel.app/api/commissions/calculate`
+- Method: `POST`
+- Headers: `Authorization: Bearer YOUR_COMMISSION_API_KEY`
+- Schedule: Daily (e.g., 2:00 AM UTC)
+
+#### Commission Data (Frontend)
+```http
+GET /api/commissions/summary
+# Returns: total_earned, monthly_earned, invited_users_count, etc.
+```
+
+### Database Schema
+
+Run the commission schema setup:
+```sql
+-- For new databases
+\i supabase_schema.sql
+
+-- For existing databases
+\i supabase_schema_update.sql
+```
+
+### Commission Rate
+
+- **Rate**: 10% of invited users' daily P&L
+- **Source**: Based on `portfolio_snapshots.pnl` from trading activity
+- **Calculation**: Daily snapshots via `calculate_daily_commissions()` function
+- **Payment**: Tracked in `commission_payments` table for future payouts
 
 ## Tech Stack
 

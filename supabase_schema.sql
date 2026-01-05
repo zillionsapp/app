@@ -238,20 +238,46 @@ CREATE OR REPLACE FUNCTION get_user_commission_summary(user_id UUID)
 RETURNS JSON AS $$
 DECLARE
     result JSON;
+    total_earned NUMERIC;
+    monthly_earned NUMERIC;
+    invited_count BIGINT;
+    last_date DATE;
+    pending_count BIGINT;
 BEGIN
-    SELECT json_build_object(
-        'total_earned', COALESCE(SUM(cs.commission_earned), 0),
-        'invited_users_count', COUNT(DISTINCT cs.invited_user_id),
-        'last_commission_date', MAX(cs.snapshot_date),
-        'monthly_earned', COALESCE(SUM(cs.commission_earned), 0) FILTER (WHERE cs.snapshot_date >= CURRENT_DATE - INTERVAL '30 days'),
-        'pending_payments', (
-            SELECT COUNT(*)
-            FROM commission_payments
-            WHERE inviter_id = user_id AND status = 'PENDING'
-        )
-    ) INTO result
-    FROM commission_snapshots cs
-    WHERE cs.inviter_id = user_id;
+    -- Get total earned
+    SELECT COALESCE(SUM(commission_earned), 0) INTO total_earned
+    FROM commission_snapshots
+    WHERE inviter_id = user_id;
+
+    -- Get monthly earned (last 30 days)
+    SELECT COALESCE(SUM(commission_earned), 0) INTO monthly_earned
+    FROM commission_snapshots
+    WHERE inviter_id = user_id
+    AND snapshot_date >= CURRENT_DATE - INTERVAL '30 days';
+
+    -- Get invited users count
+    SELECT COUNT(DISTINCT invited_user_id) INTO invited_count
+    FROM commission_snapshots
+    WHERE inviter_id = user_id;
+
+    -- Get last commission date
+    SELECT MAX(snapshot_date) INTO last_date
+    FROM commission_snapshots
+    WHERE inviter_id = user_id;
+
+    -- Get pending payments count
+    SELECT COUNT(*) INTO pending_count
+    FROM commission_payments
+    WHERE inviter_id = user_id AND status = 'PENDING';
+
+    -- Build result JSON
+    result := json_build_object(
+        'total_earned', total_earned,
+        'invited_users_count', invited_count,
+        'last_commission_date', last_date,
+        'monthly_earned', monthly_earned,
+        'pending_payments', pending_count
+    );
 
     RETURN result;
 END;
