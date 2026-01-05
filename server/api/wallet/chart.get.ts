@@ -44,7 +44,7 @@ export default defineEventHandler(async (event) => {
   const { data: snapshots, error: snapError } = await (supabase as any)
     .from('portfolio_snapshots')
     .select('timestamp, totalValue')
-    .gte('timestamp', Math.floor(startDate.getTime() / 1000))
+    .gte('timestamp', startDate.getTime())
     .order('timestamp', { ascending: true })
 
   if (snapError) {
@@ -104,7 +104,7 @@ export default defineEventHandler(async (event) => {
     const userEquity = totalShares > 0 ? (userShares / totalShares) * totalValue : 0
 
     chartData.push({
-      timestamp: snapTime * 1000, // Convert to milliseconds
+      timestamp: snapTime, // Already in milliseconds from database
       equity: userEquity
     })
   }
