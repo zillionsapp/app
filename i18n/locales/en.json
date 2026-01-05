@@ -47,7 +47,7 @@
     "riskAware": {
       "badge": "Risk Management",
       "title": "Proper Risk Management",
-      "description": "Advanced position sizing and capital protection. Identifies LTF Confirmations to find perfect entries while securing your investments."
+      "description": "Advanced position sizing and capital protection. The bot sets professional Trailing Stop Loss & Take Profits."
     }
   },
   "howItWorks": {

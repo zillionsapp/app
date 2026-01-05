@@ -47,7 +47,7 @@
     "riskAware": {
       "badge": "Gestión de riesgo",
       "title": "Gestión de riesgo apropiada",
-      "description": "Dimensionamiento avanzado de posiciones y protección de capital. Identifica confirmaciones LTF para encontrar entradas perfectas mientras asegura tus inversiones."
+      "description": "Dimensionamiento avanzado de posiciones y protección de capital. El bot establece Stop Loss de Trailing y Take Profits profesionales."
     }
   },
   "howItWorks": {

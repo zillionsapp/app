@@ -47,7 +47,7 @@
     "riskAware": {
       "badge": "Risikomanagement",
       "title": "Ordentliches Risikomanagement",
-      "description": "Fortschrittliche Positionsgrößen und Kapitalschutz. Identifiziert LTF-Bestätigungen, um perfekte Einträge zu finden und Ihre Investitionen zu sichern."
+      "description": "Fortschrittliche Positionsgrößen und Kapitalschutz. Der Bot setzt professionelle Trailing Stop Loss & Take Profits."
     }
   },
   "howItWorks": {
