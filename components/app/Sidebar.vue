@@ -25,37 +25,37 @@ const logout = async () => {
           class="fill-base-content">
           <path d="M12 2L20.5 7V17L12 22L3.5 17V7L12 2Z"/>
         </svg>
-        NujinBoilerplate
+        Zillions
       </div>
       <ul class="menu menu-compact w-full px-6">
         <li class="w-full">
           <NuxtLink to="/app" exact-active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/home.svg" class="h-5 w-5 flex-shrink-0"></svg>
-            <span>{{ $t('dashboard') }}</span>
+            <span>{{ $t('app.nav.dashboard') }}</span>
           </NuxtLink>
         </li>
         <li class="w-full">
           <NuxtLink to="/app/wallet" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/wallet' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/wallet.svg" class="h-5 w-5 flex-shrink-0"></svg>
-            <span>Wallet</span>
+            <span>{{ $t('app.nav.wallet') }}</span>
           </NuxtLink>
         </li>
         <li class="w-full">
           <NuxtLink to="/app/transactions" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/transactions' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/receipt-refund.svg" class="h-5 w-5 flex-shrink-0"></svg>
-            <span>Transactions</span>
+            <span>{{ $t('app.nav.transactions') }}</span>
           </NuxtLink>
         </li>
         <li class="w-full">
           <NuxtLink to="/app/referrals" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/referrals' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/user-plus.svg" class="h-5 w-5 flex-shrink-0"></svg>
-            <span>Referrals</span>
+            <span>{{ $t('app.nav.referrals') }}</span>
           </NuxtLink>
         </li>
         <li class="w-full">
           <NuxtLink to="/app/settings" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/settings' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/adjustments-vertical.svg" class="h-5 w-5 flex-shrink-0"></svg>
-            <span>{{ $t('settings') }}</span>
+            <span>{{ $t('app.nav.settings') }}</span>
           </NuxtLink>
         </li>
       </ul>
@@ -67,7 +67,7 @@ const logout = async () => {
         <div class="flex flex-col gap-2 px-4">
           <a @click="logout" class="btn btn-ghost btn-sm text-error justify-start">
             <svg data-src="https://unpkg.com/heroicons/20/solid/arrow-right-on-rectangle.svg" class="h-5 w-5"></svg>
-            {{ $t('logout') }}
+            {{ $t('app.nav.logout') }}
           </a>
           <LanguageSwitcher direction="up" />
           <ThemeToggle />

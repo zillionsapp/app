@@ -143,22 +143,22 @@ const handleSend = async () => {
   <!-- stats -->
   <section class="stats stats-vertical col-span-12 w-full xl:stats-horizontal bg-base-100 rounded-box">
     <div class="stat">
-      <div class="stat-title text-primary uppercase text-xs font-bold tracking-widest">Total Deposited</div>
+      <div class="stat-title text-primary uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.total_deposited') }}</div>
       <div class="stat-value text-2xl">${{ (walletData?.totalDeposited ?? 0).toLocaleString() }}</div>
-      <div class="stat-desc mt-1">Paper money invested</div>
+      <div class="stat-desc mt-1">{{ $t('app.wallet.paper_money_invested') }}</div>
     </div>
     <div class="stat">
-      <div class="stat-title text-secondary uppercase text-xs font-bold tracking-widest">Balance Left</div>
+      <div class="stat-title text-secondary uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.balance_left') }}</div>
       <div class="stat-value text-2xl">${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
-      <div class="stat-desc mt-1">Available to trade</div>
+      <div class="stat-desc mt-1">{{ $t('app.wallet.available_to_trade') }}</div>
     </div>
     <div class="stat">
-      <div class="stat-title text-accent uppercase text-xs font-bold tracking-widest">Total Equity</div>
+      <div class="stat-title text-accent uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.total_equity') }}</div>
       <div class="stat-value text-2xl">${{ (walletData?.totalEquity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
-      <div class="stat-desc mt-1">Current portfolio value</div>
+      <div class="stat-desc mt-1">{{ $t('app.wallet.current_portfolio_value') }}</div>
     </div>
     <div class="stat">
-      <div class="stat-title text-info uppercase text-xs font-bold tracking-widest">Total PnL</div>
+      <div class="stat-title text-info uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.total_pnl') }}</div>
       <div class="stat-value text-2xl" :class="(walletData?.pnl ?? 0) >= 0 ? 'text-success' : 'text-error'">
         {{ (walletData?.pnl ?? 0) >= 0 ? '+' : '-' }}${{ Math.abs(walletData?.pnl ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
       </div>
@@ -172,7 +172,7 @@ const handleSend = async () => {
   <div class="card bg-base-100 rounded-box col-span-12">
     <div class="card-body">
       <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
-        <h2 class="card-title">Portfolio Performance</h2>
+        <h2 class="card-title">{{ $t('app.wallet.portfolio_performance') }}</h2>
         <div class="flex gap-2 flex-wrap">
           <button
             v-for="period in ['1d', '1w', '1m', '1y', 'all']"
@@ -199,7 +199,7 @@ const handleSend = async () => {
       <div v-else class="flex items-center justify-center h-80 text-base-content/50">
         <div class="text-center">
           <div class="text-4xl mb-2">📈</div>
-          <p>No performance data available</p>
+          <p>{{ $t('app.wallet.no_performance_data') }}</p>
         </div>
       </div>
     </div>
@@ -209,18 +209,18 @@ const handleSend = async () => {
   <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 col-span-12">
     <div class="card bg-base-100 rounded-box">
       <div class="card-body">
-        <h3 class="card-title">Wallet Overview</h3>
+        <h3 class="card-title">{{ $t('app.wallet.wallet_overview') }}</h3>
         <div class="space-y-4">
           <div class="flex justify-between">
-            <span>Current Shares:</span>
+            <span>{{ $t('app.wallet.current_shares') }}</span>
             <span class="font-mono">{{ (walletData?.currentShares ?? 0).toLocaleString() }}</span>
           </div>
           <div class="flex justify-between">
-            <span>Portfolio Value:</span>
+            <span>{{ $t('app.wallet.portfolio_value') }}</span>
             <span class="font-mono">${{ (walletData?.totalEquity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
           </div>
           <div class="flex justify-between">
-            <span>Available Balance:</span>
+            <span>{{ $t('app.wallet.available_balance') }}</span>
             <span class="font-mono">${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
           </div>
         </div>
@@ -229,19 +229,19 @@ const handleSend = async () => {
 
     <div class="card bg-base-100 rounded-box">
       <div class="card-body">
-        <h3 class="card-title">Quick Actions</h3>
+        <h3 class="card-title">{{ $t('app.wallet.quick_actions') }}</h3>
         <div class="space-y-2">
           <button class="btn btn-primary btn-block" @click="showDepositModal = true">
             <svg data-src="https://unpkg.com/heroicons/20/solid/plus.svg" class="h-5 w-5"></svg>
-            Deposit Funds
+            {{ $t('app.wallet.deposit_funds') }}
           </button>
           <button class="btn btn-outline btn-block" @click="showWithdrawModal = true">
             <svg data-src="https://unpkg.com/heroicons/20/solid/minus.svg" class="h-5 w-5"></svg>
-            Withdraw Funds
+            {{ $t('app.wallet.withdraw_funds') }}
           </button>
           <button class="btn btn-secondary btn-block" @click="showSendModal = true">
             <svg data-src="https://unpkg.com/heroicons/20/solid/paper-airplane.svg" class="h-5 w-5"></svg>
-            Send Funds
+            {{ $t('app.wallet.send_funds') }}
           </button>
         </div>
       </div>
@@ -251,11 +251,11 @@ const handleSend = async () => {
   <!-- Deposit Modal -->
   <div v-if="showDepositModal" class="modal modal-open">
     <div class="modal-box">
-      <h3 class="font-bold text-lg">Deposit Funds</h3>
-      <p class="py-4">Enter the amount you want to deposit as paper money.</p>
+      <h3 class="font-bold text-lg">{{ $t('app.wallet.deposit_funds') }}</h3>
+      <p class="py-4">{{ $t('app.wallet.deposit_funds_desc') }}</p>
       <div class="form-control">
         <label class="label">
-          <span class="label-text">Amount ($)</span>
+          <span class="label-text">{{ $t('app.wallet.amount_dollar') }}</span>
         </label>
         <input
           v-model="depositAmount"
@@ -268,14 +268,14 @@ const handleSend = async () => {
         />
       </div>
       <div class="modal-action">
-        <button class="btn" @click="closeModals">Cancel</button>
+        <button class="btn" @click="closeModals">{{ $t('app.wallet.cancel') }}</button>
         <button
           class="btn btn-primary"
           :disabled="!depositAmount || parseFloat(depositAmount) <= 0 || depositLoading"
           @click="handleDeposit"
         >
           <span v-if="depositLoading" class="loading loading-spinner loading-sm"></span>
-          Deposit
+          {{ $t('app.wallet.deposit') }}
         </button>
       </div>
     </div>
@@ -284,11 +284,11 @@ const handleSend = async () => {
   <!-- Withdraw Modal -->
   <div v-if="showWithdrawModal" class="modal modal-open">
     <div class="modal-box">
-      <h3 class="font-bold text-lg">Withdraw Funds</h3>
-      <p class="py-4">Enter the amount you want to withdraw. Available balance: ${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+      <h3 class="font-bold text-lg">{{ $t('app.wallet.withdraw_funds') }}</h3>
+      <p class="py-4">{{ $t('app.wallet.withdraw_funds_desc') }} ${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
       <div class="form-control">
         <label class="label">
-          <span class="label-text">Amount ($)</span>
+          <span class="label-text">{{ $t('app.wallet.amount_dollar') }}</span>
         </label>
         <input
           v-model="withdrawAmount"
@@ -302,14 +302,14 @@ const handleSend = async () => {
         />
       </div>
       <div class="modal-action">
-        <button class="btn" @click="closeModals">Cancel</button>
+        <button class="btn" @click="closeModals">{{ $t('app.wallet.cancel') }}</button>
         <button
           class="btn btn-outline"
           :disabled="!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > (walletData?.balanceLeft ?? 0) || withdrawLoading"
           @click="handleWithdraw"
         >
           <span v-if="withdrawLoading" class="loading loading-spinner loading-sm"></span>
-          Withdraw
+          {{ $t('app.wallet.withdraw') }}
         </button>
       </div>
     </div>
@@ -318,11 +318,11 @@ const handleSend = async () => {
   <!-- Send Modal -->
   <div v-if="showSendModal" class="modal modal-open">
     <div class="modal-box">
-      <h3 class="font-bold text-lg">Send Funds</h3>
-      <p class="py-4">Send paper money to another user. Available balance: ${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
+      <h3 class="font-bold text-lg">{{ $t('app.wallet.send_funds') }}</h3>
+      <p class="py-4">{{ $t('app.wallet.send_funds_desc') }} ${{ (walletData?.balanceLeft ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</p>
       <div class="form-control">
         <label class="label">
-          <span class="label-text">Recipient Email</span>
+          <span class="label-text">{{ $t('app.wallet.recipient_email') }}</span>
         </label>
         <input
           v-model="sendRecipient"
@@ -333,7 +333,7 @@ const handleSend = async () => {
       </div>
       <div class="form-control mt-4">
         <label class="label">
-          <span class="label-text">Amount ($)</span>
+          <span class="label-text">{{ $t('app.wallet.amount_dollar') }}</span>
         </label>
         <input
           v-model="sendAmount"
@@ -347,14 +347,14 @@ const handleSend = async () => {
         />
       </div>
       <div class="modal-action">
-        <button class="btn" @click="closeModals">Cancel</button>
+        <button class="btn" @click="closeModals">{{ $t('app.wallet.cancel') }}</button>
         <button
           class="btn btn-secondary"
           :disabled="!sendAmount || !sendRecipient || parseFloat(sendAmount) <= 0 || parseFloat(sendAmount) > (walletData?.balanceLeft ?? 0) || sendLoading"
           @click="handleSend"
         >
           <span v-if="sendLoading" class="loading loading-spinner loading-sm"></span>
-          Send
+          {{ $t('app.wallet.send') }}
         </button>
       </div>
     </div>

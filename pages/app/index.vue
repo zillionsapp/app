@@ -142,7 +142,7 @@ const goToPage = async (page: number) => {
     <div v-if="loading" class="flex justify-center items-center min-h-96">
       <div class="text-center">
         <span class="loading loading-spinner loading-lg"></span>
-        <p class="mt-4">Loading trading dashboard...</p>
+        <p class="mt-4">{{ $t('app.dashboard.loading') }}</p>
       </div>
     </div>
 
@@ -151,33 +151,33 @@ const goToPage = async (page: number) => {
       <!-- Trading Stats -->
       <section class="stats stats-vertical w-full xl:stats-horizontal bg-base-100 rounded-box mb-8">
         <div class="stat">
-          <div class="stat-title">Current Balance</div>
+          <div class="stat-title">{{ $t('app.dashboard.current_balance') }}</div>
           <div class="stat-value">${{ (portfolioData?.currentBalance || 0).toLocaleString() }}</div>
-          <div class="stat-desc">Available Cash (USDT)</div>
+          <div class="stat-desc">{{ $t('app.dashboard.available_cash') }}</div>
         </div>
 
         <div class="stat">
-          <div class="stat-title">Current Equity</div>
+          <div class="stat-title">{{ $t('app.dashboard.current_equity') }}</div>
           <div class="stat-value">${{ (portfolioData?.currentEquity || 0).toLocaleString() }}</div>
           <div class="stat-desc">
             <span :class="totalUnrealizedPnL.dollar >= 0 ? 'text-success' : 'text-error'">
               {{ totalUnrealizedPnL.dollar >= 0 ? '+' : '-' }}${{ Math.abs(totalUnrealizedPnL.dollar).toFixed(2) }}
               ({{ totalUnrealizedPnL.percentage >= 0 ? '+' : '-' }}{{ Math.abs(totalUnrealizedPnL.percentage).toFixed(2) }}%)
             </span>
-            unrealized P&L
+            {{ $t('app.dashboard.unrealized_pnl') }}
           </div>
         </div>
 
         <div class="stat">
-          <div class="stat-title">Win Rate</div>
+          <div class="stat-title">{{ $t('app.dashboard.win_rate') }}</div>
           <div class="stat-value">{{ ((portfolioData?.winRate || 0) * 100).toFixed(1) }}%</div>
-          <div class="stat-desc">Based on closed trades</div>
+          <div class="stat-desc">{{ $t('app.dashboard.based_on_closed_trades') }}</div>
         </div>
 
         <div class="stat">
-          <div class="stat-title">Profit Factor</div>
+          <div class="stat-title">{{ $t('app.dashboard.profit_factor') }}</div>
           <div class="stat-value">{{ (portfolioData?.profitFactor || 0).toFixed(2) }}</div>
-          <div class="stat-desc">Gross Profit / Gross Loss</div>
+          <div class="stat-desc">{{ $t('app.dashboard.gross_profit_gross_loss') }}</div>
         </div>
       </section>
 
@@ -185,29 +185,29 @@ const goToPage = async (page: number) => {
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
         <div class="card bg-base-100 shadow-lg">
           <div class="card-body">
-            <h3 class="card-title text-lg">Total PnL</h3>
+            <h3 class="card-title text-lg">{{ $t('app.dashboard.total_pnl') }}</h3>
             <p class="text-3xl font-bold" :class="(portfolioData?.totalPnL || 0) >= 0 ? 'text-success' : 'text-error'">
               {{ (portfolioData?.totalPnL || 0) >= 0 ? '+' : '-' }}${{ Math.abs(portfolioData?.totalPnL || 0).toFixed(2) }}
             </p>
             <p class="text-sm opacity-70">
-              {{ (portfolioData?.totalPnLPercentage || 0).toFixed(2) }}% realized P&L
+              {{ (portfolioData?.totalPnLPercentage || 0).toFixed(2) }}% {{ $t('app.dashboard.realized_pnl') }}
             </p>
           </div>
         </div>
 
         <div class="card bg-base-100 shadow-lg">
           <div class="card-body">
-            <h3 class="card-title text-lg">Open Positions</h3>
+            <h3 class="card-title text-lg">{{ $t('app.dashboard.open_positions') }}</h3>
             <p class="text-3xl font-bold text-info">{{ portfolioData?.openTradesCount || 0 }}</p>
             <p class="text-sm opacity-70">
-              ${{ (portfolioData?.totalMarginUsed || 0).toLocaleString() }} margin used
+              ${{ (portfolioData?.totalMarginUsed || 0).toLocaleString() }} {{ $t('app.dashboard.margin_used') }}
             </p>
           </div>
         </div>
 
         <div class="card bg-base-100 shadow-lg">
           <div class="card-body">
-            <h3 class="card-title text-lg">Closed Trades</h3>
+            <h3 class="card-title text-lg">{{ $t('app.dashboard.closed_trades') }}</h3>
             <p class="text-3xl font-bold text-warning">{{ portfolioData?.closedTrades || 0 }}</p>
             <p class="text-sm opacity-70">
               {{ portfolioData?.winningTrades || 0 }}W / {{ portfolioData?.losingTrades || 0 }}L
@@ -219,32 +219,32 @@ const goToPage = async (page: number) => {
       <!-- Recent Trades -->
       <div class="card bg-base-100 shadow-xl">
         <div class="card-body">
-          <h2 class="card-title">Recent Trades</h2>
+          <h2 class="card-title">{{ $t('app.dashboard.recent_trades') }}</h2>
 
           <div class="overflow-x-auto">
             <table class="table table-zebra w-full">
               <thead>
                 <tr class="bg-base-200">
-                  <th>Status</th>
-                  <th>Symbol</th>
-                  <th>Side</th>
-                  <th>Entry Price</th>
-                  <th>Exit Price</th>
-                  <th>PnL ($)</th>
-                  <th>PnL (%)</th>
+                  <th>{{ $t('app.dashboard.status') }}</th>
+                  <th>{{ $t('app.dashboard.symbol') }}</th>
+                  <th>{{ $t('app.dashboard.side') }}</th>
+                  <th>{{ $t('app.dashboard.entry_price') }}</th>
+                  <th>{{ $t('app.dashboard.exit_price') }}</th>
+                  <th>{{ $t('app.dashboard.pnl_dollar') }}</th>
+                  <th>{{ $t('app.dashboard.pnl_percentage') }}</th>
                 </tr>
               </thead>
               <tbody>
                 <tr v-for="trade in (tradesData?.trades || [])" :key="trade.id">
                   <td>
                     <span :class="trade.status === 'OPEN' ? 'badge badge-warning' : 'badge badge-success'">
-                      {{ trade.status }}
+                      {{ trade.status === 'OPEN' ? $t('app.dashboard.open') : $t('app.dashboard.closed') }}
                     </span>
                   </td>
                   <td class="font-bold">{{ trade.symbol }}</td>
                   <td>
                     <span :class="trade.side === 'BUY' ? 'badge badge-success' : 'badge badge-error'">
-                      {{ trade.side }}
+                      {{ trade.side === 'BUY' ? $t('app.dashboard.buy') : $t('app.dashboard.sell') }}
                     </span>
                   </td>
                   <td>${{ trade.price?.toFixed(2) || '0.00' }}</td>
@@ -290,11 +290,11 @@ const goToPage = async (page: number) => {
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
                 </svg>
-                Previous
+                {{ $t('app.dashboard.previous') }}
               </button>
 
               <button class="join-item btn btn-outline btn-active px-6">
-                Page {{ currentPage }} of {{ Math.ceil(totalTrades / pageSize) }}
+                {{ $t('app.dashboard.page') }} {{ currentPage }} {{ $t('app.dashboard.of') }} {{ Math.ceil(totalTrades / pageSize) }}
               </button>
 
               <button
@@ -302,7 +302,7 @@ const goToPage = async (page: number) => {
                 :disabled="currentPage >= Math.ceil(totalTrades / pageSize)"
                 @click="nextPage"
               >
-                Next
+                {{ $t('app.dashboard.next') }}
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                 </svg>
@@ -311,7 +311,7 @@ const goToPage = async (page: number) => {
           </div>
 
           <div v-if="!(tradesData?.trades || []).length" class="text-center py-8 opacity-60">
-            <p>No trades yet</p>
+            <p>{{ $t('app.dashboard.no_trades_yet') }}</p>
           </div>
         </div>
       </div>
