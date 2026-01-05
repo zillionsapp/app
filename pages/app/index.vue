@@ -8,6 +8,7 @@ definePageMeta({
 const portfolioData = ref(null)
 const chartData = ref(null)
 const tradesData = ref(null)
+const currentPrices = ref<Record<string, number>>({})
 const loading = ref(true)
 
 // Pagination
@@ -34,12 +35,72 @@ const refreshData = async () => {
 
     portfolioData.value = portfolio
     chartData.value = chart
+
+    // Fetch current prices for unrealized PnL calculations
+    await fetchCurrentPrices()
   } catch (error) {
     console.error('Failed to refresh dashboard data:', error)
   } finally {
     loading.value = false
   }
 }
+
+// Fetch current prices from Binance
+const fetchCurrentPrices = async () => {
+  if (!tradesData.value?.trades?.length) return
+
+  const symbols = [...new Set(tradesData.value.trades.map((trade: any) => trade.symbol))]
+  if (symbols.length === 0) return
+
+  try {
+    const prices = await $fetch(`/api/prices?symbols=${symbols.join(',')}`)
+    currentPrices.value = prices as Record<string, number>
+  } catch (error) {
+    console.error('Failed to fetch current prices:', error)
+  }
+}
+
+// Calculate unrealized PnL for a trade
+const calculateUnrealizedPnL = (trade: any) => {
+  if (trade.status !== 'OPEN' || !currentPrices.value[trade.symbol]) {
+    return { dollar: 0, percentage: 0 }
+  }
+
+  const entryPrice = trade.price
+  const currentPrice = currentPrices.value[trade.symbol]
+  const quantity = trade.quantity
+  const leverage = trade.leverage || 1
+
+  // Calculate dollar PnL
+  const dollarPnL = trade.side === 'BUY'
+    ? (currentPrice - entryPrice) * quantity
+    : (entryPrice - currentPrice) * quantity
+
+  // Calculate percentage PnL (based on margin used)
+  const entryValue = entryPrice * quantity
+  const margin = entryValue / leverage
+  const percentagePnL = margin !== 0 ? (dollarPnL / margin) * 100 : 0
+
+  return { dollar: dollarPnL, percentage: percentagePnL }
+}
+
+// Calculate total unrealized PnL
+const totalUnrealizedPnL = computed(() => {
+  if (!tradesData.value?.trades?.length) return { dollar: 0, percentage: 0 }
+
+  let totalDollar = 0
+  const openTrades = tradesData.value.trades.filter((trade: any) => trade.status === 'OPEN')
+
+  openTrades.forEach((trade: any) => {
+    const pnl = calculateUnrealizedPnL(trade)
+    totalDollar += pnl.dollar
+  })
+
+  const walletBalance = portfolioData.value?.currentBalance || 0
+  const percentage = walletBalance > 0 ? (totalDollar / walletBalance) * 100 : 0
+
+  return { dollar: totalDollar, percentage }
+})
 
 // Load trades with pagination
 const loadTrades = async () => {
@@ -98,7 +159,13 @@ const goToPage = async (page: number) => {
         <div class="stat">
           <div class="stat-title">Current Equity</div>
           <div class="stat-value">${{ (portfolioData?.currentEquity || 0).toLocaleString() }}</div>
-          <div class="stat-desc">Total Portfolio Value</div>
+          <div class="stat-desc">
+            <span :class="totalUnrealizedPnL.dollar >= 0 ? 'text-success' : 'text-error'">
+              {{ totalUnrealizedPnL.dollar >= 0 ? '+' : '-' }}${{ Math.abs(totalUnrealizedPnL.dollar).toFixed(2) }}
+              ({{ totalUnrealizedPnL.percentage >= 0 ? '+' : '-' }}{{ Math.abs(totalUnrealizedPnL.percentage).toFixed(2) }}%)
+            </span>
+            unrealized P&L
+          </div>
         </div>
 
         <div class="stat">
@@ -185,18 +252,26 @@ const goToPage = async (page: number) => {
                     <span v-if="trade.exitPrice">${{ trade.exitPrice.toFixed(2) }}</span>
                     <span v-else>-</span>
                   </td>
-                  <td :class="trade.pnl >= 0 ? 'text-success' : 'text-error'">
-                    <span v-if="trade.status === 'CLOSED'">
+                  <td>
+                    <span v-if="trade.status === 'CLOSED'" :class="trade.pnl >= 0 ? 'text-success' : 'text-error'">
                       {{ trade.pnl >= 0 ? '+' : '' }}{{ trade.pnl.toFixed(2) }}
                     </span>
-                    <span v-else-if="trade.status === 'OPEN'">Unrealized</span>
+                    <span v-else-if="trade.status === 'OPEN'">
+                      <span :class="calculateUnrealizedPnL(trade).dollar >= 0 ? 'text-success' : 'text-error'">
+                        {{ calculateUnrealizedPnL(trade).dollar >= 0 ? '+' : '' }}{{ calculateUnrealizedPnL(trade).dollar.toFixed(2) }}
+                      </span>
+                    </span>
                     <span v-else>-</span>
                   </td>
-                  <td :class="trade.pnlPercentage >= 0 ? 'text-success' : 'text-error'">
-                    <span v-if="trade.status === 'CLOSED'">
+                  <td>
+                    <span v-if="trade.status === 'CLOSED'" :class="trade.pnlPercentage >= 0 ? 'text-success' : 'text-error'">
                       {{ trade.pnlPercentage >= 0 ? '+' : '' }}{{ trade.pnlPercentage.toFixed(2) }}%
                     </span>
-                    <span v-else-if="trade.status === 'OPEN'">Unrealized</span>
+                    <span v-else-if="trade.status === 'OPEN'">
+                      <span :class="calculateUnrealizedPnL(trade).percentage >= 0 ? 'text-success' : 'text-error'">
+                        {{ calculateUnrealizedPnL(trade).percentage >= 0 ? '+' : '' }}{{ calculateUnrealizedPnL(trade).percentage.toFixed(2) }}%
+                      </span>
+                    </span>
                     <span v-else>-</span>
                   </td>
                 </tr>
