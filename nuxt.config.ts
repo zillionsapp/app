@@ -1,71 +1,90 @@
-import tailwindcss from "@tailwindcss/vite";
-
+// https://nuxt.com/docs/api/configuration/nuxt-config
 export default defineNuxtConfig({
   compatibilityDate: '2025-07-15',
-  devtools: { enabled: true },
-  app: {
-    baseURL: '/',            // keep '/' for zillions.app or username.github.io root
-    // buildAssetsDir: 'assets/' // optional workaround if you don't want to use .nojekyll
-  },
-  ssr: true,
-  // Make Nitro target Vercel Node functions (not edge)
-  nitro: {
-    preset: 'vercel',
-    experimental: {
-      tasks: true
-    },
-    scheduledTasks: {
-      // Run paper trading every 5 minutes
-      '0,5,10,15,20,25,30,35,40,45,50,55 * * * *': 'paper-trading',
-      // Run crypto research daily at 9:00 AM UTC
-      /* '0 9 * * *': 'crypto-research', */
-      // Run BTC day trader every hour (24/7 for crypto)
-      /* '0,5,10,15,20,25,30,35,40,45,50,55 * * * *': 'btc-day-trader' */
-    }
-  },
-  // Optional: make sure this route is always dynamic and never cached/prerendered
-  routeRules: {
-    '/api/series': { swr: false, cache: false, isr: false }
-  },
-  vite: {
-    plugins: [tailwindcss()],
-  },
-  css: ["~/assets/app.css"],
   modules: [
-    '@clerk/nuxt',
-    '@nuxtjs/i18n'
+    '@nuxtjs/tailwindcss',
+    '@nuxtjs/supabase',
+    '@nuxtjs/i18n',
+    '@pinia/nuxt',
+    ...(process.env.NODE_ENV !== 'test' ? ['@nuxtjs/color-mode'] : []),
+    '@nuxt/test-utils/module',
+    'nuxt-charts',
+    '@vite-pwa/nuxt'
   ],
+  colorMode: {
+    preference: 'system',
+    dataValue: 'theme', // try to use data-theme attribute
+    classSuffix: '',
+  },
+  supabase: {
+    redirect: false,
+    url: process.env.SUPABASE_URL || 'https://example.supabase.co',
+    key: process.env.SUPABASE_KEY || 'test-key',
+  },
   i18n: {
     locales: [
       { code: 'en', file: 'en.json' },
-      { code: 'de', file: 'de.json' }
+      { code: 'fr', file: 'fr.json' },
+      { code: 'de', file: 'de.json' },
+      { code: 'es', file: 'es.json' }
     ],
     defaultLocale: 'en',
+    strategy: 'no_prefix',
     detectBrowserLanguage: {
       useCookie: true,
       cookieKey: 'i18n_redirected',
       redirectOn: 'root',
-      alwaysRedirect: false
+      alwaysRedirect: false,
+      fallbackLocale: 'en'
     },
+    vueI18n: './i18n.config.ts'
   },
-  runtimeConfig: {
-    // Private keys (only available on server-side)
-    airtableApiKey: process.env.AIRTABLE_API_KEY,
-    airtableBaseId: process.env.AIRTABLE_BASE_ID,
-    airtableWalletTable: process.env.AIRTABLE_WALLET_TABLE,
-    airtableCryptoResearchTable: process.env.AIRTABLE_CRYPTO_RESEARCH_TABLE,
-    airtableReferralTable: process.env.AIRTABLE_REFERRAL_TABLE,
-    airtableReferralBaseId: process.env.AIRTABLE_REFERRAL_BASE_ID,
-    openrouterApiKey: process.env.OPENROUTER_API_KEY,
-    anthropicApiKey: process.env.ANTHROPHIC_API_KEY,
-
-    // Public keys (available on both client and server)
-    public: {
-      clerkPublishableKey: process.env.CLERK_PUBLISHABLE_KEY,
-      clerkSecretKey: process.env.CLERK_SECRET_KEY
+  css: ['~/assets/css/main.css'],
+  app: {
+    head: {
+      script: [
+        {
+          src: 'https://cdn.jsdelivr.net/npm/external-svg-loader@1.6.10/svg-loader.min.js',
+          async: true
+        }
+      ]
     }
   },
-  router: {
-    middleware: ['auth']
+  devtools: { enabled: true },
+  pwa: {
+    registerType: 'autoUpdate',
+    manifest: {
+      name: 'Boilerplate App',
+      short_name: 'Boilerplate',
+      description: 'A Nuxt 4 web application',
+      theme_color: '#4A90E2',
+      icons: [
+        {
+          src: '/pwa-icon-192x192.png',
+          sizes: '192x192',
+          type: 'image/png',
+        },
+        {
+          src: '/pwa-icon-512x512.png',
+          sizes: '512x512',
+          type: 'image/png',
+        },
+      ],
+    },
+    workbox: {
+      runtimeCaching: [
+        {
+          urlPattern: /\.(?:png|jpg|jpeg|svg|gif)$/,
+          handler: 'CacheFirst',
+          options: {
+            cacheName: 'image-cache',
+            expiration: {
+              maxEntries: 100,
+              maxAgeSeconds: 7 * 24 * 60 * 60, // 1 week
+            },
+          },
+        },
+      ],
+    },
   }
 })
