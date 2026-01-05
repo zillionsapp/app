@@ -8,6 +8,7 @@ const pageTitle = computed(() => {
   if (route.path === '/app') return t('dashboard')
   if (route.path === '/app/settings') return t('settings')
   if (route.path === '/app/profile') return t('profile')
+  if (route.path === '/app/referrals') return 'Referrals'
   return t('dashboard')
 })
 
