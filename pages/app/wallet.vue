@@ -61,10 +61,10 @@ const xFormatter = (tick: number): string => {
     <div class="stat">
       <div class="stat-title text-info uppercase text-xs font-bold tracking-widest">Total PnL</div>
       <div class="stat-value text-2xl" :class="(walletData?.pnl ?? 0) >= 0 ? 'text-success' : 'text-error'">
-        {{ (walletData?.pnl ?? 0) >= 0 ? '+' : '' }}${{ Math.abs(walletData?.pnl ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
+        {{ (walletData?.pnl ?? 0) >= 0 ? '+' : '-' }}${{ Math.abs(walletData?.pnl ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}
       </div>
       <div class="stat-desc mt-1" :class="(walletData?.pnl ?? 0) >= 0 ? 'text-success' : 'text-error'">
-        {{ (walletData?.pnlPercentage ?? 0) >= 0 ? '+' : '' }}{{ Math.abs(walletData?.pnlPercentage ?? 0).toFixed(2) }}%
+        {{ (walletData?.pnlPercentage ?? 0) >= 0 ? '+' : '-' }}{{ Math.abs(walletData?.pnlPercentage ?? 0).toFixed(2) }}%
       </div>
     </div>
   </section>
