@@ -41,6 +41,12 @@ const logout = async () => {
           </NuxtLink>
         </li>
         <li class="w-full">
+          <NuxtLink to="/app/transactions" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/transactions' ? 'bg-base-200' : '']">
+            <svg data-src="https://unpkg.com/heroicons/20/solid/receipt-refund.svg" class="h-5 w-5 flex-shrink-0"></svg>
+            <span>Transactions</span>
+          </NuxtLink>
+        </li>
+        <li class="w-full">
           <NuxtLink to="/app/referrals" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/referrals' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/user-plus.svg" class="h-5 w-5 flex-shrink-0"></svg>
             <span>Referrals</span>
