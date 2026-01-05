@@ -197,7 +197,7 @@
   },
   "app": {
     "nav": {
-      "dashboard": "Dashboard",
+      "dashboard": "Tresor",
       "wallet": "Wallet",
       "transactions": "Transaktionen",
       "referrals": "Empfehlungen",
