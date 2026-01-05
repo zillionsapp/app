@@ -10,24 +10,69 @@ const chartData = ref(null)
 const tradesData = ref(null)
 const loading = ref(true)
 
+// Pagination
+const currentPage = ref(1)
+const pageSize = ref(10)
+const totalTrades = ref(0)
+
 // Load data on mount
 onMounted(async () => {
+  await refreshData()
+
+  // Set up real-time refresh every 10 seconds
+  setInterval(refreshData, 10000)
+})
+
+// Refresh all dashboard data
+const refreshData = async () => {
   try {
     const [portfolio, chart, trades] = await Promise.all([
       $fetch('/api/trading/portfolio'),
       $fetch('/api/trading/chart'),
-      $fetch('/api/trading/trades')
+      loadTrades()
     ])
 
     portfolioData.value = portfolio
     chartData.value = chart
-    tradesData.value = trades
   } catch (error) {
-    console.error('Failed to load dashboard data:', error)
+    console.error('Failed to refresh dashboard data:', error)
   } finally {
     loading.value = false
   }
-})
+}
+
+// Load trades with pagination
+const loadTrades = async () => {
+  try {
+    const response = await $fetch(`/api/trading/trades?limit=${pageSize.value}&offset=${(currentPage.value - 1) * pageSize.value}`)
+    tradesData.value = response
+    totalTrades.value = response.total || 0
+    return response
+  } catch (error) {
+    console.error('Failed to load trades:', error)
+    return null
+  }
+}
+
+// Pagination methods
+const nextPage = async () => {
+  if (currentPage.value * pageSize.value < totalTrades.value) {
+    currentPage.value++
+    await loadTrades()
+  }
+}
+
+const prevPage = async () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+    await loadTrades()
+  }
+}
+
+const goToPage = async (page: number) => {
+  currentPage.value = page
+  await loadTrades()
+}
 </script>
 
 <template>
@@ -75,7 +120,7 @@ onMounted(async () => {
           <div class="card-body">
             <h3 class="card-title text-lg">Total PnL</h3>
             <p class="text-3xl font-bold" :class="(portfolioData?.totalPnL || 0) >= 0 ? 'text-success' : 'text-error'">
-              {{ (portfolioData?.totalPnL || 0) >= 0 ? '+' : '' }}${{ Math.abs(portfolioData?.totalPnL || 0).toFixed(2) }}
+              {{ (portfolioData?.totalPnL || 0) >= 0 ? '+' : '-' }}${{ Math.abs(portfolioData?.totalPnL || 0).toFixed(2) }}
             </p>
             <p class="text-sm opacity-70">
               {{ (portfolioData?.totalPnLPercentage || 0).toFixed(2) }}% realized P&L
@@ -118,11 +163,12 @@ onMounted(async () => {
                   <th>Side</th>
                   <th>Entry Price</th>
                   <th>Exit Price</th>
-                  <th>PnL</th>
+                  <th>PnL ($)</th>
+                  <th>PnL (%)</th>
                 </tr>
               </thead>
               <tbody>
-                <tr v-for="trade in (tradesData?.trades || []).slice(0, 5)" :key="trade.id">
+                <tr v-for="trade in (tradesData?.trades || [])" :key="trade.id">
                   <td>
                     <span :class="trade.status === 'OPEN' ? 'badge badge-warning' : 'badge badge-success'">
                       {{ trade.status }}
@@ -140,14 +186,53 @@ onMounted(async () => {
                     <span v-else>-</span>
                   </td>
                   <td :class="trade.pnl >= 0 ? 'text-success' : 'text-error'">
-                    <span v-if="trade.pnl !== undefined">
+                    <span v-if="trade.status === 'CLOSED'">
                       {{ trade.pnl >= 0 ? '+' : '' }}{{ trade.pnl.toFixed(2) }}
                     </span>
+                    <span v-else-if="trade.status === 'OPEN'">Unrealized</span>
+                    <span v-else>-</span>
+                  </td>
+                  <td :class="trade.pnlPercentage >= 0 ? 'text-success' : 'text-error'">
+                    <span v-if="trade.status === 'CLOSED'">
+                      {{ trade.pnlPercentage >= 0 ? '+' : '' }}{{ trade.pnlPercentage.toFixed(2) }}%
+                    </span>
+                    <span v-else-if="trade.status === 'OPEN'">Unrealized</span>
                     <span v-else>-</span>
                   </td>
                 </tr>
               </tbody>
             </table>
+          </div>
+
+          <!-- Pagination -->
+          <div v-if="totalTrades > pageSize" class="flex justify-center mt-6">
+            <div class="join">
+              <button
+                class="join-item btn btn-primary"
+                :disabled="currentPage <= 1"
+                @click="prevPage"
+              >
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+                </svg>
+                Previous
+              </button>
+
+              <button class="join-item btn btn-outline btn-active px-6">
+                Page {{ currentPage }} of {{ Math.ceil(totalTrades / pageSize) }}
+              </button>
+
+              <button
+                class="join-item btn btn-primary"
+                :disabled="currentPage >= Math.ceil(totalTrades / pageSize)"
+                @click="nextPage"
+              >
+                Next
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+                </svg>
+              </button>
+            </div>
           </div>
 
           <div v-if="!(tradesData?.trades || []).length" class="text-center py-8 opacity-60">
