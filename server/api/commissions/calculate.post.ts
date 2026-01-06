@@ -1,4 +1,4 @@
-import { serverSupabaseClient } from '#supabase/server'
+import { createClient } from '@supabase/supabase-js'
 
 export default defineEventHandler(async (event) => {
   // Set timeout for long-running operations (extend to 10 minutes)
@@ -30,7 +30,23 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const supabase = await serverSupabaseClient(event)
+  // Create direct Supabase client to avoid Nuxt i18n context issues
+  const supabaseUrl = process.env.SUPABASE_URL
+  const supabaseKey = process.env.SUPABASE_KEY
+
+  if (!supabaseUrl || !supabaseKey) {
+    throw createError({
+      statusCode: 500,
+      statusMessage: 'Supabase configuration missing'
+    })
+  }
+
+  const supabase = createClient(supabaseUrl, supabaseKey, {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  })
 
   try {
     // Optional: Add target date parameter
