@@ -51,8 +51,19 @@ const equityCategories = computed(() => ({
 }))
 
 const xFormatter = (tick: number): string => {
-  const date = new Date(performanceData.value[tick]?.date || '')
-  return date.toLocaleDateString()
+  const dateStr = performanceData.value[tick]?.date
+  if (!dateStr) return ''
+
+  const date = new Date(dateStr + 'T00:00:00')
+  return date.toLocaleDateString('en-US', {
+    month: 'short',
+    day: 'numeric',
+    year: 'numeric'
+  })
+}
+
+const yFormatter = (value: number): string => {
+  return `$${value.toLocaleString()}`
 }
 
 // Modal functions
@@ -192,6 +203,7 @@ const handleSend = async () => {
         :categories="equityCategories"
         :y-grid-line="true"
         :x-formatter="xFormatter"
+        :y-formatter="yFormatter"
         :curve-type="CurveType.MonotoneX"
         :legend-position="LegendPosition.BottomCenter"
         :hide-legend="true"
