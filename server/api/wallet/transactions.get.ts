@@ -30,21 +30,31 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get user's commission payments (as referrer)
-  const { data: commissionPayments, error: commError } = await (supabase as any)
+  // Get user's commission earnings (as referrer)
+  const { data: commissionEarnings, error: earningsError } = await (supabase as any)
     .from('commission_transactions')
     .select('id, commission_earned, transaction_date, invited_user_id')
     .eq('inviter_id', user.id)
     .order('transaction_date', { ascending: true })
 
-  if (commError) {
-    console.error('Error fetching commission payments:', commError)
-    // Don't fail if commission data isn't available
+  if (earningsError) {
+    console.error('Error fetching commission earnings:', earningsError)
+  }
+
+  // Get user's commission payments (as referred user)
+  const { data: commissionPayments, error: paymentsError } = await (supabase as any)
+    .from('commission_transactions')
+    .select('id, commission_earned, transaction_date, inviter_id')
+    .eq('invited_user_id', user.id)
+    .order('transaction_date', { ascending: true })
+
+  if (paymentsError) {
+    console.error('Error fetching commission payments:', paymentsError)
   }
 
 
 
-  // Combine vault transactions and commission payments
+  // Combine vault transactions and commission transactions
   const allTransactions = [
     // Vault transactions
     ...(vaultTransactions || []).map((tx: any) => ({
@@ -53,17 +63,29 @@ export default defineEventHandler(async (event) => {
       commission_earned: null,
       invited_user_id: null
     })),
-    // Commission payments
-    ...(commissionPayments || []).map((comm: any) => ({
+    // Commission earnings (positive for referrer)
+    ...(commissionEarnings || []).map((comm: any) => ({
       id: comm.id,
       amount: comm.commission_earned,
       shares: 0,
-      type: 'COMMISSION',
+      type: 'COMMISSION_EARNED',
       timestamp: new Date(comm.transaction_date).getTime(),
       email: userEmail,
-      transaction_type: 'commission',
+      transaction_type: 'commission_earned',
       commission_earned: comm.commission_earned,
       invited_user_id: comm.invited_user_id
+    })),
+    // Commission payments (negative for referred user)
+    ...(commissionPayments || []).map((comm: any) => ({
+      id: comm.id,
+      amount: -comm.commission_earned, // Negative amount for payment
+      shares: 0,
+      type: 'COMMISSION_PAID',
+      timestamp: new Date(comm.transaction_date).getTime(),
+      email: userEmail,
+      transaction_type: 'commission_paid',
+      commission_earned: -comm.commission_earned,
+      inviter_id: comm.inviter_id
     }))
   ].sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp ascending
 
@@ -90,10 +112,16 @@ export default defineEventHandler(async (event) => {
         typeDisplay = 'withdrawal'
         shares = Number(tx.shares).toLocaleString()
       }
-    } else if (tx.transaction_type === 'commission') {
-      // Commission payments don't affect deposited balance
+    } else if (tx.transaction_type === 'commission_earned') {
+      // Commission earnings don't affect deposited balance
       description = 'Commission Received'
       amountDisplay = `+$${Number(tx.commission_earned).toLocaleString()}`
+      typeDisplay = 'commission'
+      shares = '0'
+    } else if (tx.transaction_type === 'commission_paid') {
+      // Commission payments don't affect deposited balance
+      description = 'Commission Paid'
+      amountDisplay = `-$${Math.abs(Number(tx.commission_earned)).toLocaleString()}`
       typeDisplay = 'commission'
       shares = '0'
     }
