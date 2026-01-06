@@ -19,7 +19,7 @@ const user = useSupabaseUser()
             </div>
             <div>
                 <h2 class="text-2xl font-bold">{{ user?.email?.split('@')[0] || 'User' }}</h2>
-                <p class="opacity-70">{{ $t('member_since') }}</p>
+                <p class="opacity-70">{{ $t('app.profile.member_since') }}</p>
             </div>
         </div>
 
@@ -28,30 +28,30 @@ const user = useSupabaseUser()
         <form>
             <div class="form-control w-full">
                 <label class="label">
-                    <span class="label-text">{{ $t('email_address') }}</span>
+                    <span class="label-text">{{ $t('app.profile.email_address') }}</span>
                 </label>
                 <input type="text" :value="user?.email" disabled class="input input-bordered w-full" />
                 <label class="label">
-                    <span class="label-text-alt text-warning">{{ $t('email_cannot_change') }}</span>
+                    <span class="label-text-alt text-warning">{{ $t('app.profile.email_cannot_change') }}</span>
                 </label>
             </div>
 
             <div class="form-control w-full mt-4">
                 <label class="label">
-                    <span class="label-text">{{ $t('full_name') }}</span>
+                    <span class="label-text">{{ $t('app.profile.full_name') }}</span>
                 </label>
-                <input type="text" :placeholder="$t('full_name')" class="input input-bordered w-full" />
+                <input type="text" :placeholder="$t('app.profile.full_name')" class="input input-bordered w-full" />
             </div>
 
              <div class="form-control w-full mt-4">
                 <label class="label">
-                    <span class="label-text">{{ $t('job_title') }}</span>
+                    <span class="label-text">{{ $t('app.profile.job_title') }}</span>
                 </label>
-                <input type="text" :placeholder="$t('job_title')" class="input input-bordered w-full" />
+                <input type="text" :placeholder="$t('app.profile.job_title')" class="input input-bordered w-full" />
             </div>
 
             <div class="mt-8 flex justify-end">
-                <button class="btn btn-primary" type="button" onclick="alert('Profile Updated!')">{{ $t('save_changes') }}</button>
+                <button class="btn btn-primary" type="button" onclick="alert('Profile Updated!')">{{ $t('app.profile.save_changes') }}</button>
             </div>
         </form>
     </div>

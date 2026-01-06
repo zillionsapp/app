@@ -329,5 +329,21 @@
       "job_title": "Berufsbezeichnung",
       "save_changes": "Änderungen speichern"
     }
+  },
+  "auth": {
+    "login_title": "Willkommen zurück",
+    "login_subtitle": "Melden Sie sich in Ihrem Zillions-Konto an, um mit dem Trading fortzufahren",
+    "register_title": "Zillions beitreten",
+    "register_subtitle": "Erstellen Sie Ihr Konto und beginnen Sie Ihre Trading-Reise",
+    "email": "E-Mail",
+    "password": "Passwort",
+    "forgot_password": "Passwort vergessen?",
+    "login_button": "Anmelden",
+    "register_button": "Konto erstellen",
+    "or_divider": "oder",
+    "no_account": "Haben Sie noch kein Konto?",
+    "have_account": "Haben Sie bereits ein Konto?",
+    "register_link": "Registrieren",
+    "login_link": "Anmelden"
   }
 }
