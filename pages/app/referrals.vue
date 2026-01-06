@@ -4,16 +4,23 @@ definePageMeta({
   middleware: 'auth'
 })
 
+interface InviteCodeUsage {
+  id: string
+  used_at: string
+  used_by: {
+    id: string
+    email: string
+  }
+}
+
 interface InviteCode {
   id: string
   code: string
   created_at: string
-  used_at?: string
   is_active: boolean
-  used_by?: {
-    id: string
-    email: string
-  }
+  max_uses: number
+  current_uses: number
+  usages: InviteCodeUsage[]
 }
 
 interface CommissionSummary {
@@ -27,10 +34,13 @@ interface CommissionSummary {
 const inviteCodes = ref<InviteCode[]>([])
 const commissionSummary = ref<CommissionSummary | null>(null)
 const loading = ref(false)
+const initialLoading = ref(true)
 const copiedCode = ref('')
 const showShareModal = ref(false)
+const showCreateModal = ref(false)
 const shareUrl = ref('')
 const newCode = ref('')
+const maxUsesInput = ref(1)
 
 const loadInviteCodes = async () => {
   try {
@@ -51,15 +61,22 @@ const loadCommissionSummary = async () => {
   }
 }
 
+const openCreateModal = () => {
+  maxUsesInput.value = 1
+  showCreateModal.value = true
+}
+
 const createInviteCode = async () => {
   loading.value = true
   try {
     const response = await $fetch('/api/invites/create', {
-      method: 'POST'
+      method: 'POST',
+      body: { maxUses: maxUsesInput.value }
     }) as any
 
     newCode.value = response.inviteCode.code
     shareUrl.value = `${window.location.origin}/?invite=${response.inviteCode.code}`
+    showCreateModal.value = false
     showShareModal.value = true
 
     await loadInviteCodes()
@@ -126,10 +143,15 @@ const formatDate = (dateString: string) => {
 }
 
 onMounted(async () => {
-  await Promise.all([
-    loadInviteCodes(),
-    loadCommissionSummary()
-  ])
+  initialLoading.value = true
+  try {
+    await Promise.all([
+      loadInviteCodes(),
+      loadCommissionSummary()
+    ])
+  } finally {
+    initialLoading.value = false
+  }
 })
 </script>
 
@@ -177,8 +199,8 @@ onMounted(async () => {
             </svg>
           </div>
           <div>
-            <div class="text-2xl font-bold">{{ inviteCodes.filter(c => c.used_by).length }}</div>
-            <div class="text-sm text-base-content/70">{{ $t('app.referrals.codes_used') }}</div>
+            <div class="text-2xl font-bold">{{ inviteCodes.reduce((sum, c) => sum + c.current_uses, 0) }}</div>
+            <div class="text-sm text-base-content/70">{{ $t('app.referrals.total_uses') }}</div>
           </div>
         </div>
       </div>
@@ -207,7 +229,7 @@ onMounted(async () => {
       <div class="card-body">
         <div class="flex justify-between items-center mb-6">
           <h2 class="card-title">{{ $t('app.referrals.your_referral_codes') }}</h2>
-          <button @click="createInviteCode" class="btn btn-primary btn-md gap-2" :disabled="loading">
+          <button @click="openCreateModal" class="btn btn-primary btn-md gap-2" :disabled="loading">
             <svg v-if="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
@@ -216,16 +238,24 @@ onMounted(async () => {
           </button>
         </div>
 
-        <div v-if="inviteCodes.length === 0" class="text-center py-12">
+        <!-- Loading State -->
+        <div v-if="initialLoading" class="text-center py-12">
+          <div class="loading loading-spinner loading-lg text-primary"></div>
+          <p class="mt-4 text-base-content/70">Loading your referral codes...</p>
+        </div>
+
+        <!-- No codes state -->
+        <div v-else-if="inviteCodes.length === 0" class="text-center py-12">
           <div class="text-6xl mb-4">🎁</div>
           <h3 class="text-xl font-semibold mb-2">{{ $t('app.referrals.no_referral_codes_yet') }}</h3>
           <p class="text-base-content/70 mb-6">{{ $t('app.referrals.create_first_code_desc') }}</p>
-          <button @click="createInviteCode" class="btn btn-primary btn-lg" :disabled="loading">
+          <button @click="openCreateModal" class="btn btn-primary btn-lg" :disabled="loading">
             <span v-if="loading" class="loading loading-spinner"></span>
             {{ $t('app.referrals.create_first_code') }}
           </button>
         </div>
 
+        <!-- Codes table -->
         <div v-else>
           <div class="overflow-x-auto">
             <table class="table table-zebra w-full">
@@ -235,74 +265,129 @@ onMounted(async () => {
                   <th>{{ $t('app.referrals.code') }}</th>
                   <th>{{ $t('app.referrals.status') }}</th>
                   <th>{{ $t('app.referrals.created') }}</th>
-                  <th>{{ $t('app.referrals.used') }}</th>
+                  <th>{{ $t('app.referrals.uses') }}</th>
                   <th>{{ $t('app.referrals.used_by') }}</th>
                   <th>{{ $t('app.referrals.actions') }}</th>
                 </tr>
               </thead>
               <!-- Table Body -->
               <tbody>
-                <tr v-for="code in inviteCodes" :key="code.id">
-                  <td>
-                    <code class="font-mono bg-base-200 px-2 py-1 rounded text-sm">{{ code.code }}</code>
-                  </td>
-                  <td>
-                    <div v-if="code.is_active" class="badge badge-success">{{ $t('app.referrals.active') }}</div>
-                    <div v-else class="badge badge-neutral">{{ $t('app.referrals.inactive') }}</div>
-                  </td>
-                  <td class="text-sm">{{ formatDate(code.created_at) }}</td>
-                  <td class="text-sm">
-                    <span v-if="code.used_at">{{ formatDate(code.used_at) }}</span>
-                    <span v-else class="text-base-content/50">-</span>
-                  </td>
-                  <td class="text-sm">
-                    <span v-if="code.used_by">{{ code.used_by.email }}</span>
-                    <span v-else class="text-base-content/50">-</span>
-                  </td>
-                  <td>
-                    <div class="flex gap-2">
-                      <button
-                        @click="copyToClipboard(code.code)"
-                        class="btn btn-sm btn-ghost tooltip"
-                        :class="{ 'btn-success': copiedCode === code.code }"
-                        data-tip="Copy code"
-                      >
-                        <svg v-if="copiedCode === code.code" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
-                        </svg>
-                        <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
-                        </svg>
-                      </button>
+                <template v-for="code in inviteCodes" :key="code.id">
+                  <tr>
+                    <td>
+                      <code class="font-mono bg-base-200 px-2 py-1 rounded text-sm">{{ code.code }}</code>
+                    </td>
+                    <td>
+                      <div v-if="code.is_active" class="badge badge-success">{{ $t('app.referrals.active') }}</div>
+                      <div v-else class="badge badge-neutral">{{ $t('app.referrals.inactive') }}</div>
+                    </td>
+                    <td class="text-sm">{{ formatDate(code.created_at) }}</td>
+                    <td class="text-sm">
+                      <span class="font-medium">{{ code.current_uses }}/{{ code.max_uses }}</span>
+                    </td>
+                    <td class="text-sm">
+                      <div v-if="code.usages.length > 0" class="space-y-1">
+                        <div v-for="usage in code.usages.slice(0, 2)" :key="usage.id" class="text-xs">
+                          {{ usage.used_by.email }}
+                        </div>
+                        <div v-if="code.usages.length > 2" class="text-xs text-base-content/60">
+                          +{{ code.usages.length - 2 }} more
+                        </div>
+                      </div>
+                      <span v-else class="text-base-content/50">-</span>
+                    </td>
+                    <td>
+                      <div class="flex gap-2">
+                        <button
+                          @click="copyToClipboard(code.code)"
+                          class="btn btn-sm btn-ghost tooltip"
+                          :class="{ 'btn-success': copiedCode === code.code }"
+                          data-tip="Copy code"
+                        >
+                          <svg v-if="copiedCode === code.code" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
+                          </svg>
+                          <svg v-else class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
+                          </svg>
+                        </button>
 
-                      <button
-                        @click="shareCode(code.code)"
-                        class="btn btn-sm btn-ghost tooltip"
-                        data-tip="Share link"
-                      >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
-                        </svg>
-                      </button>
+                        <button
+                          @click="shareCode(code.code)"
+                          class="btn btn-sm btn-ghost tooltip"
+                          data-tip="Share link"
+                        >
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.367 2.684 3 3 0 00-5.367-2.684z"></path>
+                          </svg>
+                        </button>
 
-                      <button
-                        v-if="code.is_active"
-                        @click="deactivateCode(code.id)"
-                        class="btn btn-sm btn-ghost text-error hover:bg-error hover:text-error-content tooltip"
-                        :disabled="loading"
-                        data-tip="Deactivate code"
-                      >
-                        <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728m0-12.728l12.728 12.728"></path>
-                        </svg>
-                      </button>
-                    </div>
-                  </td>
-                </tr>
+                        <button
+                          v-if="code.is_active"
+                          @click="deactivateCode(code.id)"
+                          class="btn btn-sm btn-ghost text-error hover:bg-error hover:text-error-content tooltip"
+                          :disabled="loading"
+                          data-tip="Deactivate code"
+                        >
+                          <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 5.636l-12.728 12.728m0-12.728l12.728 12.728"></path>
+                          </svg>
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                  <!-- Expanded details row for multiple usages -->
+                  <tr v-if="code.usages.length > 2" :key="`${code.id}-details`">
+                    <td colspan="6" class="bg-base-200/50">
+                      <div class="py-2">
+                        <div class="text-sm font-medium mb-2">All users who used this code:</div>
+                        <div class="space-y-1">
+                          <div v-for="usage in code.usages" :key="usage.id" class="flex justify-between items-center text-sm">
+                            <span>{{ usage.used_by.email }}</span>
+                            <span class="text-base-content/60">{{ formatDate(usage.used_at) }}</span>
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                  </tr>
+                </template>
               </tbody>
             </table>
           </div>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Create Modal -->
+  <div v-if="showCreateModal" class="modal modal-open">
+    <div class="modal-box">
+      <h3 class="font-bold text-lg mb-4">Create Invite Code</h3>
+      <p class="mb-4">How many times can this invite code be used?</p>
+
+      <div class="form-control">
+        <label class="label">
+          <span class="label-text">Maximum Uses</span>
+        </label>
+        <input
+          v-model.number="maxUsesInput"
+          type="number"
+          min="1"
+          max="1000"
+          class="input input-bordered"
+          placeholder="Enter number of uses"
+        />
+        <label class="label">
+          <span class="label-text-alt">1 = single use, 1000 = up to 1000 uses</span>
+        </label>
+      </div>
+
+      <div class="modal-action">
+        <button @click="createInviteCode" class="btn btn-primary" :disabled="loading || maxUsesInput < 1">
+          <span v-if="loading" class="loading loading-spinner loading-sm"></span>
+          Create Code
+        </button>
+        <button @click="showCreateModal = false" class="btn">Cancel</button>
       </div>
     </div>
   </div>

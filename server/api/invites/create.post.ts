@@ -1,6 +1,15 @@
 import { serverSupabaseClient } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
+  let body: any = {}
+  try {
+    body = await readBody(event) || {}
+  } catch (error) {
+    // No body sent, use defaults
+    body = {}
+  }
+  const { maxUses = 1 } = body
+
   const supabase = await serverSupabaseClient(event)
 
   // Get the current user
@@ -10,6 +19,14 @@ export default defineEventHandler(async (event) => {
     throw createError({
       statusCode: 401,
       statusMessage: 'Unauthorized'
+    })
+  }
+
+  // Validate maxUses
+  if (typeof maxUses !== 'number' || maxUses < 1 || maxUses > 1000) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'maxUses must be a number between 1 and 1000'
     })
   }
 
@@ -29,7 +46,8 @@ export default defineEventHandler(async (event) => {
     .from('invite_codes')
     .insert({
       code: codeData,
-      created_by: user.id
+      created_by: user.id,
+      max_uses: maxUses
     })
     .select()
     .single()

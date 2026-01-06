@@ -6,10 +6,18 @@ CREATE TABLE IF NOT EXISTS invite_codes (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     code VARCHAR(255) UNIQUE NOT NULL,
     created_by UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    used_by UUID REFERENCES auth.users(id) ON DELETE SET NULL,
+    max_uses INTEGER DEFAULT 1 CHECK (max_uses > 0),
+    current_uses INTEGER DEFAULT 0,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
-    used_at TIMESTAMP WITH TIME ZONE,
     is_active BOOLEAN DEFAULT TRUE
+);
+
+-- Create invite_code_usages table to track each usage
+CREATE TABLE IF NOT EXISTS invite_code_usages (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    invite_code_id UUID REFERENCES invite_codes(id) ON DELETE CASCADE,
+    used_by UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    used_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
 -- Create index on code for faster lookups
@@ -18,8 +26,9 @@ CREATE INDEX IF NOT EXISTS idx_invite_codes_code ON invite_codes(code);
 -- Create index on created_by for user's invite codes
 CREATE INDEX IF NOT EXISTS idx_invite_codes_created_by ON invite_codes(created_by);
 
--- Create index on used_by for tracking usage
-CREATE INDEX IF NOT EXISTS idx_invite_codes_used_by ON invite_codes(used_by);
+-- Create index on invite_code_usages
+CREATE INDEX IF NOT EXISTS idx_invite_code_usages_code_id ON invite_code_usages(invite_code_id);
+CREATE INDEX IF NOT EXISTS idx_invite_code_usages_used_by ON invite_code_usages(used_by);
 
 -- Row Level Security (RLS) policies
 ALTER TABLE invite_codes ENABLE ROW LEVEL SECURITY;
@@ -39,6 +48,29 @@ CREATE POLICY "Users can update their own invite codes" ON invite_codes
 -- Policy: Allow anyone to check if a code exists and is active (for registration)
 CREATE POLICY "Anyone can check invite code validity" ON invite_codes
     FOR SELECT USING (is_active = true);
+
+-- RLS for invite_code_usages
+ALTER TABLE invite_code_usages ENABLE ROW LEVEL SECURITY;
+
+-- Users can view usages of their own invite codes
+CREATE POLICY "Users can view usages of their invite codes" ON invite_code_usages
+    FOR SELECT USING (
+        EXISTS (
+            SELECT 1 FROM invite_codes ic
+            WHERE ic.id = invite_code_usages.invite_code_id
+            AND ic.created_by = auth.uid()
+        )
+    );
+
+-- Users can insert usages for their invite codes (when using codes)
+CREATE POLICY "Users can insert usages for invite codes" ON invite_code_usages
+    FOR INSERT WITH CHECK (
+        EXISTS (
+            SELECT 1 FROM invite_codes ic
+            WHERE ic.id = invite_code_usages.invite_code_id
+            AND ic.is_active = true
+        )
+    );
 
 -- Function to generate a random invite code
 CREATE OR REPLACE FUNCTION generate_invite_code()
@@ -72,13 +104,13 @@ BEGIN
         RETURN TRUE;
     END IF;
 
-    -- If invite code provided, check if it's valid and unused
+    -- If invite code provided, check if it's valid and has remaining uses
     IF invite_code_param IS NOT NULL THEN
         SELECT EXISTS(
             SELECT 1 FROM invite_codes
             WHERE code = invite_code_param
             AND is_active = true
-            AND used_by IS NULL
+            AND current_uses < max_uses
         ) INTO code_valid;
     END IF;
 
@@ -90,21 +122,40 @@ $$ LANGUAGE plpgsql SECURITY DEFINER;
 CREATE OR REPLACE FUNCTION use_invite_code(invite_code_param TEXT, user_id UUID)
 RETURNS BOOLEAN AS $$
 DECLARE
-    code_exists BOOLEAN := FALSE;
+    invite_code_record RECORD;
+    can_use BOOLEAN := FALSE;
+    new_current_uses INTEGER;
 BEGIN
-    -- Check if code exists and is available
-    SELECT EXISTS(
-        SELECT 1 FROM invite_codes
-        WHERE code = invite_code_param
-        AND is_active = true
-        AND used_by IS NULL
-    ) INTO code_exists;
+    -- Get the invite code details
+    SELECT * INTO invite_code_record
+    FROM invite_codes
+    WHERE code = invite_code_param
+    AND is_active = true;
 
-    IF code_exists THEN
-        -- Mark code as used
+    -- Check if code exists and has remaining uses
+    IF invite_code_record.id IS NOT NULL AND invite_code_record.current_uses < invite_code_record.max_uses THEN
+        -- Check if user hasn't already used this code
+        SELECT NOT EXISTS(
+            SELECT 1 FROM invite_code_usages
+            WHERE invite_code_id = invite_code_record.id
+            AND used_by = user_id
+        ) INTO can_use;
+    END IF;
+
+    IF can_use THEN
+        -- Calculate new usage count
+        new_current_uses := invite_code_record.current_uses + 1;
+
+        -- Insert usage record
+        INSERT INTO invite_code_usages (invite_code_id, used_by)
+        VALUES (invite_code_record.id, user_id);
+
+        -- Update current uses and deactivate if limit reached
         UPDATE invite_codes
-        SET used_by = user_id, used_at = NOW()
-        WHERE code = invite_code_param;
+        SET current_uses = new_current_uses,
+            is_active = CASE WHEN new_current_uses >= max_uses THEN false ELSE true END
+        WHERE id = invite_code_record.id;
+
         RETURN TRUE;
     END IF;
 
@@ -241,19 +292,19 @@ DECLARE
     commission_amount NUMERIC;
     inserted_count INTEGER := 0;
 BEGIN
-    -- Loop through all active invite relationships
+    -- Loop through all invite relationships (including deactivated codes)
     FOR commission_record IN
         SELECT
             ic.created_by as inviter_id,
-            ic.used_by as invited_user_id,
+            icu.used_by as invited_user_id,
             u.email as invited_email
         FROM invite_codes ic
-        JOIN auth.users u ON u.id = ic.used_by
-        WHERE ic.used_by IS NOT NULL
-        AND ic.is_active = true
+        JOIN invite_code_usages icu ON icu.invite_code_id = ic.id
+        JOIN auth.users u ON u.id = icu.used_by
     LOOP
         -- Get the invited user's daily P&L from portfolio_snapshots
-        -- This assumes portfolio_snapshots has daily snapshots with pnl data
+        -- NOTE: This currently uses global P&L data. When per-user portfolio tracking is implemented,
+        -- this should be updated to filter by user_id
         SELECT COALESCE(ps.pnl, 0) INTO daily_pnl
         FROM portfolio_snapshots ps
         WHERE DATE(ps.created_at) = target_date

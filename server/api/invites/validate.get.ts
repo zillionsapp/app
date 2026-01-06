@@ -16,7 +16,7 @@ export default defineEventHandler(async (event) => {
   // Check if code exists and is valid
   const { data, error } = await supabase
     .from('invite_codes')
-    .select('id, is_active, used_by')
+    .select('id, is_active, current_uses, max_uses')
     .eq('code', code)
     .single()
 
@@ -24,8 +24,8 @@ export default defineEventHandler(async (event) => {
     return { valid: false }
   }
 
-  // Code is valid if it's active and not used
-  const valid = (data as any).is_active && !(data as any).used_by
+  // Code is valid if it's active and has remaining uses
+  const valid = (data as any).is_active && (data as any).current_uses < (data as any).max_uses
 
   return { valid }
 })

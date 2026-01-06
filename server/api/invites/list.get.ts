@@ -13,16 +13,21 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get all invite codes created by this user
-  const { data, error } = await (supabase as any)
+  // Get all invite codes created by this user with usage information
+  const { data: codes, error } = await (supabase as any)
     .from('invite_codes')
     .select(`
       id,
       code,
       created_at,
-      used_at,
       is_active,
-      used_by
+      max_uses,
+      current_uses,
+      invite_code_usages (
+        id,
+        used_by,
+        used_at
+      )
     `)
     .eq('created_by', user.id)
     .order('created_at', { ascending: false })
@@ -32,7 +37,7 @@ export default defineEventHandler(async (event) => {
     if (error.message?.includes('relation "invite_codes" does not exist')) {
       throw createError({
         statusCode: 500,
-        statusMessage: 'Database table not found. Please run the supabase_schema.sql file in your Supabase database.'
+        statusMessage: 'Database table not found. Please run the frontend_schema.sql file in your Supabase database.'
       })
     }
 
@@ -43,8 +48,36 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Enrich usage data with user emails
+  const enrichedCodes = await Promise.all(
+    (codes || []).map(async (code: any) => {
+      const enrichedUsages = await Promise.all(
+        (code.invite_code_usages || []).map(async (usage: any) => {
+          // Fetch user email from auth.users
+          const { data: userData, error: userError } = await supabase.auth.admin.getUserById(usage.used_by)
+          if (!userError && userData.user) {
+            return {
+              id: usage.id,
+              used_at: usage.used_at,
+              used_by: {
+                id: usage.used_by,
+                email: userData.user.email
+              }
+            }
+          }
+          return usage
+        })
+      )
+
+      return {
+        ...code,
+        usages: enrichedUsages
+      }
+    })
+  )
+
   return {
     success: true,
-    inviteCodes: data || []
+    inviteCodes: enrichedCodes
   }
 })
