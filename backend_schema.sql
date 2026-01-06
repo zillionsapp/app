@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS public.vault_transactions (
     email TEXT NOT NULL,
     amount NUMERIC NOT NULL,
     shares NUMERIC NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL')),
+    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', 'COMMISSION_EARNED', 'COMMISSION_PAID')),
     timestamp BIGINT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );

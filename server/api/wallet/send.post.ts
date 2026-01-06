@@ -67,9 +67,9 @@ export default defineEventHandler(async (event) => {
   let senderTotalShares = 0
 
   for (const tx of senderTransactions || []) {
-    if (tx.type === 'DEPOSIT') {
+    if (tx.type === 'DEPOSIT' || tx.type === 'RECEIVE') {
       senderTotalShares += Number(tx.shares)
-    } else if (tx.type === 'WITHDRAWAL') {
+    } else if (tx.type === 'WITHDRAWAL' || tx.type === 'SEND') {
       senderTotalShares -= Number(tx.shares)
     }
   }
@@ -99,38 +99,38 @@ export default defineEventHandler(async (event) => {
 
   const timestamp = Date.now()
 
-  // Create withdrawal transaction for sender
-  const { error: senderWithdrawError } = await (supabase as any)
+  // Create send transaction for sender
+  const { error: senderSendError } = await (supabase as any)
     .from('vault_transactions')
     .insert({
       email: senderEmail,
       amount: amount,
       shares: sharesToTransfer,
-      type: 'WITHDRAWAL',
+      type: 'SEND',
       timestamp: timestamp
     })
 
-  if (senderWithdrawError) {
-    console.error('Error creating sender withdrawal:', senderWithdrawError)
+  if (senderSendError) {
+    console.error('Error creating sender send transaction:', senderSendError)
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to create sender transaction'
     })
   }
 
-  // Create deposit transaction for recipient
-  const { error: recipientDepositError } = await (supabase as any)
+  // Create receive transaction for recipient
+  const { error: recipientReceiveError } = await (supabase as any)
     .from('vault_transactions')
     .insert({
       email: recipientEmail,
       amount: amount,
       shares: sharesToTransfer,
-      type: 'DEPOSIT',
+      type: 'RECEIVE',
       timestamp: timestamp
     })
 
-  if (recipientDepositError) {
-    console.error('Error creating recipient deposit:', recipientDepositError)
+  if (recipientReceiveError) {
+    console.error('Error creating recipient receive transaction:', recipientReceiveError)
     // Note: In a real system, you'd want to rollback the sender transaction
     throw createError({
       statusCode: 500,

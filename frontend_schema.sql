@@ -243,7 +243,7 @@ CREATE TABLE IF NOT EXISTS public.vault_transactions (
     email TEXT NOT NULL,
     amount NUMERIC NOT NULL,
     shares NUMERIC NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL', 'COMMISSION_EARNED', 'COMMISSION_PAID')),
+    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', 'COMMISSION_EARNED', 'COMMISSION_PAID')),
     timestamp BIGINT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
     -- Commission-related fields (NULL for non-commission transactions)
@@ -342,9 +342,15 @@ BEGIN
         END IF;
 
         -- Calculate user's actual profit based on their vault share
-        -- Get user's net deposit amount (deposits - withdrawals)
+        -- Get user's net deposit amount (deposits + receives - withdrawals - sends)
         SELECT
-            COALESCE(SUM(CASE WHEN vt.type = 'DEPOSIT' THEN vt.amount ELSE -vt.amount END), 0) INTO user_deposit_total
+            COALESCE(SUM(
+                CASE
+                    WHEN vt.type IN ('DEPOSIT', 'RECEIVE') THEN vt.amount
+                    WHEN vt.type IN ('WITHDRAWAL', 'SEND') THEN -vt.amount
+                    ELSE 0
+                END
+            ), 0) INTO user_deposit_total
         FROM vault_transactions vt
         WHERE vt.email = commission_record.invited_email;
 

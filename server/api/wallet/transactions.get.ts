@@ -15,12 +15,12 @@ export default defineEventHandler(async (event) => {
 
   const userEmail = user.email!
 
-  // Get user's transactions from vault_transactions (deposits, withdrawals, earned commissions)
+  // Get user's transactions from vault_transactions (deposits, withdrawals, sends, receives, earned commissions)
   const { data: allTransactions, error: txError } = await (supabase as any)
     .from('vault_transactions')
     .select('id, amount, shares, type, timestamp, email, inviter_id, invited_user_id, invited_portfolio_value, invited_daily_pnl, commission_rate')
     .eq('email', userEmail)
-    .or('type.eq.DEPOSIT,type.eq.WITHDRAWAL,type.eq.COMMISSION_EARNED')
+    .in('type', ['DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', 'COMMISSION_EARNED'])
     .order('timestamp', { ascending: true })
 
   if (txError) {
@@ -31,7 +31,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Calculate running cash balance (deposits/withdrawals/commissions only)
+  // Calculate running cash balance (deposits/withdrawals/sends/receives/commissions)
   // This shows the user's deposited amount changes over time
   let cashBalance = 0
   const transactionsWithBalance = allTransactions.map((tx: any) => {
@@ -54,6 +54,20 @@ export default defineEventHandler(async (event) => {
       description = 'Withdrawal'
       amountDisplay = `-$${Number(tx.amount).toLocaleString()}`
       typeDisplay = 'withdrawal'
+      shares = Number(tx.shares).toLocaleString()
+    } else if (tx.type === 'SEND') {
+      amountChange = -Number(tx.amount)
+      cashBalance += amountChange
+      description = 'Sent'
+      amountDisplay = `-$${Number(tx.amount).toLocaleString()}`
+      typeDisplay = 'send'
+      shares = Number(tx.shares).toLocaleString()
+    } else if (tx.type === 'RECEIVE') {
+      amountChange = Number(tx.amount)
+      cashBalance += amountChange
+      description = 'Received'
+      amountDisplay = `+$${Number(tx.amount).toLocaleString()}`
+      typeDisplay = 'receive'
       shares = Number(tx.shares).toLocaleString()
     } else if (tx.type === 'COMMISSION_EARNED') {
       amountChange = Number(tx.amount) // Commission earned amount is positive
