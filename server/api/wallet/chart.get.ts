@@ -43,7 +43,7 @@ export default defineEventHandler(async (event) => {
   // Get portfolio snapshots in range
   const { data: snapshots, error: snapError } = await (supabase as any)
     .from('portfolio_snapshots')
-    .select('timestamp, totalValue')
+    .select('timestamp, currentEquity')
     .gte('timestamp', startDate.getTime())
     .order('timestamp', { ascending: true })
 
@@ -100,27 +100,33 @@ export default defineEventHandler(async (event) => {
     }
 
     // Calculate user's equity
-    const totalValue = Number(snapshot.totalValue)
-    const userEquity = totalShares > 0 ? (userShares / totalShares) * totalValue : 0
+    const currentEquity = Number(snapshot.currentEquity)
+    const userEquity = totalShares > 0 ? (userShares / totalShares) * currentEquity : 0
 
     chartData.push({
-      timestamp: snapTime, // Already in milliseconds from database
+      timestamp: snapTime,
       equity: userEquity
     })
   }
 
-  // Add current/latest data point based on vault state
-  // This ensures the chart shows real-time updates after transactions
-  const { data: vaultState, error: vaultError } = await (supabase as any)
-    .from('vault_state')
-    .select('total_assets, total_shares')
+  // Add current equity point
+  const { data: latestSnapshot, error: snapError2 } = await (supabase as any)
+    .from('portfolio_snapshots')
+    .select('currentEquity')
+    .order('timestamp', { ascending: false })
+    .limit(1)
     .single()
 
-  if (!vaultError && vaultState) {
-    const currentTotalAssets = Number(vaultState.total_assets)
+  const { data: vaultState, error: vaultError } = await (supabase as any)
+    .from('vault_state')
+    .select('total_shares')
+    .single()
+
+  if (!snapError2 && !vaultError && latestSnapshot && vaultState) {
+    const currentEquity = Number(latestSnapshot.currentEquity)
     const currentTotalShares = Number(vaultState.total_shares)
 
-    // Calculate current user shares (all transactions up to now)
+    // Calculate current user shares
     let currentUserShares = 0
     for (const tx of allTransactions || []) {
       if (tx.email === userEmail) {
@@ -132,9 +138,9 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    const currentUserEquity = currentTotalShares > 0 ? (currentUserShares / currentTotalShares) * currentTotalAssets : 0
+    const currentUserEquity = currentTotalShares > 0 ? (currentUserShares / currentTotalShares) * currentEquity : 0
 
-    // Add current point if it's different from the last historical point or if no historical data
+    // Add current point if different
     const lastPoint = chartData[chartData.length - 1]
     const currentTime = Date.now()
 
