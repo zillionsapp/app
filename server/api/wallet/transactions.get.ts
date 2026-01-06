@@ -30,19 +30,7 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get all trades to calculate margin used
-  const { data: allTrades, error: tradeError } = await (supabase as any)
-    .from('trades')
-    .select('timestamp, margin, status')
-    .order('timestamp', { ascending: true })
 
-  if (tradeError) {
-    console.error('Error fetching trades:', tradeError)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to fetch trades'
-    })
-  }
 
   // Calculate for each transaction in ascending order
   let deposited = 0
@@ -53,16 +41,6 @@ export default defineEventHandler(async (event) => {
     } else if (tx.type === 'WITHDRAWAL') {
       deposited -= Number(tx.amount)
     }
-
-    // Calculate margin used up to this timestamp
-    let marginUsed = 0
-    for (const trade of allTrades || []) {
-      if (trade.timestamp <= tx.timestamp && trade.status === 'OPEN') {
-        marginUsed += Number(trade.margin)
-      }
-    }
-
-    const balance = deposited - marginUsed
 
     let description = ''
     let amountDisplay = ''
@@ -96,7 +74,7 @@ export default defineEventHandler(async (event) => {
       description,
       amount: amountDisplay,
       shares: Number(tx.shares).toLocaleString(),
-      balance: `$${balance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      balance: `$${deposited.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       type: typeDisplay,
       timestamp: tx.timestamp
     }
