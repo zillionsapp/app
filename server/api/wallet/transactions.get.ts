@@ -83,8 +83,16 @@ export default defineEventHandler(async (event) => {
 
     return {
       id: tx.id,
-      date: new Date(tx.timestamp).toLocaleDateString(),
-      time: new Date(tx.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }),
+      date: new Date(tx.timestamp).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      }),
+      time: new Date(tx.timestamp).toLocaleTimeString('en-US', {
+        hour: '2-digit',
+        minute: '2-digit',
+        hour12: false
+      }),
       description,
       amount: amountDisplay,
       shares: Number(tx.shares).toLocaleString(),
