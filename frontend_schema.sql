@@ -365,22 +365,30 @@ BEGIN
 
             -- Only record if there's profit to commission
             IF commission_amount > 0 THEN
-                INSERT INTO commission_transactions (
-                    inviter_id,
-                    invited_user_id,
-                    transaction_date,
-                    invited_portfolio_value,
-                    invited_daily_pnl,
-                    commission_earned
-                ) VALUES (
-                    commission_record.inviter_id,
-                    commission_record.invited_user_id,
-                    target_date,
-                    user_deposit_total, -- User's deposit amount
-                    net_user_profit, -- User's gross profit
-                    commission_amount
-                );
-                inserted_count := inserted_count + 1;
+                -- Check if commission transaction already exists for this date and users
+                IF NOT EXISTS (
+                    SELECT 1 FROM commission_transactions
+                    WHERE inviter_id = commission_record.inviter_id
+                    AND invited_user_id = commission_record.invited_user_id
+                    AND transaction_date = target_date
+                ) THEN
+                    INSERT INTO commission_transactions (
+                        inviter_id,
+                        invited_user_id,
+                        transaction_date,
+                        invited_portfolio_value,
+                        invited_daily_pnl,
+                        commission_earned
+                    ) VALUES (
+                        commission_record.inviter_id,
+                        commission_record.invited_user_id,
+                        target_date,
+                        user_deposit_total, -- User's deposit amount
+                        net_user_profit, -- User's gross profit
+                        commission_amount
+                    );
+                    inserted_count := inserted_count + 1;
+                END IF;
             END IF;
         END IF;
     END LOOP;
