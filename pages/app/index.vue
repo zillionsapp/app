@@ -4,7 +4,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const currentPeriod = ref('1w')
+const currentPeriod = ref('all')
 
 // Modal states
 const showDepositModal = ref(false)
