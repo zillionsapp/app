@@ -294,6 +294,9 @@ DECLARE
     net_user_profit NUMERIC;
     inserted_count INTEGER := 0;
     first_deposit_timestamp BIGINT;
+    user_deposit_total NUMERIC;
+    vault_daily_pnl NUMERIC;
+    vault_total_value NUMERIC;
 BEGIN
     -- Loop through all invite relationships (including deactivated codes)
     FOR commission_record IN
@@ -317,13 +320,34 @@ BEGIN
             CONTINUE;
         END IF;
 
-        -- Calculate user's share of daily P&L based on their deposit timing
-        -- This is a simplified approach - in a real per-user system, this would be more precise
-        SELECT COALESCE(ps.pnl, 0) INTO user_daily_pnl
+        -- Calculate user's actual profit based on their vault share
+        -- Get user's net deposit amount (deposits - withdrawals)
+        SELECT
+            COALESCE(SUM(CASE WHEN vt.type = 'DEPOSIT' THEN vt.amount ELSE -vt.amount END), 0) INTO user_deposit_total
+        FROM vault_transactions vt
+        WHERE vt.email = commission_record.invited_email;
+
+        -- Get vault's total value for the period
+        SELECT COALESCE(ps."totalValue", 10000) INTO vault_total_value
         FROM portfolio_snapshots ps
         WHERE DATE(ps.created_at) = target_date
         ORDER BY ps.created_at DESC
         LIMIT 1;
+
+        -- Get vault's daily P&L
+        SELECT COALESCE(ps.pnl, 0) INTO vault_daily_pnl
+        FROM portfolio_snapshots ps
+        WHERE DATE(ps.created_at) = target_date
+        ORDER BY ps.created_at DESC
+        LIMIT 1;
+
+        -- Calculate user's share of vault P&L based on their deposit percentage
+        -- This gives the user's actual profit contribution
+        IF user_deposit_total > 0 AND vault_total_value > 0 THEN
+            user_daily_pnl := vault_daily_pnl * (user_deposit_total / vault_total_value);
+        ELSE
+            user_daily_pnl := 0;
+        END IF;
 
         -- Only calculate commission if the user was active (had deposited) on this date
         -- Convert first_deposit_timestamp from milliseconds to date for comparison
