@@ -33,11 +33,7 @@ export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event)
 
   try {
-    // Optional: Add target date parameter
-    const query = getQuery(event)
-    const targetDate = query.date as string || new Date().toISOString().split('T')[0]
-
-    console.log(`Starting commission calculation for date: ${targetDate}`)
+    console.log(`Starting commission calculation`)
 
     // Call the commission calculation function
     const { data, error } = await supabase
@@ -55,7 +51,6 @@ export default defineEventHandler(async (event) => {
       success: true,
       message: `Calculated commissions for ${data || 0} invite relationships`,
       commissionRecordsCreated: data || 0,
-      targetDate: targetDate,
       timestamp: new Date().toISOString()
     }
 
