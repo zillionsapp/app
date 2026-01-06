@@ -29,18 +29,50 @@ export default defineEventHandler(async (event) => {
   }
 
   // Get portfolio snapshots for trading performance
-  const { data: snapshots, error: snapError } = await (supabase as any)
-    .from('portfolio_snapshots')
-    .select('timestamp, currentEquity, initialBalance')
-    .gte('timestamp', startDate.getTime())
-    .order('timestamp', { ascending: true })
+  let snapshots
+  if (period === 'all') {
+    // For 'all' period, get all snapshots
+    const { data, error } = await (supabase as any)
+      .from('portfolio_snapshots')
+      .select('timestamp, currentEquity, initialBalance')
+      .order('timestamp', { ascending: true })
+    snapshots = data
+    if (error) {
+      console.error('Error fetching portfolio snapshots:', error)
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to fetch vault chart data'
+      })
+    }
+  } else {
+    // For other periods, get snapshots from startDate, but also include the most recent one
+    const { data: periodData, error: periodError } = await (supabase as any)
+      .from('portfolio_snapshots')
+      .select('timestamp, currentEquity, initialBalance')
+      .gte('timestamp', startDate.getTime())
+      .order('timestamp', { ascending: true })
 
-  if (snapError) {
-    console.error('Error fetching portfolio snapshots:', snapError)
-    throw createError({
-      statusCode: 500,
-      statusMessage: 'Failed to fetch vault chart data'
-    })
+    const { data: latestData, error: latestError } = await (supabase as any)
+      .from('portfolio_snapshots')
+      .select('timestamp, currentEquity, initialBalance')
+      .order('timestamp', { descending: true })
+      .limit(1)
+
+    if (periodError || latestError) {
+      console.error('Error fetching portfolio snapshots:', periodError || latestError)
+      throw createError({
+        statusCode: 500,
+        statusMessage: 'Failed to fetch vault chart data'
+      })
+    }
+
+    // Combine period data with latest snapshot if it's not already included
+    const latest = latestData?.[0]
+    const periodSnapshots = periodData || []
+    const hasLatest = periodSnapshots.some((s: any) => s.timestamp === latest?.timestamp)
+
+    snapshots = hasLatest ? periodSnapshots : [...periodSnapshots, latest].filter(Boolean)
+    snapshots.sort((a: any, b: any) => a.timestamp - b.timestamp)
   }
 
   // Get vault transactions to calculate capital flows

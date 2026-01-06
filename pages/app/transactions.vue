@@ -123,8 +123,6 @@ const handleSend = async () => {
     <!-- Transactions Table -->
     <div class="card bg-base-100">
       <div class="card-body">
-        <h2 class="card-title">{{ $t('app.transactions.transaction_history') }}</h2>
-
         <div class="overflow-x-auto">
           <table class="table table-zebra w-full">
             <thead>

@@ -293,8 +293,6 @@ const yFormatter = (value: number): string => {
       <!-- Recent Trades -->
       <div class="card bg-base-100">
         <div class="card-body">
-          <h2 class="card-title">{{ $t('app.dashboard.recent_trades') }}</h2>
-
           <div class="overflow-x-auto">
             <table class="table table-zebra w-full">
               <thead>
