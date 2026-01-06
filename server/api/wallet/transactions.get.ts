@@ -86,13 +86,15 @@ export default defineEventHandler(async (event) => {
         shares = Number(tx.shares).toLocaleString()
       }
     } else if (tx.transaction_type === 'commission_earned') {
-      // Commission earnings don't affect deposited balance
+      // Commission earnings INCREASE deposited balance
+      deposited += Number(tx.commission_earned)
       description = 'Commission Received'
       amountDisplay = `+$${Number(tx.commission_earned).toLocaleString()}`
       typeDisplay = 'commission'
       shares = '0'
     } else if (tx.transaction_type === 'commission_paid') {
-      // Commission payments don't affect deposited balance
+      // Commission payments DECREASE deposited balance
+      deposited -= Math.abs(Number(tx.commission_earned))
       description = 'Commission Paid'
       amountDisplay = `-$${Math.abs(Number(tx.commission_earned)).toLocaleString()}`
       typeDisplay = 'commission'
