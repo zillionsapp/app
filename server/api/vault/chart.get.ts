@@ -1,5 +1,83 @@
 import { serverSupabaseClient } from '#supabase/server'
 
+// Function to resample snapshots to uniform intervals
+function resampleSnapshots(snapshots: any[], period: string, startDate: Date, endDate: Date) {
+  if (!snapshots || snapshots.length === 0) return []
+
+  // Sort snapshots by timestamp
+  snapshots.sort((a, b) => a.timestamp - b.timestamp)
+
+  // Determine interval based on period (balanced daily for longer periods)
+  let intervalMs: number
+  switch (period) {
+    case '1d':
+      intervalMs = 60 * 60 * 1000 // 1 hour
+      break
+    case '1w':
+    case '1m':
+    case '1y':
+    case 'all':
+    default:
+      intervalMs = 24 * 60 * 60 * 1000 // 1 day
+      break
+  }
+
+  // For 'all' period, start from first snapshot
+  const actualStart = period === 'all' ? new Date(snapshots[0].timestamp) : startDate
+
+  // Generate target timestamps
+  const targets: number[] = []
+  let current = actualStart.getTime()
+  const end = endDate.getTime()
+  while (current <= end) {
+    targets.push(current)
+    current += intervalMs
+  }
+
+  // Ensure the last snapshot is included if it's after the last target
+  const lastSnapshotTime = snapshots[snapshots.length - 1].timestamp
+  if (lastSnapshotTime > targets[targets.length - 1]) {
+    targets.push(lastSnapshotTime)
+  }
+
+  // Resample: for each target, interpolate equity linearly between snapshots
+  const resampled: { date: string; equity: number }[] = []
+
+  for (const target of targets) {
+    let equity: number
+
+    // Find the snapshots around the target
+    if (target <= snapshots[0].timestamp) {
+      // Before first snapshot, use first equity
+      equity = snapshots[0].currentEquity || 0
+    } else if (target >= snapshots[snapshots.length - 1].timestamp) {
+      // After last snapshot, use last equity
+      equity = snapshots[snapshots.length - 1].currentEquity || 0
+    } else {
+      // Find the two snapshots to interpolate between
+      let i = 0
+      while (i < snapshots.length - 1 && snapshots[i + 1].timestamp <= target) {
+        i++
+      }
+      const prev = snapshots[i]
+      const next = snapshots[i + 1]
+
+      // Linear interpolation
+      const timeDiff = next.timestamp - prev.timestamp
+      const valueDiff = (next.currentEquity || 0) - (prev.currentEquity || 0)
+      const targetDiff = target - prev.timestamp
+      equity = (prev.currentEquity || 0) + (valueDiff * targetDiff) / timeDiff
+    }
+
+    resampled.push({
+      date: new Date(target).toISOString().split('T')[0],
+      equity: equity
+    })
+  }
+
+  return resampled
+}
+
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event)
   const query = getQuery(event)
@@ -89,19 +167,15 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Format portfolio snapshots for chart
-  // The vault's equity is represented by the portfolio's current equity over time
-  const chartData = (snapshots || []).map((snapshot: any) => ({
-    date: new Date(snapshot.timestamp).toISOString().split('T')[0],
-    equity: snapshot.currentEquity || 0
-  }))
+  // Resample data to uniform intervals for balanced x-axis
+  const resampledData = resampleSnapshots(snapshots || [], period, startDate, now)
 
-  // If no snapshots, return empty array
-  if (chartData.length === 0) {
+  // If no data, return empty array
+  if (resampledData.length === 0) {
     return { data: [] }
   }
 
   return {
-    data: chartData
+    data: resampledData
   }
 })

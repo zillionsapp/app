@@ -38,7 +38,7 @@ const refreshData = async (period = currentPeriod.value) => {
 const performanceData = computed(() => {
   if (!chartData.value?.data) return []
   return chartData.value.data.map((point: any) => ({
-    date: new Date(point.timestamp).toISOString().split('T')[0],
+    date: point.date,
     equity: point.equity
   }))
 })
