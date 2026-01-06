@@ -15,52 +15,21 @@ export default defineEventHandler(async (event) => {
 
   const userEmail = user.email!
 
-  // Get user's vault transactions
-  const { data: vaultTransactions, error: txError } = await (supabase as any)
+  // Get user's transactions from vault_transactions (deposits, withdrawals, earned commissions)
+  const { data: allTransactions, error: txError } = await (supabase as any)
     .from('vault_transactions')
-    .select('id, amount, shares, type, timestamp, email')
+    .select('id, amount, shares, type, timestamp, email, inviter_id, invited_user_id, invited_portfolio_value, invited_daily_pnl, commission_rate')
     .eq('email', userEmail)
+    .or('type.eq.DEPOSIT,type.eq.WITHDRAWAL,type.eq.COMMISSION_EARNED')
     .order('timestamp', { ascending: true })
 
   if (txError) {
-    console.error('Error fetching vault transactions:', txError)
+    console.error('Error fetching transactions:', txError)
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to fetch transactions'
     })
   }
-
-  // Get user's commission transactions from vault_transactions
-  const { data: commissionTransactions, error: commissionError } = await (supabase as any)
-    .from('vault_transactions')
-    .select('id, amount, type, timestamp, inviter_id, invited_user_id, invited_portfolio_value, invited_daily_pnl, commission_rate')
-    .or(`inviter_id.eq.${user.id},invited_user_id.eq.${user.id}`)
-    .in('type', ['COMMISSION_EARNED', 'COMMISSION_PAID'])
-    .order('timestamp', { ascending: true })
-
-  if (commissionError) {
-    console.error('Error fetching commission transactions:', commissionError)
-  }
-
-
-
-  // Combine vault transactions and commission transactions
-  const allTransactions = [
-    // Vault transactions
-    ...(vaultTransactions || []).map((tx: any) => ({
-      ...tx,
-      transaction_type: 'vault',
-      commission_earned: null,
-      invited_user_id: null
-    })),
-    // Commission transactions from vault_transactions
-    ...(commissionTransactions || []).map((comm: any) => ({
-      ...comm,
-      transaction_type: comm.type === 'COMMISSION_EARNED' ? 'commission_earned' : 'commission_paid',
-      commission_earned: Math.abs(comm.amount),
-      email: userEmail
-    }))
-  ].sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp ascending
 
   // Calculate running cash balance (deposits/withdrawals/commissions only)
   // This shows the user's deposited amount changes over time
@@ -70,32 +39,41 @@ export default defineEventHandler(async (event) => {
     let amountDisplay = ''
     let typeDisplay = ''
     let shares = '0'
+    let amountChange = 0
 
-    if (tx.transaction_type === 'vault') {
-      if (tx.type === 'DEPOSIT') {
-        cashBalance += Number(tx.amount)
-        description = 'Deposit'
-        amountDisplay = `+$${Number(tx.amount).toLocaleString()}`
-        typeDisplay = 'deposit'
-        shares = Number(tx.shares).toLocaleString()
-      } else if (tx.type === 'WITHDRAWAL') {
-        cashBalance -= Number(tx.amount)
-        description = 'Withdrawal'
-        amountDisplay = `-$${Number(tx.amount).toLocaleString()}`
-        typeDisplay = 'withdrawal'
-        shares = Number(tx.shares).toLocaleString()
-      }
-    } else if (tx.transaction_type === 'commission_earned') {
-      cashBalance += Number(tx.commission_earned)
+    if (tx.type === 'DEPOSIT') {
+      amountChange = Number(tx.amount)
+      cashBalance += amountChange
+      description = 'Deposit'
+      amountDisplay = `+$${Number(tx.amount).toLocaleString()}`
+      typeDisplay = 'deposit'
+      shares = Number(tx.shares).toLocaleString()
+    } else if (tx.type === 'WITHDRAWAL') {
+      amountChange = -Number(tx.amount)
+      cashBalance += amountChange
+      description = 'Withdrawal'
+      amountDisplay = `-$${Number(tx.amount).toLocaleString()}`
+      typeDisplay = 'withdrawal'
+      shares = Number(tx.shares).toLocaleString()
+    } else if (tx.type === 'COMMISSION_EARNED') {
+      amountChange = Number(tx.amount) // Commission earned amount is positive
+      cashBalance += amountChange
       description = 'Commission Received'
-      amountDisplay = `+$${Number(tx.commission_earned).toLocaleString()}`
+      amountDisplay = `+$${Math.abs(Number(tx.amount)).toLocaleString()}`
       typeDisplay = 'commission'
       shares = '0'
-    } else if (tx.transaction_type === 'commission_paid') {
-      cashBalance -= Math.abs(Number(tx.commission_earned))
+    } else if (tx.type === 'COMMISSION_PAID') {
+      amountChange = Number(tx.amount) // Commission paid amount is negative
+      cashBalance += amountChange
       description = 'Commission Paid'
-      amountDisplay = `-$${Math.abs(Number(tx.commission_earned)).toLocaleString()}`
+      amountDisplay = `-$${Math.abs(Number(tx.amount)).toLocaleString()}`
       typeDisplay = 'commission'
+      shares = '0'
+    } else {
+      // Unknown transaction type - skip
+      description = 'Unknown Transaction'
+      amountDisplay = '$0.00'
+      typeDisplay = 'unknown'
       shares = '0'
     }
 
@@ -116,11 +94,13 @@ export default defineEventHandler(async (event) => {
       shares,
       balance: `$${cashBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       type: typeDisplay,
-      timestamp: tx.timestamp
+      timestamp: tx.timestamp,
+      amountChange // Store for balance recalculation when reversed
     }
   })
 
   // Reverse for display (newest first)
+  // The balances are already calculated correctly in chronological order
   const formattedTransactions = transactionsWithBalance.reverse()
 
   return {
