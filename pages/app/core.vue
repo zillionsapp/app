@@ -6,10 +6,13 @@ definePageMeta({
 
 // Simple reactive data
 const portfolioData = ref(null)
-const chartData = ref(null)
+const chartData = ref<any>({ data: [] })
 const tradesData = ref(null)
 const currentPrices = ref<Record<string, number>>({})
 const loading = ref(true)
+
+// Chart period selection
+const currentPeriod = ref('1w')
 
 // Pagination
 const currentPage = ref(1)
@@ -25,11 +28,12 @@ onMounted(async () => {
 })
 
 // Refresh all dashboard data
-const refreshData = async () => {
+const refreshData = async (period = currentPeriod.value) => {
+  currentPeriod.value = period
   try {
     const [portfolio, chart, trades] = await Promise.all([
       $fetch('/api/trading/portfolio'),
-      $fetch('/api/trading/chart'),
+      $fetch(`/api/vault/chart?period=${period}`),
       loadTrades()
     ])
 
@@ -134,6 +138,27 @@ const goToPage = async (page: number) => {
   currentPage.value = page
   await loadTrades()
 }
+
+// Chart data for performance
+const performanceData = computed(() => {
+  if (!chartData.value?.data) return []
+  return chartData.value.data.map((point: any) => ({
+    date: point.date,
+    equity: point.equity || 0
+  }))
+})
+
+const equityCategories = computed(() => ({
+  equity: {
+    name: 'Equity',
+    color: (portfolioData.value?.totalPnL ?? 0) >= 0 ? '#00ff9d' : '#ff006e', // Green for profit, red for loss
+  },
+}))
+
+const xFormatter = (tick: number): string => {
+  const date = new Date(performanceData.value[tick]?.date || '')
+  return date.toLocaleDateString()
+}
 </script>
 
 <template>
@@ -212,6 +237,43 @@ const goToPage = async (page: number) => {
             <p class="text-sm opacity-70">
               {{ portfolioData?.winningTrades || 0 }}W / {{ portfolioData?.losingTrades || 0 }}L
             </p>
+          </div>
+        </div>
+      </div>
+
+      <!-- Portfolio Performance Chart -->
+      <div class="card bg-base-100 rounded-box col-span-12 mb-8">
+        <div class="card-body">
+          <div class="flex justify-between items-center mb-4 flex-wrap gap-4">
+            <h2 class="card-title">{{ $t('app.dashboard.vault_performance') }}</h2>
+            <div class="flex gap-2 flex-wrap">
+              <button
+                v-for="period in ['1d', '1w', '1m', '1y', 'all']"
+                :key="period"
+                @click="refreshData(period)"
+                class="btn btn-xs"
+                :class="currentPeriod === period ? 'btn-active btn-primary' : 'btn-outline'"
+              >
+                {{ period.toUpperCase() }}
+              </button>
+            </div>
+          </div>
+          <AreaChart
+            v-if="performanceData.length > 0"
+            :data="performanceData"
+            :height="300"
+            :categories="equityCategories"
+            :y-grid-line="true"
+            :x-formatter="xFormatter"
+            :curve-type="CurveType.MonotoneX"
+            :legend-position="LegendPosition.BottomCenter"
+            :hide-legend="true"
+          />
+          <div v-else class="flex items-center justify-center h-80 text-base-content/50">
+            <div class="text-center">
+              <div class="text-4xl mb-2">📈</div>
+              <p>{{ $t('app.dashboard.no_performance_data') }}</p>
+            </div>
           </div>
         </div>
       </div>
