@@ -283,7 +283,7 @@ const goToPage = async (page: number) => {
           <div v-if="totalTrades > pageSize" class="flex justify-center mt-6">
             <div class="join">
               <button
-                class="join-item btn btn-primary"
+                class="btn btn-outline"
                 :disabled="currentPage <= 1"
                 @click="prevPage"
               >
@@ -293,12 +293,12 @@ const goToPage = async (page: number) => {
                 {{ $t('app.dashboard.previous') }}
               </button>
 
-              <button class="join-item btn btn-outline btn-active px-6">
+              <button class="btn btn-outline btn-active px-6">
                 {{ $t('app.dashboard.page') }} {{ currentPage }} {{ $t('app.dashboard.of') }} {{ Math.ceil(totalTrades / pageSize) }}
               </button>
 
               <button
-                class="join-item btn btn-primary"
+                class="btn btn-outline"
                 :disabled="currentPage >= Math.ceil(totalTrades / pageSize)"
                 @click="nextPage"
               >

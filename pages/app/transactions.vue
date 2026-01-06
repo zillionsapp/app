@@ -114,7 +114,7 @@ const handleSend = async () => {
         <svg data-src="https://unpkg.com/heroicons/20/solid/minus.svg" class="h-5 w-5"></svg>
         {{ $t('app.wallet.withdraw_funds') }}
       </button>
-      <button class="btn btn-secondary" @click="showSendModal = true">
+      <button class="btn btn-outline" @click="showSendModal = true">
         <svg data-src="https://unpkg.com/heroicons/20/solid/paper-airplane.svg" class="h-5 w-5"></svg>
         {{ $t('app.wallet.send_funds') }}
       </button>
@@ -234,7 +234,7 @@ const handleSend = async () => {
         <div class="modal-action">
           <button class="btn" @click="closeModals">{{ $t('app.wallet.cancel') }}</button>
           <button
-            class="btn btn-outline"
+            class="btn btn-primary"
             :disabled="!withdrawAmount || parseFloat(withdrawAmount) <= 0 || parseFloat(withdrawAmount) > (walletData?.balanceLeft ?? 0) || withdrawLoading"
             @click="handleWithdraw"
           >
@@ -279,7 +279,7 @@ const handleSend = async () => {
         <div class="modal-action">
           <button class="btn" @click="closeModals">{{ $t('app.wallet.cancel') }}</button>
           <button
-            class="btn btn-secondary"
+            class="btn btn-primary"
             :disabled="!sendAmount || !sendRecipient || parseFloat(sendAmount) <= 0 || parseFloat(sendAmount) > (walletData?.balanceLeft ?? 0) || sendLoading"
             @click="handleSend"
           >

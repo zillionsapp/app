@@ -46,3 +46,16 @@
 
 .animate-gradient{ background-size:300% 300%; animation:gradientShift 8s ease infinite; }
 @keyframes gradientShift{ 0%{background-position:0% 50%} 50%{background-position:100% 50%} 100%{background-position:0% 50%} }
+
+/* Global Button Styles */
+.btn-primary {
+  background: linear-gradient(to right, var(--color-primary), var(--color-secondary), var(--color-accent));
+  background-size: 300% 300%;
+  animation: gradientShift 8s ease infinite;
+  color: var(--color-primary-content);
+  border: 0;
+  border-radius: 0.75rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  font-weight: bold;
+}
