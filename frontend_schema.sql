@@ -280,9 +280,9 @@ ALTER TABLE commission_transactions ENABLE ROW LEVEL SECURITY;
 CREATE POLICY "Users can view their commission payments" ON commission_payments
     FOR SELECT USING (auth.uid() = inviter_id);
 
--- Users can view their commission transactions (as inviter)
+-- Users can view their commission transactions (as both inviter and invited)
 CREATE POLICY "Users can view their commission transactions" ON commission_transactions
-    FOR SELECT USING (auth.uid() = inviter_id);
+    FOR SELECT USING (auth.uid() = inviter_id OR auth.uid() = invited_user_id);
 
 -- Function to calculate daily commissions for all inviters
 CREATE OR REPLACE FUNCTION calculate_daily_commissions(target_date DATE DEFAULT CURRENT_DATE)
