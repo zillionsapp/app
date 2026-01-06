@@ -372,21 +372,41 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
+-- Function to get total commission paid by a user (when they were referred)
+CREATE OR REPLACE FUNCTION get_user_commission_paid(user_id UUID)
+RETURNS NUMERIC AS $$
+DECLARE
+    total_paid NUMERIC;
+BEGIN
+    SELECT COALESCE(SUM(commission_earned), 0) INTO total_paid
+    FROM commission_snapshots
+    WHERE invited_user_id = user_id;
+
+    RETURN total_paid;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
 -- Function to get commission summary for a user
 CREATE OR REPLACE FUNCTION get_user_commission_summary(user_id UUID)
 RETURNS JSON AS $$
 DECLARE
     result JSON;
     total_earned NUMERIC;
+    total_paid NUMERIC;
     monthly_earned NUMERIC;
     invited_count BIGINT;
     last_date DATE;
     pending_count BIGINT;
 BEGIN
-    -- Get total earned
+    -- Get total earned (as referrer)
     SELECT COALESCE(SUM(commission_earned), 0) INTO total_earned
     FROM commission_snapshots
     WHERE inviter_id = user_id;
+
+    -- Get total paid (as referred user)
+    SELECT COALESCE(SUM(commission_earned), 0) INTO total_paid
+    FROM commission_snapshots
+    WHERE invited_user_id = user_id;
 
     -- Get monthly earned (last 30 days)
     SELECT COALESCE(SUM(commission_earned), 0) INTO monthly_earned
@@ -412,6 +432,7 @@ BEGIN
     -- Build result JSON
     result := json_build_object(
         'total_earned', total_earned,
+        'total_paid', total_paid,
         'invited_users_count', invited_count,
         'last_commission_date', last_date,
         'monthly_earned', monthly_earned,

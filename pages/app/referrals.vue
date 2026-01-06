@@ -26,6 +26,7 @@ interface InviteCode {
 
 interface CommissionSummary {
   total_earned: number
+  total_paid: number
   invited_users_count: number
   last_commission_date?: string
   monthly_earned: number
@@ -163,7 +164,7 @@ onMounted(async () => {
 
 <template>
   <!-- Stats Row -->
-  <div class="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
+  <div class="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-6 mb-8">
     <div class="card bg-base-100">
       <div class="card-body">
         <div class="flex items-center gap-3">
@@ -223,6 +224,22 @@ onMounted(async () => {
           <div>
             <div class="text-2xl font-bold">${{ commissionSummary?.total_earned?.toFixed(2) || '0.00' }}</div>
             <div class="text-sm text-base-content/70">{{ $t('app.referrals.total_commissions') }}</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card bg-base-100">
+      <div class="card-body">
+        <div class="flex items-center gap-3">
+          <div class="p-3 bg-error/10 rounded-full">
+            <svg class="w-6 h-6 text-error" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2m2 4h10a2 2 0 002-2v-6a2 2 0 00-2-2H9a2 2 0 00-2 2v6a2 2 0 002 2zm7-5a2 2 0 11-4 0 2 2 0 014 0z"></path>
+            </svg>
+          </div>
+          <div>
+            <div class="text-2xl font-bold">${{ commissionSummary?.total_paid?.toFixed(2) || '0.00' }}</div>
+            <div class="text-sm text-base-content/70">Commission Paid</div>
           </div>
         </div>
       </div>
