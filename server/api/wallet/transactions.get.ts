@@ -62,39 +62,36 @@ export default defineEventHandler(async (event) => {
     }))
   ].sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp ascending
 
-  // Calculate for each transaction in ascending order
-  let deposited = 0
-  const formattedTransactions = allTransactions.map((tx: any) => {
+  // Calculate running balance in chronological order
+  let runningBalance = 0
+  const transactionsWithBalance = allTransactions.map((tx: any) => {
     let description = ''
     let amountDisplay = ''
     let typeDisplay = ''
     let shares = '0'
 
     if (tx.transaction_type === 'vault') {
-      // Update deposited balance for vault transactions
       if (tx.type === 'DEPOSIT') {
-        deposited += Number(tx.amount)
+        runningBalance += Number(tx.amount)
         description = 'Deposit'
         amountDisplay = `+$${Number(tx.amount).toLocaleString()}`
         typeDisplay = 'deposit'
         shares = Number(tx.shares).toLocaleString()
       } else if (tx.type === 'WITHDRAWAL') {
-        deposited -= Number(tx.amount)
+        runningBalance -= Number(tx.amount)
         description = 'Withdrawal'
         amountDisplay = `-$${Number(tx.amount).toLocaleString()}`
         typeDisplay = 'withdrawal'
         shares = Number(tx.shares).toLocaleString()
       }
     } else if (tx.transaction_type === 'commission_earned') {
-      // Commission earnings INCREASE deposited balance
-      deposited += Number(tx.commission_earned)
+      runningBalance += Number(tx.commission_earned)
       description = 'Commission Received'
       amountDisplay = `+$${Number(tx.commission_earned).toLocaleString()}`
       typeDisplay = 'commission'
       shares = '0'
     } else if (tx.transaction_type === 'commission_paid') {
-      // Commission payments DECREASE deposited balance
-      deposited -= Math.abs(Number(tx.commission_earned))
+      runningBalance -= Math.abs(Number(tx.commission_earned))
       description = 'Commission Paid'
       amountDisplay = `-$${Math.abs(Number(tx.commission_earned)).toLocaleString()}`
       typeDisplay = 'commission'
@@ -116,11 +113,14 @@ export default defineEventHandler(async (event) => {
       description,
       amount: amountDisplay,
       shares,
-      balance: `$${deposited.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      balance: `$${runningBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       type: typeDisplay,
       timestamp: tx.timestamp
     }
-  }).reverse() // Reverse for display (newest first)
+  })
+
+  // Reverse for display (newest first)
+  const formattedTransactions = transactionsWithBalance.reverse()
 
   return {
     transactions: formattedTransactions
