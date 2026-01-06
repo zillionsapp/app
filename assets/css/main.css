@@ -58,6 +58,7 @@
   padding-left: 1rem;
   padding-right: 1rem;
   font-weight: bold;
+  box-shadow: none;
 }
 
 /* Global Input and Textarea Styles */
