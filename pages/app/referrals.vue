@@ -77,11 +77,16 @@ const deactivateCode = async (codeId: string) => {
 
   loading.value = true
   try {
-    // Note: You might want to add a deactivate endpoint
-    // For now, we'll just reload
+    await $fetch('/api/invites/deactivate', {
+      method: 'POST',
+      body: { codeId }
+    })
+
+    // Reload the codes to reflect the changes
     await loadInviteCodes()
   } catch (error) {
     console.error('Failed to deactivate code:', error)
+    // You might want to show an error message to the user here
   } finally {
     loading.value = false
   }

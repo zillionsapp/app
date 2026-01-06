@@ -330,20 +330,27 @@
       "save_changes": "Save Changes"
     }
   },
+  "login_title": "Welcome Back",
+  "login_subtitle": "Sign in to your Zillions account to continue trading",
+  "register_title": "Join Zillions",
+  "register_subtitle": "Create your account and start your trading journey",
+  "email": "Email",
+  "password": "Password",
+  "forgot_password": "Forgot password?",
+  "login_button": "Sign In",
+  "register_button": "Create Account",
+  "or_divider": "or",
+  "no_account": "Don't have an account?",
+  "have_account": "Already have an account?",
+  "register_link": "Sign up",
+  "login_link": "Sign in",
   "auth": {
-    "login_title": "Welcome Back",
-    "login_subtitle": "Sign in to your Zillions account to continue trading",
-    "register_title": "Join Zillions",
-    "register_subtitle": "Create your account and start your trading journey",
-    "email": "Email",
-    "password": "Password",
-    "forgot_password": "Forgot password?",
-    "login_button": "Sign In",
-    "register_button": "Create Account",
-    "or_divider": "or",
-    "no_account": "Don't have an account?",
-    "have_account": "Already have an account?",
-    "register_link": "Sign up",
-    "login_link": "Sign in"
+    "invite_title": "Enter Invite Code",
+    "invite_subtitle": "You need a valid invite code to join Zillions",
+    "invite_code": "Invite Code",
+    "invite_code_placeholder": "Enter your invite code",
+    "validate_code": "Validate Code",
+    "invalid_code": "Invalid invite code. Please try again.",
+    "code_validated": "Code validated! Please complete your registration."
   }
 }

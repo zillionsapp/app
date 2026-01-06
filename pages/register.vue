@@ -13,6 +13,65 @@ const password = ref('')
 const loading = ref(false)
 const errorMsg = ref('')
 
+// Invite code related state
+const inviteCode = ref('')
+const inviteLoading = ref(false)
+const inviteError = ref('')
+const hasValidCode = ref(false)
+const codeValidated = ref(false)
+
+const validateInviteCode = async () => {
+    inviteLoading.value = true
+    inviteError.value = ''
+
+    if (!inviteCode.value.trim()) {
+        inviteError.value = 'Please enter an invite code'
+        inviteLoading.value = false
+        return
+    }
+
+    try {
+        const response = await $fetch<{ valid: boolean }>(`/api/invites/validate?code=${inviteCode.value.trim()}`)
+
+        if (response.valid) {
+            // Store the code in localStorage
+            if (process.client) {
+                localStorage.setItem('inviteCode', inviteCode.value.trim())
+            }
+            hasValidCode.value = true
+            codeValidated.value = true
+            inviteError.value = ''
+        } else {
+            inviteError.value = $t('auth.invalid_code')
+        }
+    } catch (error) {
+        inviteError.value = 'Failed to validate code. Please try again.'
+    } finally {
+        inviteLoading.value = false
+    }
+}
+
+const checkExistingCode = async () => {
+    const existingCode = route.query.invite as string || (process.client ? localStorage.getItem('inviteCode') : null)
+
+    if (existingCode) {
+        try {
+            const response = await $fetch<{ valid: boolean }>(`/api/invites/validate?code=${existingCode}`)
+            if (response.valid) {
+                hasValidCode.value = true
+                codeValidated.value = true
+                return
+            }
+        } catch (error) {
+            // Code is invalid, continue to show form
+        }
+    }
+}
+
+onMounted(() => {
+    checkExistingCode()
+})
+
 const register = async () => {
     loading.value = true
     errorMsg.value = ''
@@ -81,12 +140,37 @@ watchEffect(() => {
   <div class="hero min-h-[80vh] bg-base-200">
     <div class="hero-content flex-col lg:flex-row-reverse w-full max-w-5xl justify-around">
       <div class="text-center lg:text-left max-w-md">
-        <h1 class="text-5xl font-bold">{{ $t('register_title') }}</h1>
-        <p class="py-6">{{ $t('register_subtitle') }}</p>
+        <h1 class="text-5xl font-bold" v-if="hasValidCode">{{ $t('register_title') }}</h1>
+        <h1 class="text-5xl font-bold" v-else>{{ $t('auth.invite_title') }}</h1>
+        <p class="py-6" v-if="hasValidCode">{{ $t('register_subtitle') }}</p>
+        <p class="py-6" v-else>{{ $t('auth.invite_subtitle') }}</p>
       </div>
       <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
         <div class="card-body">
-          <form @submit.prevent="register">
+          <!-- Invite Code Form -->
+          <form v-if="!hasValidCode" @submit.prevent="validateInviteCode">
+            <div class="form-control">
+                <label class="label">
+                <span class="label-text">{{ $t('auth.invite_code') }}</span>
+                </label>
+                <input v-model="inviteCode" type="text" :placeholder="$t('auth.invite_code_placeholder')" class="input input-bordered" required />
+            </div>
+            <div v-if="inviteError" class="alert alert-error mt-4 text-sm py-2">
+                <span>{{ inviteError }}</span>
+            </div>
+            <div v-if="codeValidated" class="alert alert-success mt-4 text-sm py-2">
+                <span>{{ $t('auth.code_validated') }}</span>
+            </div>
+            <div class="form-control mt-6">
+                <button type="submit" class="btn btn-primary" :disabled="inviteLoading">
+                    <span v-if="inviteLoading" class="loading loading-spinner"></span>
+                    {{ $t('auth.validate_code') }}
+                </button>
+            </div>
+          </form>
+
+          <!-- Registration Form -->
+          <form v-else @submit.prevent="register">
             <div class="form-control">
                 <label class="label">
                 <span class="label-text">{{ $t('email') }}</span>

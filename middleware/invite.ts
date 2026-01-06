@@ -21,8 +21,8 @@ export default defineNuxtRouteMiddleware(async (to, _from) => {
   const storedInvite = process.client ? localStorage.getItem('inviteCode') : null
 
   if (!inviteCode && !storedInvite) {
-    // No invite code found, redirect to home
-    return navigateTo('/')
+    // No invite code found, but allow access to register page (will show code entry form)
+    return
   }
 
   // If we have an invite code, validate it server-side
