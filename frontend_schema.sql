@@ -113,6 +113,75 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================================
+-- USER SETTINGS TABLE
+-- ============================================================================
+
+-- User settings table - stores user preferences and configuration
+CREATE TABLE IF NOT EXISTS user_settings (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
+    user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
+    setting_key TEXT NOT NULL,
+    setting_value JSONB,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    UNIQUE(user_id, setting_key)
+);
+
+-- Indexes for performance
+CREATE INDEX IF NOT EXISTS idx_user_settings_user_id ON user_settings(user_id);
+CREATE INDEX IF NOT EXISTS idx_user_settings_key ON user_settings(setting_key);
+
+-- Row Level Security (RLS) policies
+ALTER TABLE user_settings ENABLE ROW LEVEL SECURITY;
+
+-- Policy: Users can view their own settings
+CREATE POLICY "Users can view their own settings" ON user_settings
+    FOR SELECT USING (auth.uid() = user_id);
+
+-- Policy: Users can insert their own settings
+CREATE POLICY "Users can insert their own settings" ON user_settings
+    FOR INSERT WITH CHECK (auth.uid() = user_id);
+
+-- Policy: Users can update their own settings
+CREATE POLICY "Users can update their own settings" ON user_settings
+    FOR UPDATE USING (auth.uid() = user_id);
+
+-- Policy: Users can delete their own settings
+CREATE POLICY "Users can delete their own settings" ON user_settings
+    FOR DELETE USING (auth.uid() = user_id);
+
+-- Function to get user setting with default value
+CREATE OR REPLACE FUNCTION get_user_setting(user_id_param UUID, setting_key_param TEXT, default_value JSONB DEFAULT NULL)
+RETURNS JSONB AS $$
+DECLARE
+    setting_value JSONB;
+BEGIN
+    SELECT setting_value INTO setting_value
+    FROM user_settings
+    WHERE user_id = user_id_param AND setting_key = setting_key_param;
+
+    IF setting_value IS NULL THEN
+        RETURN default_value;
+    END IF;
+
+    RETURN setting_value;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- Function to set user setting (upsert)
+CREATE OR REPLACE FUNCTION set_user_setting(user_id_param UUID, setting_key_param TEXT, setting_value_param JSONB)
+RETURNS VOID AS $$
+BEGIN
+    INSERT INTO user_settings (user_id, setting_key, setting_value, updated_at)
+    VALUES (user_id_param, setting_key_param, setting_value_param, NOW())
+    ON CONFLICT (user_id, setting_key)
+    DO UPDATE SET
+        setting_value = setting_value_param,
+        updated_at = NOW();
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+-- ============================================================================
 -- COMMISSION SYSTEM TABLES AND FUNCTIONS
 -- ============================================================================
 
