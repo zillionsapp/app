@@ -20,6 +20,10 @@ const inviteError = ref('')
 const hasValidCode = ref(false)
 const codeValidated = ref(false)
 
+// Commission details state
+const commissionDetails = ref<any>(null)
+const commissionLoading = ref(false)
+
 const validateInviteCode = async () => {
     inviteLoading.value = true
     inviteError.value = ''
@@ -38,6 +42,10 @@ const validateInviteCode = async () => {
             if (process.client) {
                 localStorage.setItem('inviteCode', inviteCode.value.trim())
             }
+
+            // Fetch commission details
+            await fetchCommissionDetails(inviteCode.value.trim())
+
             hasValidCode.value = true
             codeValidated.value = true
             inviteError.value = ''
@@ -51,6 +59,19 @@ const validateInviteCode = async () => {
     }
 }
 
+const fetchCommissionDetails = async (code: string) => {
+    commissionLoading.value = true
+    try {
+        const details = await $fetch(`/api/invites/details?code=${code}`)
+        commissionDetails.value = details
+    } catch (error) {
+        console.error('Failed to fetch commission details:', error)
+        // Don't fail validation if commission details fail to load
+    } finally {
+        commissionLoading.value = false
+    }
+}
+
 const checkExistingCode = async () => {
     const existingCode = route.query.invite as string || (process.client ? localStorage.getItem('inviteCode') : null)
 
@@ -58,6 +79,14 @@ const checkExistingCode = async () => {
         try {
             const response = await $fetch<{ valid: boolean }>(`/api/invites/validate?code=${existingCode}`)
             if (response.valid) {
+                // Store the code in localStorage if it came from URL
+                if (process.client && route.query.invite) {
+                    localStorage.setItem('inviteCode', existingCode)
+                }
+
+                // Fetch commission details for the valid code
+                await fetchCommissionDetails(existingCode)
+
                 hasValidCode.value = true
                 codeValidated.value = true
                 return
@@ -183,6 +212,20 @@ watchEffect(() => {
                 </label>
                 <input v-model="password" type="password" :placeholder="$t('password')" class="input input-bordered" required />
             </div>
+
+            <!-- Commission Information -->
+            <div v-if="commissionDetails" class="alert alert-info mt-4 text-sm">
+                <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="stroke-current flex-shrink-0 w-6 h-6">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+                </svg>
+                <div>
+                    <div class="font-semibold">Referral Commission</div>
+                    <div class="text-xs">
+                        By registering with this invite code, the referrer will earn <strong>{{ (commissionDetails.commissionRate * 100).toFixed(1) }}%</strong> of your future trading profits.
+                    </div>
+                </div>
+            </div>
+
             <div v-if="errorMsg" class="alert alert-error mt-4 text-sm py-2">
                 <span>{{ errorMsg }}</span>
             </div>

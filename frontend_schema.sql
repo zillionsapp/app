@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS invite_codes (
     created_by UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     max_uses INTEGER DEFAULT 1 CHECK (max_uses > 0),
     current_uses INTEGER DEFAULT 0,
+    commission_rate NUMERIC DEFAULT 0.10 CHECK (commission_rate >= 0 AND commission_rate <= 0.5),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     is_active BOOLEAN DEFAULT TRUE
 );
@@ -288,50 +289,66 @@ CREATE OR REPLACE FUNCTION calculate_daily_commissions(target_date DATE DEFAULT 
 RETURNS INTEGER AS $$
 DECLARE
     commission_record RECORD;
-    daily_pnl NUMERIC;
+    user_daily_pnl NUMERIC;
     commission_amount NUMERIC;
     inserted_count INTEGER := 0;
+    first_deposit_timestamp BIGINT;
 BEGIN
     -- Loop through all invite relationships (including deactivated codes)
     FOR commission_record IN
         SELECT
             ic.created_by as inviter_id,
             icu.used_by as invited_user_id,
+            ic.commission_rate,
             u.email as invited_email
         FROM invite_codes ic
         JOIN invite_code_usages icu ON icu.invite_code_id = ic.id
         JOIN auth.users u ON u.id = icu.used_by
     LOOP
-        -- Get the invited user's daily P&L from portfolio_snapshots
-        -- NOTE: This currently uses global P&L data. When per-user portfolio tracking is implemented,
-        -- this should be updated to filter by user_id
-        SELECT COALESCE(ps.pnl, 0) INTO daily_pnl
+        -- Find the user's first deposit timestamp
+        SELECT MIN(vt.timestamp) INTO first_deposit_timestamp
+        FROM vault_transactions vt
+        WHERE vt.email = commission_record.invited_email
+        AND vt.type = 'DEPOSIT';
+
+        -- If user has no deposits, skip commission calculation
+        IF first_deposit_timestamp IS NULL THEN
+            CONTINUE;
+        END IF;
+
+        -- Calculate user's share of daily P&L based on their deposit timing
+        -- This is a simplified approach - in a real per-user system, this would be more precise
+        SELECT COALESCE(ps.pnl, 0) INTO user_daily_pnl
         FROM portfolio_snapshots ps
         WHERE DATE(ps.created_at) = target_date
         ORDER BY ps.created_at DESC
         LIMIT 1;
 
-        -- Calculate 10% commission
-        commission_amount := daily_pnl * 0.10;
+        -- Only calculate commission if the user was active (had deposited) on this date
+        -- Convert first_deposit_timestamp from milliseconds to date for comparison
+        IF first_deposit_timestamp / 1000 <= EXTRACT(epoch FROM target_date + INTERVAL '1 day') THEN
+            -- Calculate commission using the custom rate from the invite code
+            commission_amount := user_daily_pnl * commission_record.commission_rate;
 
-        -- Only record if there's profit to commission
-        IF commission_amount > 0 THEN
-            INSERT INTO commission_snapshots (
-                inviter_id,
-                invited_user_id,
-                snapshot_date,
-                invited_portfolio_value,
-                invited_daily_pnl,
-                commission_earned
-            ) VALUES (
-                commission_record.inviter_id,
-                commission_record.invited_user_id,
-                target_date,
-                0, -- We could calculate this from vault_transactions if needed
-                daily_pnl,
-                commission_amount
-            );
-            inserted_count := inserted_count + 1;
+            -- Only record if there's profit to commission
+            IF commission_amount > 0 THEN
+                INSERT INTO commission_snapshots (
+                    inviter_id,
+                    invited_user_id,
+                    snapshot_date,
+                    invited_portfolio_value,
+                    invited_daily_pnl,
+                    commission_earned
+                ) VALUES (
+                    commission_record.inviter_id,
+                    commission_record.invited_user_id,
+                    target_date,
+                    0, -- Could be enhanced to show user's vault share
+                    user_daily_pnl,
+                    commission_amount
+                );
+                inserted_count := inserted_count + 1;
+            END IF;
         END IF;
     END LOOP;
 

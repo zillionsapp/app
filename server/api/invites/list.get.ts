@@ -23,6 +23,7 @@ export default defineEventHandler(async (event) => {
       is_active,
       max_uses,
       current_uses,
+      commission_rate,
       invite_code_usages (
         id,
         used_by,

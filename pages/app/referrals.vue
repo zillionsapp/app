@@ -20,6 +20,7 @@ interface InviteCode {
   is_active: boolean
   max_uses: number
   current_uses: number
+  commission_rate: number
   usages: InviteCodeUsage[]
 }
 
@@ -41,6 +42,7 @@ const showCreateModal = ref(false)
 const shareUrl = ref('')
 const newCode = ref('')
 const maxUsesInput = ref(1)
+const commissionRateInput = ref(10) // Default 10% (stored as 10 for easier input)
 
 const loadInviteCodes = async () => {
   try {
@@ -63,6 +65,7 @@ const loadCommissionSummary = async () => {
 
 const openCreateModal = () => {
   maxUsesInput.value = 1
+  commissionRateInput.value = 10
   showCreateModal.value = true
 }
 
@@ -71,7 +74,10 @@ const createInviteCode = async () => {
   try {
     const response = await $fetch('/api/invites/create', {
       method: 'POST',
-      body: { maxUses: maxUsesInput.value }
+      body: {
+        maxUses: maxUsesInput.value,
+        commissionRate: commissionRateInput.value / 100 // Convert from percentage to decimal
+      }
     }) as any
 
     newCode.value = response.inviteCode.code
@@ -266,6 +272,7 @@ onMounted(async () => {
                   <th>{{ $t('app.referrals.status') }}</th>
                   <th>{{ $t('app.referrals.created') }}</th>
                   <th>{{ $t('app.referrals.uses') }}</th>
+                  <th>Commission</th>
                   <th>{{ $t('app.referrals.used_by') }}</th>
                   <th>{{ $t('app.referrals.actions') }}</th>
                 </tr>
@@ -284,6 +291,9 @@ onMounted(async () => {
                     <td class="text-sm">{{ formatDate(code.created_at) }}</td>
                     <td class="text-sm">
                       <span class="font-medium">{{ code.current_uses }}/{{ code.max_uses }}</span>
+                    </td>
+                    <td class="text-sm">
+                      <span class="font-medium">{{ (code.commission_rate * 100).toFixed(1) }}%</span>
                     </td>
                     <td class="text-sm">
                       <div v-if="code.usages.length > 0" class="space-y-1">
@@ -363,9 +373,9 @@ onMounted(async () => {
   <div v-if="showCreateModal" class="modal modal-open">
     <div class="modal-box">
       <h3 class="font-bold text-lg mb-4">Create Invite Code</h3>
-      <p class="mb-4">How many times can this invite code be used?</p>
+      <p class="mb-4">Configure your referral code settings</p>
 
-      <div class="form-control">
+      <div class="form-control mb-4">
         <label class="label">
           <span class="label-text">Maximum Uses</span>
         </label>
@@ -378,12 +388,30 @@ onMounted(async () => {
           placeholder="Enter number of uses"
         />
         <label class="label">
-          <span class="label-text-alt">1 = single use, 1000 = up to 1000 uses</span>
+          <span class="label-text-alt">How many times can this code be used? (1-1000)</span>
+        </label>
+      </div>
+
+      <div class="form-control mb-4">
+        <label class="label">
+          <span class="label-text">Commission Rate (%)</span>
+        </label>
+        <input
+          v-model.number="commissionRateInput"
+          type="number"
+          min="0"
+          max="50"
+          step="0.1"
+          class="input input-bordered"
+          placeholder="Enter commission percentage"
+        />
+        <label class="label">
+          <span class="label-text-alt">What percentage of referred users' profits do you want? (0-50%)</span>
         </label>
       </div>
 
       <div class="modal-action">
-        <button @click="createInviteCode" class="btn btn-primary" :disabled="loading || maxUsesInput < 1">
+        <button @click="createInviteCode" class="btn btn-primary" :disabled="loading || maxUsesInput < 1 || commissionRateInput < 0 || commissionRateInput > 50">
           <span v-if="loading" class="loading loading-spinner loading-sm"></span>
           Create Code
         </button>

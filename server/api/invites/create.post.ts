@@ -8,7 +8,7 @@ export default defineEventHandler(async (event) => {
     // No body sent, use defaults
     body = {}
   }
-  const { maxUses = 1 } = body
+  const { maxUses = 1, commissionRate = 0.10 } = body
 
   const supabase = await serverSupabaseClient(event)
 
@@ -30,6 +30,14 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Validate commissionRate
+  if (typeof commissionRate !== 'number' || commissionRate < 0 || commissionRate > 0.5) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'commissionRate must be a number between 0 and 0.5 (e.g., 0.10 for 10%, max 50%)'
+    })
+  }
+
   // Generate a new invite code using the database function
   const { data: codeData, error: codeError } = await supabase
     .rpc('generate_invite_code')
@@ -47,7 +55,8 @@ export default defineEventHandler(async (event) => {
     .insert({
       code: codeData,
       created_by: user.id,
-      max_uses: maxUses
+      max_uses: maxUses,
+      commission_rate: commissionRate
     })
     .select()
     .single()
