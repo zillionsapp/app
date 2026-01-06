@@ -52,6 +52,13 @@ const logout = async () => {
             <span>{{ $t('app.nav.dashboard') }}</span>
           </NuxtLink>
         </li>
+        <li class="w-full disabled">
+          <div class="flex items-center gap-3 w-full px-6 rounded-lg opacity-50 cursor-not-allowed">
+            <svg data-src="https://unpkg.com/heroicons/20/solid/signal.svg" class="h-5 w-5 flex-shrink-0"></svg>
+            <span>{{ $t('app.nav.signals') }}</span>
+            <span class="badge badge-primary badge-sm">Pro</span>
+          </div>
+        </li>
         <li class="w-full">
           <NuxtLink to="/app/settings" active-class="active" :class="['flex items-center gap-3 w-full block px-6 rounded-lg', $route.path === '/app/settings' ? 'bg-base-200' : '']">
             <svg data-src="https://unpkg.com/heroicons/20/solid/adjustments-vertical.svg" class="h-5 w-5 flex-shrink-0"></svg>

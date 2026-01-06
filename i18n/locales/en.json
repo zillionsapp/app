@@ -201,6 +201,7 @@
       "wallet": "Wallet",
       "transactions": "Transactions",
       "referrals": "Referrals",
+      "signals": "Signals",
       "settings": "Settings",
       "profile": "Profile",
       "logout": "Logout"
