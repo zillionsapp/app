@@ -234,6 +234,27 @@ END;
 $$ LANGUAGE plpgsql SECURITY DEFINER;
 
 -- ============================================================================
+-- VAULT TRANSACTIONS TABLE
+-- ============================================================================
+
+-- Vault Transactions Table
+CREATE TABLE IF NOT EXISTS public.vault_transactions (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    email TEXT NOT NULL,
+    amount NUMERIC NOT NULL,
+    shares NUMERIC NOT NULL,
+    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL', 'COMMISSION_EARNED', 'COMMISSION_PAID')),
+    timestamp BIGINT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
+    -- Commission-related fields (NULL for non-commission transactions)
+    inviter_id UUID REFERENCES auth.users(id),
+    invited_user_id UUID REFERENCES auth.users(id),
+    invited_portfolio_value NUMERIC,
+    invited_daily_pnl NUMERIC,
+    commission_rate NUMERIC
+);
+
+-- ============================================================================
 -- COMMISSION SYSTEM TABLES AND FUNCTIONS
 -- ============================================================================
 
@@ -365,27 +386,36 @@ BEGIN
 
             -- Only record if there's profit to commission
             IF commission_amount > 0 THEN
-                -- Check if commission transaction already exists for this date and users
+                -- Check if commission transactions already exist for this date and users
                 IF NOT EXISTS (
-                    SELECT 1 FROM commission_transactions
+                    SELECT 1 FROM vault_transactions
                     WHERE inviter_id = commission_record.inviter_id
                     AND invited_user_id = commission_record.invited_user_id
-                    AND transaction_date = target_date
+                    AND type IN ('COMMISSION_EARNED', 'COMMISSION_PAID')
+                    AND DATE(to_timestamp(timestamp / 1000)) = target_date
                 ) THEN
-                    INSERT INTO commission_transactions (
-                        inviter_id,
-                        invited_user_id,
-                        transaction_date,
-                        invited_portfolio_value,
-                        invited_daily_pnl,
-                        commission_earned
+                    -- Get inviter's email for vault transaction
+                    SELECT u2.email INTO STRICT inviter_email
+                    FROM auth.users u2
+                    WHERE u2.id = commission_record.inviter_id;
+
+                    -- Transfer commission funds between vault accounts with full metadata
+                    -- Debit from invited user (commission payment)
+                    INSERT INTO vault_transactions (
+                        email, amount, shares, type, timestamp,
+                        inviter_id, invited_user_id, invited_portfolio_value, invited_daily_pnl, commission_rate
                     ) VALUES (
-                        commission_record.inviter_id,
-                        commission_record.invited_user_id,
-                        target_date,
-                        user_deposit_total, -- User's deposit amount
-                        net_user_profit, -- User's gross profit
-                        commission_amount
+                        commission_record.invited_email, -commission_amount, 0, 'COMMISSION_PAID', EXTRACT(epoch FROM target_date) * 1000,
+                        commission_record.inviter_id, commission_record.invited_user_id, user_deposit_total, net_user_profit, commission_record.commission_rate
+                    );
+
+                    -- Credit to inviter (commission earned)
+                    INSERT INTO vault_transactions (
+                        email, amount, shares, type, timestamp,
+                        inviter_id, invited_user_id, invited_portfolio_value, invited_daily_pnl, commission_rate
+                    ) VALUES (
+                        inviter_email, commission_amount, 0, 'COMMISSION_EARNED', EXTRACT(epoch FROM target_date) * 1000,
+                        commission_record.inviter_id, commission_record.invited_user_id, user_deposit_total, net_user_profit, commission_record.commission_rate
                     );
                     inserted_count := inserted_count + 1;
                 END IF;
@@ -403,9 +433,9 @@ RETURNS NUMERIC AS $$
 DECLARE
     total_commission NUMERIC;
 BEGIN
-    SELECT COALESCE(SUM(commission_earned), 0) INTO total_commission
-    FROM commission_transactions
-    WHERE inviter_id = user_id;
+    SELECT COALESCE(SUM(ABS(amount)), 0) INTO total_commission
+    FROM vault_transactions
+    WHERE inviter_id = user_id AND type = 'COMMISSION_EARNED';
 
     RETURN total_commission;
 END;
@@ -417,9 +447,9 @@ RETURNS NUMERIC AS $$
 DECLARE
     total_paid NUMERIC;
 BEGIN
-    SELECT COALESCE(SUM(commission_earned), 0) INTO total_paid
-    FROM commission_transactions
-    WHERE invited_user_id = user_id;
+    SELECT COALESCE(SUM(ABS(amount)), 0) INTO total_paid
+    FROM vault_transactions
+    WHERE invited_user_id = user_id AND type = 'COMMISSION_PAID';
 
     RETURN total_paid;
 END;
@@ -438,32 +468,32 @@ DECLARE
     pending_count BIGINT;
 BEGIN
     -- Get total earned (as referrer)
-    SELECT COALESCE(SUM(commission_earned), 0) INTO total_earned
-    FROM commission_transactions
-    WHERE inviter_id = user_id;
+    SELECT COALESCE(SUM(ABS(amount)), 0) INTO total_earned
+    FROM vault_transactions
+    WHERE inviter_id = user_id AND type = 'COMMISSION_EARNED';
 
     -- Get total paid (as referred user)
-    SELECT COALESCE(SUM(commission_earned), 0) INTO total_paid
-    FROM commission_transactions
-    WHERE invited_user_id = user_id;
+    SELECT COALESCE(SUM(ABS(amount)), 0) INTO total_paid
+    FROM vault_transactions
+    WHERE invited_user_id = user_id AND type = 'COMMISSION_PAID';
 
     -- Get monthly earned (last 30 days)
-    SELECT COALESCE(SUM(commission_earned), 0) INTO monthly_earned
-    FROM commission_transactions
-    WHERE inviter_id = user_id
-    AND transaction_date >= CURRENT_DATE - INTERVAL '30 days';
+    SELECT COALESCE(SUM(ABS(amount)), 0) INTO monthly_earned
+    FROM vault_transactions
+    WHERE inviter_id = user_id AND type = 'COMMISSION_EARNED'
+    AND DATE(to_timestamp(timestamp / 1000)) >= CURRENT_DATE - INTERVAL '30 days';
 
     -- Get invited users count
     SELECT COUNT(DISTINCT invited_user_id) INTO invited_count
-    FROM commission_transactions
-    WHERE inviter_id = user_id;
+    FROM vault_transactions
+    WHERE inviter_id = user_id AND type = 'COMMISSION_EARNED';
 
     -- Get last commission date
-    SELECT MAX(transaction_date) INTO last_date
-    FROM commission_transactions
-    WHERE inviter_id = user_id;
+    SELECT MAX(DATE(to_timestamp(timestamp / 1000))) INTO last_date
+    FROM vault_transactions
+    WHERE inviter_id = user_id AND type = 'COMMISSION_EARNED';
 
-    -- Get pending payments count
+    -- Get pending payments count (keeping this for now, though it might be obsolete)
     SELECT COUNT(*) INTO pending_count
     FROM commission_payments
     WHERE inviter_id = user_id AND status = 'PENDING';
@@ -499,16 +529,16 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     SELECT
-        ct.transaction_date,
+        DATE(to_timestamp(vt.timestamp / 1000)) as transaction_date,
         u.email::TEXT,
-        (ct.invited_daily_pnl + ct.commission_earned) as invited_gross_pnl, -- Reconstruct gross profit
-        ct.invited_daily_pnl as invited_net_pnl, -- Net profit after commission
-        ct.commission_earned,
-        (ct.commission_earned / (ct.invited_daily_pnl + ct.commission_earned)) as commission_rate
-    FROM commission_transactions ct
-    JOIN auth.users u ON u.id = ct.invited_user_id
-    WHERE ct.inviter_id = user_id
-    ORDER BY ct.transaction_date DESC
+        (vt.invited_daily_pnl + ABS(vt.amount)) as invited_gross_pnl, -- Reconstruct gross profit
+        vt.invited_daily_pnl as invited_net_pnl, -- Net profit after commission
+        ABS(vt.amount) as commission_earned,
+        vt.commission_rate
+    FROM vault_transactions vt
+    JOIN auth.users u ON u.id = vt.invited_user_id
+    WHERE vt.inviter_id = user_id AND vt.type = 'COMMISSION_EARNED'
+    ORDER BY vt.timestamp DESC
     LIMIT limit_count
     OFFSET offset_count;
 END;

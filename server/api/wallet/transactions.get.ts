@@ -30,26 +30,16 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  // Get user's commission earnings (as referrer)
-  const { data: commissionEarnings, error: earningsError } = await (supabase as any)
-    .from('commission_transactions')
-    .select('id, commission_earned, transaction_date, invited_user_id')
-    .eq('inviter_id', user.id)
-    .order('transaction_date', { ascending: true })
+  // Get user's commission transactions from vault_transactions
+  const { data: commissionTransactions, error: commissionError } = await (supabase as any)
+    .from('vault_transactions')
+    .select('id, amount, type, timestamp, inviter_id, invited_user_id, invited_portfolio_value, invited_daily_pnl, commission_rate')
+    .or(`inviter_id.eq.${user.id},invited_user_id.eq.${user.id}`)
+    .in('type', ['COMMISSION_EARNED', 'COMMISSION_PAID'])
+    .order('timestamp', { ascending: true })
 
-  if (earningsError) {
-    console.error('Error fetching commission earnings:', earningsError)
-  }
-
-  // Get user's commission payments (as referred user)
-  const { data: commissionPayments, error: paymentsError } = await (supabase as any)
-    .from('commission_transactions')
-    .select('id, commission_earned, transaction_date, inviter_id')
-    .eq('invited_user_id', user.id)
-    .order('transaction_date', { ascending: true })
-
-  if (paymentsError) {
-    console.error('Error fetching commission payments:', paymentsError)
+  if (commissionError) {
+    console.error('Error fetching commission transactions:', commissionError)
   }
 
 
@@ -63,29 +53,12 @@ export default defineEventHandler(async (event) => {
       commission_earned: null,
       invited_user_id: null
     })),
-    // Commission earnings (positive for referrer)
-    ...(commissionEarnings || []).map((comm: any) => ({
-      id: comm.id,
-      amount: comm.commission_earned,
-      shares: 0,
-      type: 'COMMISSION_EARNED',
-      timestamp: new Date(comm.transaction_date).getTime(),
-      email: userEmail,
-      transaction_type: 'commission_earned',
-      commission_earned: comm.commission_earned,
-      invited_user_id: comm.invited_user_id
-    })),
-    // Commission payments (negative for referred user)
-    ...(commissionPayments || []).map((comm: any) => ({
-      id: comm.id,
-      amount: -comm.commission_earned, // Negative amount for payment
-      shares: 0,
-      type: 'COMMISSION_PAID',
-      timestamp: new Date(comm.transaction_date).getTime(),
-      email: userEmail,
-      transaction_type: 'commission_paid',
-      commission_earned: -comm.commission_earned,
-      inviter_id: comm.inviter_id
+    // Commission transactions from vault_transactions
+    ...(commissionTransactions || []).map((comm: any) => ({
+      ...comm,
+      transaction_type: comm.type === 'COMMISSION_EARNED' ? 'commission_earned' : 'commission_paid',
+      commission_earned: Math.abs(comm.amount),
+      email: userEmail
     }))
   ].sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp ascending
 
