@@ -300,6 +300,7 @@ const yFormatter = (value: number): string => {
               <thead>
                 <tr class="bg-base-200">
                   <th>{{ $t('app.dashboard.status') }}</th>
+                  <th>{{ $t('app.dashboard.date_time') }}</th>
                   <th>{{ $t('app.dashboard.symbol') }}</th>
                   <th>{{ $t('app.dashboard.side') }}</th>
                   <th>{{ $t('app.dashboard.entry_price') }}</th>
@@ -314,6 +315,10 @@ const yFormatter = (value: number): string => {
                     <span :class="trade.status === 'OPEN' ? 'badge badge-warning' : 'badge badge-success'">
                       {{ trade.status === 'OPEN' ? $t('app.dashboard.open') : $t('app.dashboard.closed') }}
                     </span>
+                  </td>
+                  <td class="font-mono text-sm">
+                    <div>{{ new Date(trade.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</div>
+                    <div class="text-xs opacity-70">{{ new Date(trade.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) }}</div>
                   </td>
                   <td class="font-bold">{{ trade.symbol }}</td>
                   <td>
