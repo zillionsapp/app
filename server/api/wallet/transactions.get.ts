@@ -62,8 +62,9 @@ export default defineEventHandler(async (event) => {
     }))
   ].sort((a, b) => a.timestamp - b.timestamp) // Sort by timestamp ascending
 
-  // Calculate running balance in chronological order
-  let runningBalance = 0
+  // Calculate running cash balance (deposits/withdrawals/commissions only)
+  // This shows the user's deposited amount changes over time
+  let cashBalance = 0
   const transactionsWithBalance = allTransactions.map((tx: any) => {
     let description = ''
     let amountDisplay = ''
@@ -72,26 +73,26 @@ export default defineEventHandler(async (event) => {
 
     if (tx.transaction_type === 'vault') {
       if (tx.type === 'DEPOSIT') {
-        runningBalance += Number(tx.amount)
+        cashBalance += Number(tx.amount)
         description = 'Deposit'
         amountDisplay = `+$${Number(tx.amount).toLocaleString()}`
         typeDisplay = 'deposit'
         shares = Number(tx.shares).toLocaleString()
       } else if (tx.type === 'WITHDRAWAL') {
-        runningBalance -= Number(tx.amount)
+        cashBalance -= Number(tx.amount)
         description = 'Withdrawal'
         amountDisplay = `-$${Number(tx.amount).toLocaleString()}`
         typeDisplay = 'withdrawal'
         shares = Number(tx.shares).toLocaleString()
       }
     } else if (tx.transaction_type === 'commission_earned') {
-      runningBalance += Number(tx.commission_earned)
+      cashBalance += Number(tx.commission_earned)
       description = 'Commission Received'
       amountDisplay = `+$${Number(tx.commission_earned).toLocaleString()}`
       typeDisplay = 'commission'
       shares = '0'
     } else if (tx.transaction_type === 'commission_paid') {
-      runningBalance -= Math.abs(Number(tx.commission_earned))
+      cashBalance -= Math.abs(Number(tx.commission_earned))
       description = 'Commission Paid'
       amountDisplay = `-$${Math.abs(Number(tx.commission_earned)).toLocaleString()}`
       typeDisplay = 'commission'
@@ -113,7 +114,7 @@ export default defineEventHandler(async (event) => {
       description,
       amount: amountDisplay,
       shares,
-      balance: `$${runningBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
+      balance: `$${cashBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`,
       type: typeDisplay,
       timestamp: tx.timestamp
     }

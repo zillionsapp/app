@@ -48,6 +48,10 @@ export default defineEventHandler(async (event) => {
     } else if (tx.type === 'WITHDRAWAL') {
       totalDeposited -= Number(tx.amount) // Withdrawals reduce deposited amount
       currentUserShares -= Number(tx.shares)
+    } else if (tx.type === 'COMMISSION_EARNED') {
+      totalDeposited += Number(tx.amount) // Commission earnings increase deposited amount
+    } else if (tx.type === 'COMMISSION_PAID') {
+      totalDeposited -= Math.abs(Number(tx.amount)) // Commission payments decrease deposited amount
     }
   }
 
