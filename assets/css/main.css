@@ -59,3 +59,20 @@
   padding-right: 1rem;
   font-weight: bold;
 }
+
+/* Global Input and Textarea Styles */
+.input, .textarea {
+  background: transparent;
+  border: 0;
+  border-bottom: 1px solid rgba(128, 128, 128, 0.5);
+  border-radius: 0;
+  padding-left: 0.5rem;
+  padding-right: 0.5rem;
+  margin-left: 0.5rem;
+  margin-right: 0.5rem;
+}
+
+.input:focus, .textarea:focus {
+  border-bottom: 2px solid var(--color-primary);
+  outline: none;
+}
