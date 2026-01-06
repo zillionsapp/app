@@ -50,21 +50,6 @@ export default defineNuxtConfig({
     }
   },
   devtools: { enabled: true },
-  nitro: {
-    preset: 'vercel',
-    externals: {
-      inline: [
-        "@intlify/utils",
-        "@intlify/core",
-        "@intlify/core-base",
-        "@intlify/h3",
-        "@intlify/shared",
-        "@intlify/message-compiler",
-        "@nuxtjs/i18n",
-        "vue-i18n"
-      ]
-    }
-  },
   routeRules: {
     '/api/**': {
       cors: true,
