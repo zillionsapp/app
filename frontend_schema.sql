@@ -253,12 +253,12 @@ CREATE TABLE IF NOT EXISTS commission_payments (
     updated_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
 );
 
--- Commission snapshots table - tracks commission calculations over time
-CREATE TABLE IF NOT EXISTS commission_snapshots (
+-- Commission transactions table - tracks commission payouts as transactions
+CREATE TABLE IF NOT EXISTS commission_transactions (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     inviter_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     invited_user_id UUID REFERENCES auth.users(id) ON DELETE CASCADE,
-    snapshot_date DATE NOT NULL,
+    transaction_date DATE NOT NULL,
     invited_portfolio_value NUMERIC NOT NULL DEFAULT 0,
     invited_daily_pnl NUMERIC NOT NULL DEFAULT 0,
     commission_earned NUMERIC NOT NULL DEFAULT 0, -- 10% of daily pnl
@@ -269,19 +269,19 @@ CREATE TABLE IF NOT EXISTS commission_snapshots (
 CREATE INDEX IF NOT EXISTS idx_commission_payments_inviter ON commission_payments(inviter_id);
 CREATE INDEX IF NOT EXISTS idx_commission_payments_invited ON commission_payments(invited_user_id);
 CREATE INDEX IF NOT EXISTS idx_commission_payments_period ON commission_payments(period_start, period_end);
-CREATE INDEX IF NOT EXISTS idx_commission_snapshots_inviter ON commission_snapshots(inviter_id);
-CREATE INDEX IF NOT EXISTS idx_commission_snapshots_date ON commission_snapshots(snapshot_date);
+CREATE INDEX IF NOT EXISTS idx_commission_transactions_inviter ON commission_transactions(inviter_id);
+CREATE INDEX IF NOT EXISTS idx_commission_transactions_date ON commission_transactions(transaction_date);
 
 -- Row Level Security for commission tables
 ALTER TABLE commission_payments ENABLE ROW LEVEL SECURITY;
-ALTER TABLE commission_snapshots ENABLE ROW LEVEL SECURITY;
+ALTER TABLE commission_transactions ENABLE ROW LEVEL SECURITY;
 
 -- Users can view their own commission payments (as inviter)
 CREATE POLICY "Users can view their commission payments" ON commission_payments
     FOR SELECT USING (auth.uid() = inviter_id);
 
--- Users can view their commission snapshots (as inviter)
-CREATE POLICY "Users can view their commission snapshots" ON commission_snapshots
+-- Users can view their commission transactions (as inviter)
+CREATE POLICY "Users can view their commission transactions" ON commission_transactions
     FOR SELECT USING (auth.uid() = inviter_id);
 
 -- Function to calculate daily commissions for all inviters
@@ -343,10 +343,16 @@ BEGIN
 
         -- Calculate user's share of vault P&L based on their deposit percentage
         -- This gives the user's actual profit contribution
+        RAISE NOTICE 'Commission calc for user %: deposits=%, vault_value=%, vault_pnl=%',
+            commission_record.invited_email, user_deposit_total, vault_total_value, vault_daily_pnl;
+
         IF user_deposit_total > 0 AND vault_total_value > 0 THEN
             user_daily_pnl := vault_daily_pnl * (user_deposit_total / vault_total_value);
+            RAISE NOTICE 'Calculated user P&L: % * (% / %) = %',
+                vault_daily_pnl, user_deposit_total, vault_total_value, user_daily_pnl;
         ELSE
             user_daily_pnl := 0;
+            RAISE NOTICE 'User P&L set to 0: deposits=%, vault_value=%', user_deposit_total, vault_total_value;
         END IF;
 
         -- Only calculate commission if the user was active (had deposited) on this date
@@ -354,14 +360,15 @@ BEGIN
         IF first_deposit_timestamp / 1000 <= EXTRACT(epoch FROM target_date + INTERVAL '1 day') THEN
             -- Calculate commission using the custom rate from the invite code
             commission_amount := user_daily_pnl * commission_record.commission_rate;
-            net_user_profit := user_daily_pnl - commission_amount;
+            -- Keep user's P&L gross, commission paid separately
+            net_user_profit := user_daily_pnl;
 
             -- Only record if there's profit to commission
             IF commission_amount > 0 THEN
-                INSERT INTO commission_snapshots (
+                INSERT INTO commission_transactions (
                     inviter_id,
                     invited_user_id,
-                    snapshot_date,
+                    transaction_date,
                     invited_portfolio_value,
                     invited_daily_pnl,
                     commission_earned
@@ -369,8 +376,8 @@ BEGIN
                     commission_record.inviter_id,
                     commission_record.invited_user_id,
                     target_date,
-                    0, -- Could be enhanced to show user's vault share
-                    net_user_profit, -- User's profit after commission deduction
+                    user_deposit_total, -- User's deposit amount
+                    net_user_profit, -- User's gross profit
                     commission_amount
                 );
                 inserted_count := inserted_count + 1;
@@ -389,7 +396,7 @@ DECLARE
     total_commission NUMERIC;
 BEGIN
     SELECT COALESCE(SUM(commission_earned), 0) INTO total_commission
-    FROM commission_snapshots
+    FROM commission_transactions
     WHERE inviter_id = user_id;
 
     RETURN total_commission;
@@ -403,7 +410,7 @@ DECLARE
     total_paid NUMERIC;
 BEGIN
     SELECT COALESCE(SUM(commission_earned), 0) INTO total_paid
-    FROM commission_snapshots
+    FROM commission_transactions
     WHERE invited_user_id = user_id;
 
     RETURN total_paid;
@@ -424,28 +431,28 @@ DECLARE
 BEGIN
     -- Get total earned (as referrer)
     SELECT COALESCE(SUM(commission_earned), 0) INTO total_earned
-    FROM commission_snapshots
+    FROM commission_transactions
     WHERE inviter_id = user_id;
 
     -- Get total paid (as referred user)
     SELECT COALESCE(SUM(commission_earned), 0) INTO total_paid
-    FROM commission_snapshots
+    FROM commission_transactions
     WHERE invited_user_id = user_id;
 
     -- Get monthly earned (last 30 days)
     SELECT COALESCE(SUM(commission_earned), 0) INTO monthly_earned
-    FROM commission_snapshots
+    FROM commission_transactions
     WHERE inviter_id = user_id
-    AND snapshot_date >= CURRENT_DATE - INTERVAL '30 days';
+    AND transaction_date >= CURRENT_DATE - INTERVAL '30 days';
 
     -- Get invited users count
     SELECT COUNT(DISTINCT invited_user_id) INTO invited_count
-    FROM commission_snapshots
+    FROM commission_transactions
     WHERE inviter_id = user_id;
 
     -- Get last commission date
-    SELECT MAX(snapshot_date) INTO last_date
-    FROM commission_snapshots
+    SELECT MAX(transaction_date) INTO last_date
+    FROM commission_transactions
     WHERE inviter_id = user_id;
 
     -- Get pending payments count
@@ -474,7 +481,7 @@ CREATE OR REPLACE FUNCTION get_user_commission_history(
     offset_count INTEGER DEFAULT 0
 )
 RETURNS TABLE (
-    snapshot_date DATE,
+    transaction_date DATE,
     invited_user_email TEXT,
     invited_gross_pnl NUMERIC,
     invited_net_pnl NUMERIC,
@@ -484,16 +491,16 @@ RETURNS TABLE (
 BEGIN
     RETURN QUERY
     SELECT
-        cs.snapshot_date,
+        ct.transaction_date,
         u.email::TEXT,
-        (cs.invited_daily_pnl + cs.commission_earned) as invited_gross_pnl, -- Reconstruct gross profit
-        cs.invited_daily_pnl as invited_net_pnl, -- Net profit after commission
-        cs.commission_earned,
-        (cs.commission_earned / (cs.invited_daily_pnl + cs.commission_earned)) as commission_rate
-    FROM commission_snapshots cs
-    JOIN auth.users u ON u.id = cs.invited_user_id
-    WHERE cs.inviter_id = user_id
-    ORDER BY cs.snapshot_date DESC
+        (ct.invited_daily_pnl + ct.commission_earned) as invited_gross_pnl, -- Reconstruct gross profit
+        ct.invited_daily_pnl as invited_net_pnl, -- Net profit after commission
+        ct.commission_earned,
+        (ct.commission_earned / (ct.invited_daily_pnl + ct.commission_earned)) as commission_rate
+    FROM commission_transactions ct
+    JOIN auth.users u ON u.id = ct.invited_user_id
+    WHERE ct.inviter_id = user_id
+    ORDER BY ct.transaction_date DESC
     LIMIT limit_count
     OFFSET offset_count;
 END;

@@ -32,10 +32,10 @@ export default defineEventHandler(async (event) => {
 
   // Get user's commission payments (as referrer)
   const { data: commissionPayments, error: commError } = await (supabase as any)
-    .from('commission_snapshots')
-    .select('id, commission_earned, snapshot_date, invited_user_id')
+    .from('commission_transactions')
+    .select('id, commission_earned, transaction_date, invited_user_id')
     .eq('inviter_id', user.id)
-    .order('snapshot_date', { ascending: true })
+    .order('transaction_date', { ascending: true })
 
   if (commError) {
     console.error('Error fetching commission payments:', commError)
@@ -59,7 +59,7 @@ export default defineEventHandler(async (event) => {
       amount: comm.commission_earned,
       shares: 0,
       type: 'COMMISSION',
-      timestamp: new Date(comm.snapshot_date).getTime(),
+      timestamp: new Date(comm.transaction_date).getTime(),
       email: userEmail,
       transaction_type: 'commission',
       commission_earned: comm.commission_earned,
