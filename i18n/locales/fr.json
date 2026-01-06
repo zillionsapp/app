@@ -199,9 +199,10 @@
     "nav": {
       "dashboard": "Coffre-fort",
       "wallet": "Portefeuille",
-      "transactions": "Transactions",
+      "transactions": "Opérations",
       "referrals": "Parrainages",
       "settings": "Paramètres",
+      "profile": "Profil",
       "logout": "Déconnexion"
     },
     "dashboard": {
@@ -286,7 +287,6 @@
       "loading_transactions": "Chargement des transactions..."
     },
     "referrals": {
-      "referral_codes": "Codes de parrainage",
       "generate_new_code": "Générer un nouveau code",
       "total_codes": "Codes totaux",
       "active_codes": "Codes actifs",

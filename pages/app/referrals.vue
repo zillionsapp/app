@@ -134,21 +134,9 @@ onMounted(async () => {
 </script>
 
 <template>
-  <!-- Header Section -->
-  <section class="col-span-12 flex justify-between items-center mb-8">
-    <h1 class="text-3xl font-bold">{{ $t('app.referrals.referral_codes') }}</h1>
-    <button @click="createInviteCode" class="btn btn-primary btn-lg gap-2" :disabled="loading">
-      <svg v-if="!loading" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
-      </svg>
-      <span v-if="loading" class="loading loading-spinner loading-sm"></span>
-      {{ $t('app.referrals.generate_new_code') }}
-    </button>
-  </section>
-
   <!-- Stats Row -->
   <div class="col-span-12 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8">
-    <div class="card bg-base-100 shadow-lg">
+    <div class="card bg-base-100">
       <div class="card-body">
         <div class="flex items-center gap-3">
           <div class="p-3 bg-primary/10 rounded-full">
@@ -164,7 +152,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="card bg-base-100 shadow-lg">
+    <div class="card bg-base-100">
       <div class="card-body">
         <div class="flex items-center gap-3">
           <div class="p-3 bg-success/10 rounded-full">
@@ -180,7 +168,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="card bg-base-100 shadow-lg">
+    <div class="card bg-base-100">
       <div class="card-body">
         <div class="flex items-center gap-3">
           <div class="p-3 bg-info/10 rounded-full">
@@ -196,7 +184,7 @@ onMounted(async () => {
       </div>
     </div>
 
-    <div class="card bg-base-100 shadow-lg">
+    <div class="card bg-base-100">
       <div class="card-body">
         <div class="flex items-center gap-3">
           <div class="p-3 bg-warning/10 rounded-full">
@@ -215,7 +203,7 @@ onMounted(async () => {
 
   <!-- Main Content Card -->
   <div class="col-span-12">
-    <div class="card bg-base-100 shadow-lg">
+    <div class="card bg-base-100">
       <div class="card-body">
         <div class="flex justify-between items-center mb-6">
           <h2 class="card-title">{{ $t('app.referrals.your_referral_codes') }}</h2>

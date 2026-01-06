@@ -137,7 +137,7 @@ watchEffect(() => {
 </script>
 
 <template>
-  <div class="hero min-h-[80vh] bg-base-200">
+  <div class="hero min-h-screen bg-base-200">
     <div class="hero-content flex-col lg:flex-row-reverse w-full max-w-5xl justify-around">
       <div class="text-center lg:text-left max-w-md">
         <h1 class="text-5xl font-bold" v-if="hasValidCode">{{ $t('register_title') }}</h1>
@@ -145,7 +145,7 @@ watchEffect(() => {
         <p class="py-6" v-if="hasValidCode">{{ $t('register_subtitle') }}</p>
         <p class="py-6" v-else>{{ $t('auth.invite_subtitle') }}</p>
       </div>
-      <div class="card flex-shrink-0 w-full max-w-sm shadow-2xl bg-base-100">
+      <div class="card flex-shrink-0 w-full max-w-sm bg-base-100">
         <div class="card-body">
           <!-- Invite Code Form -->
           <form v-if="!hasValidCode" @submit.prevent="validateInviteCode">

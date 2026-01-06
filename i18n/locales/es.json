@@ -202,6 +202,7 @@
       "transactions": "Transacciones",
       "referrals": "Referencias",
       "settings": "Configuración",
+      "profile": "Perfil",
       "logout": "Cerrar sesión"
     },
     "dashboard": {
@@ -286,7 +287,6 @@
       "loading_transactions": "Cargando transacciones..."
     },
     "referrals": {
-      "referral_codes": "Códigos de referencia",
       "generate_new_code": "Generar nuevo código",
       "total_codes": "Códigos totales",
       "active_codes": "Códigos activos",

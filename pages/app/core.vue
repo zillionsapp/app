@@ -183,7 +183,7 @@ const goToPage = async (page: number) => {
 
       <!-- Additional Metrics -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-        <div class="card bg-base-100 shadow-lg">
+        <div class="card bg-base-100">
           <div class="card-body">
             <h3 class="card-title text-lg">{{ $t('app.dashboard.total_pnl') }}</h3>
             <p class="text-3xl font-bold" :class="(portfolioData?.totalPnL || 0) >= 0 ? 'text-success' : 'text-error'">
@@ -195,7 +195,7 @@ const goToPage = async (page: number) => {
           </div>
         </div>
 
-        <div class="card bg-base-100 shadow-lg">
+        <div class="card bg-base-100">
           <div class="card-body">
             <h3 class="card-title text-lg">{{ $t('app.dashboard.open_positions') }}</h3>
             <p class="text-3xl font-bold text-info">{{ portfolioData?.openTradesCount || 0 }}</p>
@@ -205,7 +205,7 @@ const goToPage = async (page: number) => {
           </div>
         </div>
 
-        <div class="card bg-base-100 shadow-lg">
+        <div class="card bg-base-100">
           <div class="card-body">
             <h3 class="card-title text-lg">{{ $t('app.dashboard.closed_trades') }}</h3>
             <p class="text-3xl font-bold text-warning">{{ portfolioData?.closedTrades || 0 }}</p>
@@ -217,7 +217,7 @@ const goToPage = async (page: number) => {
       </div>
 
       <!-- Recent Trades -->
-      <div class="card bg-base-100 shadow-xl">
+      <div class="card bg-base-100">
         <div class="card-body">
           <h2 class="card-title">{{ $t('app.dashboard.recent_trades') }}</h2>
 

@@ -202,6 +202,7 @@
       "transactions": "Transaktionen",
       "referrals": "Empfehlungen",
       "settings": "Einstellungen",
+      "profile": "Profil",
       "logout": "Abmelden"
     },
     "dashboard": {
@@ -286,7 +287,6 @@
       "loading_transactions": "Transaktionen werden geladen..."
     },
     "referrals": {
-      "referral_codes": "Empfehlungscodes",
       "generate_new_code": "Neuen Code generieren",
       "total_codes": "Gesamt Codes",
       "active_codes": "Aktive Codes",

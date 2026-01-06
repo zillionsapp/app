@@ -5,13 +5,13 @@ const route = useRoute()
 const { t } = useI18n()
 
 const pageTitle = computed(() => {
-  if (route.path === '/app') return t('dashboard')
-  if (route.path === '/app/wallet') return 'Wallet'
-  if (route.path === '/app/transactions') return 'Transactions'
-  if (route.path === '/app/settings') return t('settings')
-  if (route.path === '/app/profile') return t('profile')
-  if (route.path === '/app/referrals') return 'Referrals'
-  return t('dashboard')
+  if (route.path === '/app') return t('app.nav.wallet')
+  if (route.path === '/app/core') return t('app.nav.dashboard')
+  if (route.path === '/app/transactions') return t('app.nav.transactions')
+  if (route.path === '/app/settings') return t('app.nav.settings')
+  if (route.path === '/app/profile') return t('app.nav.profile')
+  if (route.path === '/app/referrals') return t('app.nav.referrals')
+  return t('app.nav.dashboard')
 })
 
 const logout = async () => {
