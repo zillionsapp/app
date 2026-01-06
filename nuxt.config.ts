@@ -50,6 +50,9 @@ export default defineNuxtConfig({
     }
   },
   devtools: { enabled: true },
+  nitro: {
+    preset: 'vercel-edge'
+  },
   pwa: {
     registerType: 'autoUpdate',
     manifest: {
