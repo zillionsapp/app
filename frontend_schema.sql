@@ -291,6 +291,7 @@ DECLARE
     commission_record RECORD;
     user_daily_pnl NUMERIC;
     commission_amount NUMERIC;
+    net_user_profit NUMERIC;
     inserted_count INTEGER := 0;
     first_deposit_timestamp BIGINT;
 BEGIN
@@ -329,6 +330,7 @@ BEGIN
         IF first_deposit_timestamp / 1000 <= EXTRACT(epoch FROM target_date + INTERVAL '1 day') THEN
             -- Calculate commission using the custom rate from the invite code
             commission_amount := user_daily_pnl * commission_record.commission_rate;
+            net_user_profit := user_daily_pnl - commission_amount;
 
             -- Only record if there's profit to commission
             IF commission_amount > 0 THEN
@@ -344,7 +346,7 @@ BEGIN
                     commission_record.invited_user_id,
                     target_date,
                     0, -- Could be enhanced to show user's vault share
-                    user_daily_pnl,
+                    net_user_profit, -- User's profit after commission deduction
                     commission_amount
                 );
                 inserted_count := inserted_count + 1;
@@ -429,16 +431,20 @@ CREATE OR REPLACE FUNCTION get_user_commission_history(
 RETURNS TABLE (
     snapshot_date DATE,
     invited_user_email TEXT,
-    invited_daily_pnl NUMERIC,
-    commission_earned NUMERIC
+    invited_gross_pnl NUMERIC,
+    invited_net_pnl NUMERIC,
+    commission_earned NUMERIC,
+    commission_rate NUMERIC
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT
         cs.snapshot_date,
         u.email::TEXT,
-        cs.invited_daily_pnl,
-        cs.commission_earned
+        (cs.invited_daily_pnl + cs.commission_earned) as invited_gross_pnl, -- Reconstruct gross profit
+        cs.invited_daily_pnl as invited_net_pnl, -- Net profit after commission
+        cs.commission_earned,
+        (cs.commission_earned / (cs.invited_daily_pnl + cs.commission_earned)) as commission_rate
     FROM commission_snapshots cs
     JOIN auth.users u ON u.id = cs.invited_user_id
     WHERE cs.inviter_id = user_id
