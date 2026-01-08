@@ -28,7 +28,7 @@
   },
   "features": {
     "title": "Pourquoi Zillions est différent",
-    "subtitle": "Un bot de trading autonome exclusif sur chaîne qui vous aide à participer aux marchés sans avoir besoin d'être un professionnel du trading.",
+    "subtitle": "L'application Zillions est le bot de trading le plus facile à utiliser et se sent comme un portefeuille crypto. Vous déposez et retirez simplement des fonds et envoyez et recevez des fonds avec des amis. Elle dispose d'un système Vault intégré et le bot négocie automatiquement avec lui de manière sécurisée et utilise une stratégie propriétaire de Concepts Smart Money pour rester compétitif.",
     "metaTrading": {
       "badge": "Smart Money",
       "title": "Algorithme unique Smart Money",
@@ -70,7 +70,7 @@
     "cta": "Obtenir un accès anticipé"
   },
   "technology": {
-    "title": "À l'intérieur du moteur Smart Money",
+    "title": "À l'intérieur du moteur",
     "subtitle": "Contrairement aux algorithmes de trading typiques utilisant des indicateurs standards, notre stratégie exclusive est basée sur des concepts Smart Money pour identifier les patterns de trading institutionnel et trouver des entrées parfaites.",
     "trend": {
       "badge": "Tendance",
@@ -183,9 +183,9 @@
     "q2": "Est-ce custodial ?",
     "a2": "Non - c'est sur chaîne et non custodial. Vous pouvez suivre l'exécution et l'historique de manière transparente.",
     "q3": "Les retours sont-ils garantis ?",
-    "a3": "Non. Les marchés impliquent un risque. Le système vise à faire croître le capital en s'alignant avec les régimes dominants, mais des pertes sont possibles.",
+    "a3": "Non. Les marchés impliquent un risque. Mais le système a une gestion de risque appropriée pour éviter de perdre tous vos fonds.",
     "q4": "Qu'est-ce que le Concept Smart Money ?",
-    "a4": "Le Concept Smart Money (SMC) ou méthodologie Inner Circle Trader (ICT) analyse les patterns de trading institutionnel. Il identifie les zones où de gros traders institutionnels placent des ordres, incluant les Orderblocks HTF (zones de support/résistance), Fair Value Gaps (déséquilibres de prix) et Liquidity Zones (où les stops retail cluster). Notre algorithme utilise ces concepts pour trouver des points d'entrée optimaux qui s'alignent avec le comportement de trading professionnel.",
+    "a4": "Le Concept Smart Money (SMC) ou méthodologie Inner Circle Trader (ICT) analyse les patterns de trading institutionnel. Il identifie les zones où de gros traders institutionnels placent des ordres. Notre algorithme utilise ces concepts pour trouver des points d'entrée optimaux qui s'alignent avec le comportement de trading professionnel.",
     "q5": "Comment obtenir l'accès ?",
     "a5": "Sur invitation seulement. Vous devez être invité par quelqu'un que vous connaissez."
   },
@@ -243,6 +243,10 @@
       "transaction_history_here": "Votre historique de transactions apparaîtra ici"
     },
     "wallet": {
+      "portfolio_dashboard": "Tableau de bord du portefeuille",
+      "live_trading_performance": "Performance de trading en direct",
+      "active": "Actif",
+      "performance_30d": "Performance (30j)",
       "total_deposited": "Total déposé",
       "paper_money_invested": "Argent papier investi",
       "balance_left": "Solde restant",

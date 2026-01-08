@@ -28,7 +28,7 @@
   },
   "features": {
     "title": "Why Zillions is different",
-    "subtitle": "An exclusive on-chain, autonomous trading bot designed to help you participate in markets without needing to be a trading pro.",
+    "subtitle": "Zillions App is the easiest to use trading bot and feels like a crypto wallet. You simply deposit and withdraw funds and send and receive funds with friends. It has a built-in Vault system and the bot trades automatically with it in a safe way and uses a proprietary Smart Money Concepts Strategy to stay competitive.",
     "metaTrading": {
       "badge": "Smart Money",
       "title": "Unique Smart Money Algorithm",
@@ -70,7 +70,7 @@
     "cta": "Get early access"
   },
   "technology": {
-    "title": "Inside the Smart Money Engine",
+    "title": "Inside the Engine",
     "subtitle": "Unlike typical trading algorithms using standard indicators, our exclusive strategy is based on Smart Money Concepts to identify institutional trading patterns and find perfect entries.",
     "trend": {
       "badge": "Setup",
@@ -183,9 +183,9 @@
     "q2": "Is this custodial?",
     "a2": "No - it's on‑chain and non‑custodial. You can track execution and history transparently.",
     "q3": "Are returns guaranteed?",
-    "a3": "No. Markets involve risk. The system aims to grow capital by aligning to dominant regimes, but losses are possible.",
+    "a3": "No. Markets involve risk. But the system has proper risk management to avoid losing all your funds.",
     "q4": "What is Smart Money Concept?",
-    "a4": "Smart Money Concept (SMC) or Inner Circle Trader (ICT) methodology analyzes institutional trading patterns. It identifies areas where large institutional traders place orders, including HTF Orderblocks (support/resistance zones), Fair Value Gaps (price imbalances), and Liquidity Zones (where retail stops cluster). Our algorithm uses these concepts to find optimal entry points that align with professional trading behavior.",
+    "a4": "Smart Money Concept (SMC) or Inner Circle Trader (ICT) methodology analyzes institutional trading patterns. It identifies areas where large institutional traders place orders. Our algorithm uses these concepts to find optimal entry points that align with professional trading behavior.",
     "q5": "How do I get access?",
     "a5": "Invitation Only. You have to get invited by someone you know."
   },
@@ -243,6 +243,10 @@
       "transaction_history_here": "Your transaction history will appear here"
     },
     "wallet": {
+      "portfolio_dashboard": "Portfolio Dashboard",
+      "live_trading_performance": "Live trading performance",
+      "active": "Active",
+      "performance_30d": "Performance (30d)",
       "total_deposited": "Total Deposited",
       "paper_money_invested": "Paper money invested",
       "balance_left": "Balance Left",
