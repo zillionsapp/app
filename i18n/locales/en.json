@@ -64,8 +64,8 @@
     },
     "step3": {
       "badge": "3",
-      "title": "Smart Money algorithm trades automatically",
-      "description": "The engine identifies HTF Orderblocks, Fair Value Gaps, and Liquidity Zones to find perfect entries."
+      "title": "Bot trades for you",
+      "description": "Let the magic happen and enjoy your capital grow automatically."
     },
     "cta": "Get early access"
   },
