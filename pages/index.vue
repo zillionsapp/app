@@ -65,7 +65,7 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
      </div>
 
     <!-- Hero -->
-    <section class="w-full pt-16">
+    <section class="w-full pt-36">
       <div class="max-w-7xl mx-auto px-4 lg:px-6 grid lg:grid-cols-2 gap-10 lg:gap-16 items-center py-10 lg:py-20">
         <div>
           <div class="badge badge-outline badge-lg text-xs md:text-sm mb-6 animate-fade-in">{{ $t('hero.badge') }}</div>
@@ -83,14 +83,14 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
 
         </div>
 
-        <!-- <div class="relative">
+        <div class="relative">
           <div class="mockup-window border border-base-300 rounded-3xl overflow-hidden shadow-2xl bg-base-100">
             <WalletPreview/>
           </div>
           <div class="absolute -right-6 -bottom-6 hidden md:block">
             <div class="badge badge-outline">Preview</div>
           </div>
-        </div> -->
+        </div>
       </div>
 
       <!-- Stats -->
