@@ -81,7 +81,7 @@ CREATE TABLE IF NOT EXISTS public.vault_transactions (
     email TEXT NOT NULL,
     amount NUMERIC NOT NULL,
     shares NUMERIC NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', 'COMMISSION_EARNED', 'COMMISSION_PAID')),
+    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL')),
     timestamp BIGINT NOT NULL,
     created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
@@ -222,3 +222,4 @@ END $$;
 -- These tables are only accessed through authenticated server-side APIs
 -- Security is enforced at the application level using JWT authentication
 -- and service role database access. No direct user access to these tables.
+

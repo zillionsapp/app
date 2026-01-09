@@ -243,16 +243,41 @@ CREATE TABLE IF NOT EXISTS public.vault_transactions (
     email TEXT NOT NULL,
     amount NUMERIC NOT NULL,
     shares NUMERIC NOT NULL,
-    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', 'COMMISSION_EARNED', 'COMMISSION_PAID')),
+    type TEXT NOT NULL CHECK (type IN ('DEPOSIT', 'WITHDRAWAL')),
     timestamp BIGINT NOT NULL,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()),
-    -- Commission-related fields (NULL for non-commission transactions)
-    inviter_id UUID REFERENCES auth.users(id),
-    invited_user_id UUID REFERENCES auth.users(id),
-    invited_portfolio_value NUMERIC,
-    invited_daily_pnl NUMERIC,
-    commission_rate NUMERIC
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now())
 );
+
+-- Extend vault_transactions table with commission-related fields
+-- These ALTER statements are idempotent - they won't error if columns already exist
+DO $$
+BEGIN
+    -- Add commission-related columns if they don't exist
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'vault_transactions' AND column_name = 'inviter_id') THEN
+        ALTER TABLE public.vault_transactions ADD COLUMN inviter_id UUID REFERENCES auth.users(id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'vault_transactions' AND column_name = 'invited_user_id') THEN
+        ALTER TABLE public.vault_transactions ADD COLUMN invited_user_id UUID REFERENCES auth.users(id);
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'vault_transactions' AND column_name = 'invited_portfolio_value') THEN
+        ALTER TABLE public.vault_transactions ADD COLUMN invited_portfolio_value NUMERIC;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'vault_transactions' AND column_name = 'invited_daily_pnl') THEN
+        ALTER TABLE public.vault_transactions ADD COLUMN invited_daily_pnl NUMERIC;
+    END IF;
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'vault_transactions' AND column_name = 'commission_rate') THEN
+        ALTER TABLE public.vault_transactions ADD COLUMN commission_rate NUMERIC;
+    END IF;
+
+    -- Update the CHECK constraint to include commission transaction types
+    -- Drop existing constraint first (if it exists)
+    ALTER TABLE public.vault_transactions DROP CONSTRAINT IF EXISTS vault_transactions_type_check;
+    ALTER TABLE public.vault_transactions ADD CONSTRAINT vault_transactions_type_check CHECK (type IN ('DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', 'COMMISSION_EARNED', 'COMMISSION_PAID'));
+EXCEPTION
+    WHEN others THEN
+        -- Ignore errors if alterations fail (e.g., columns already exist)
+        NULL;
+END $$;
 
 -- ============================================================================
 -- COMMISSION SYSTEM TABLES AND FUNCTIONS
@@ -318,6 +343,7 @@ DECLARE
     user_deposit_total NUMERIC;
     vault_daily_pnl NUMERIC;
     vault_total_value NUMERIC;
+    inviter_email TEXT;
 BEGIN
     -- Loop through all invite relationships (including deactivated codes)
     FOR commission_record IN
