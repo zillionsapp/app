@@ -301,6 +301,7 @@ const yFormatter = (value: number): string => {
                   <th>{{ $t('app.dashboard.date_time') }}</th>
                   <th>{{ $t('app.dashboard.symbol') }}</th>
                   <th>{{ $t('app.dashboard.side') }}</th>
+                  <th>{{ $t('app.dashboard.qty_value') }}</th>
                   <th>{{ $t('app.dashboard.entry_price') }}</th>
                   <th>{{ $t('app.dashboard.exit_price') }}</th>
                   <th>{{ $t('app.dashboard.pnl_dollar') }}</th>
@@ -323,6 +324,10 @@ const yFormatter = (value: number): string => {
                     <span :class="trade.side === 'BUY' ? 'badge badge-success' : 'badge badge-error'">
                       {{ trade.side === 'BUY' ? $t('app.dashboard.buy') : $t('app.dashboard.sell') }}
                     </span>
+                  </td>
+                  <td>
+                    <div>{{ trade.quantity?.toFixed(4) || '0.0000' }}</div>
+                    <div class="text-xs opacity-70">${{ (trade.quantity * trade.price)?.toFixed(2) || '0.00' }}</div>
                   </td>
                   <td>${{ trade.price?.toFixed(2) || '0.00' }}</td>
                   <td>

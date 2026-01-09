@@ -226,6 +226,7 @@
       "date_time": "Fecha/Hora",
       "symbol": "Símbolo",
       "side": "Lado",
+      "qty_value": "Cant/Valor",
       "entry_price": "Precio de entrada",
       "exit_price": "Precio de salida",
       "pnl_dollar": "P&L ($)",
