@@ -252,6 +252,7 @@
       "balance_left": "Balance Left",
       "available_to_trade": "Available to trade",
       "total_equity": "Total Equity",
+      "current_equity": "Current Equity",
       "current_portfolio_value": "Current portfolio value",
       "total_pnl": "Total PnL",
       "portfolio_performance": "Portfolio Performance",

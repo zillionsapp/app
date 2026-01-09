@@ -164,9 +164,14 @@ const handleSend = async () => {
       <div class="stat-desc mt-1">{{ $t('app.wallet.available_to_trade') }}</div>
     </div>
     <div class="stat">
-      <div class="stat-title text-accent uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.total_equity') }}</div>
-      <div class="stat-value text-2xl">${{ (walletData?.totalEquity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
-      <div class="stat-desc mt-1">{{ $t('app.wallet.current_portfolio_value') }}</div>
+      <div class="stat-title text-accent uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.current_equity') }}</div>
+      <div class="stat-value text-2xl">${{ (walletData?.currentEquity ?? walletData?.totalEquity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</div>
+      <div class="stat-desc mt-1">
+        <span v-if="walletData?.unrealizedPnL !== undefined" :class="walletData.unrealizedPnL >= 0 ? 'text-success' : 'text-error'">
+          {{ walletData.unrealizedPnL >= 0 ? '+' : '-' }}${{ Math.abs(walletData.unrealizedPnL).toFixed(2) }}
+        </span>
+        {{ $t('app.wallet.current_portfolio_value') }}
+      </div>
     </div>
     <div class="stat">
       <div class="stat-title text-info uppercase text-xs font-bold tracking-widest">{{ $t('app.wallet.total_pnl') }}</div>
@@ -229,7 +234,7 @@ const handleSend = async () => {
           </div>
           <div class="flex justify-between">
             <span>{{ $t('app.wallet.portfolio_value') }}</span>
-            <span class="font-mono">${{ (walletData?.totalEquity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
+            <span class="font-mono">${{ (walletData?.currentEquity ?? walletData?.totalEquity ?? 0).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) }}</span>
           </div>
           <div class="flex justify-between">
             <span>{{ $t('app.wallet.available_balance') }}</span>

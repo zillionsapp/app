@@ -252,6 +252,7 @@
       "balance_left": "Verbleibender Kontostand",
       "available_to_trade": "Verfügbar zum Traden",
       "total_equity": "Gesamtes Eigenkapital",
+      "current_equity": "Aktuelles Eigenkapital",
       "current_portfolio_value": "Aktueller Portfolio-Wert",
       "total_pnl": "Gesamt P&L",
       "portfolio_performance": "Portfolio-Performance",

@@ -252,6 +252,7 @@
       "balance_left": "Solde restant",
       "available_to_trade": "Disponible pour trader",
       "total_equity": "Équité totale",
+      "current_equity": "Équité actuelle",
       "current_portfolio_value": "Valeur actuelle du portefeuille",
       "total_pnl": "P&L total",
       "portfolio_performance": "Performance du portefeuille",

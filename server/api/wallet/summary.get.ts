@@ -118,16 +118,67 @@ export default defineEventHandler(async (event) => {
   // Calculate user's share of locked margin (for informational purposes)
   const userMarginLocked = initialBalance > 0 ? (totalDeposited / initialBalance) * totalMarginUsed : 0
 
-  console.log('User metrics: userEquity =', userEquity, 'userBalance =', userBalance, 'userPnl =', userPnl, 'userPnlPercentage =', userPnlPercentage, 'userMarginLocked =', userMarginLocked)
+  // Calculate user's current equity including unrealized PnL
+  // Get user's open trades to calculate unrealized PnL
+  let userUnrealizedPnL = 0
+  try {
+    // Fetch open trades for this user
+    const { data: openTrades, error: tradesError } = await (supabase as any)
+      .from('trades')
+      .select('*')
+      .eq('status', 'OPEN')
+
+    if (!tradesError && openTrades?.length > 0) {
+      // Fetch current prices for unrealized PnL calculations
+      const symbols = [...new Set(openTrades.map((trade: any) => trade.symbol))]
+      try {
+        const pricesResponse = await $fetch(`/api/prices?symbols=${symbols.join(',')}`)
+        const prices = pricesResponse as Record<string, number>
+
+        if (prices) {
+          openTrades.forEach((trade: any) => {
+            const currentPrice = prices[trade.symbol]
+            if (!currentPrice) return
+
+            const entryPrice = Number(trade.price)
+            const quantity = Number(trade.quantity)
+            const leverage = trade.leverage || 1
+
+            // Calculate dollar PnL
+            const dollarPnL = trade.side === 'BUY'
+              ? (currentPrice - entryPrice) * quantity
+              : (entryPrice - currentPrice) * quantity
+
+            // Calculate user's share of this PnL based on their ownership percentage
+            const ownershipPercentage = initialBalance > 0 ? totalDeposited / initialBalance : 0
+            userUnrealizedPnL += dollarPnL * ownershipPercentage
+          })
+        }
+      } catch (pricesError) {
+        console.error('Error fetching prices for unrealized PnL:', pricesError)
+        // Continue with zero unrealized PnL if there's an error
+      }
+    }
+  } catch (error) {
+    console.error('Error calculating user unrealized PnL:', error)
+    // Continue with zero unrealized PnL if there's an error
+  }
+
+  // User's current equity = realized equity + unrealized PnL
+  const userCurrentEquity = userEquity + userUnrealizedPnL
+
+  console.log('User metrics: userEquity =', userEquity, 'userCurrentEquity =', userCurrentEquity, 'userBalance =', userBalance, 'userPnl =', userPnl, 'userPnlPercentage =', userPnlPercentage, 'userMarginLocked =', userMarginLocked, 'userUnrealizedPnL =', userUnrealizedPnL)
 
   return {
     totalDeposited,
     balanceLeft: userBalance,
-    totalEquity: userEquity,
+    totalEquity: userEquity, // Keep realized equity for backward compatibility
+    currentEquity: userCurrentEquity, // New field: realized + unrealized
     pnl: userPnl,
     pnlPercentage: userPnlPercentage,
     currentShares: currentUserShares,
     marginLocked: userMarginLocked,
-    availableForWithdrawal: userBalance
+    availableForWithdrawal: userBalance,
+    unrealizedPnL: userUnrealizedPnL // New field: just the unrealized portion
   }
 })

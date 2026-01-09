@@ -194,7 +194,7 @@ const yFormatter = (value: number): string => {
 
         <div class="stat">
           <div class="stat-title">{{ $t('app.dashboard.current_equity') }}</div>
-          <div class="stat-value">${{ (portfolioData?.currentEquity || 0).toLocaleString() }}</div>
+          <div class="stat-value">${{ ((portfolioData?.currentEquity || 0) + totalUnrealizedPnL.dollar).toLocaleString() }}</div>
           <div class="stat-desc">
             <span :class="totalUnrealizedPnL.dollar >= 0 ? 'text-success' : 'text-error'">
               {{ totalUnrealizedPnL.dollar >= 0 ? '+' : '-' }}${{ Math.abs(totalUnrealizedPnL.dollar).toFixed(2) }}
