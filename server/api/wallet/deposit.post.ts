@@ -26,10 +26,10 @@ export default defineEventHandler(async (event) => {
   const userEmail = user.email!
 
   // Get current vault state to calculate shares
-  const { data: vaultState, error: vaultError } = await (supabase as any)
+  const { data: vaultStates, error: vaultError } = await (supabase as any)
     .from('vault_state')
     .select('total_assets, total_shares')
-    .single()
+    .limit(1)
 
   if (vaultError) {
     console.error('Error fetching vault state:', vaultError)
@@ -39,8 +39,10 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const currentTotalAssets = Number(vaultState.total_assets)
-  const currentTotalShares = Number(vaultState.total_shares)
+  // Handle case where vault state doesn't exist yet
+  const vaultState = vaultStates?.[0]
+  const currentTotalAssets = vaultState ? Number(vaultState.total_assets) : 0
+  const currentTotalShares = vaultState ? Number(vaultState.total_shares) : 0
 
   // Calculate shares for the deposit amount
   // Share price = total_assets / total_shares
@@ -70,14 +72,30 @@ export default defineEventHandler(async (event) => {
   const newTotalAssets = currentTotalAssets + amount
   const newTotalShares = currentTotalShares + sharesToIssue
 
-  const { error: updateError } = await (supabase as any)
-    .from('vault_state')
-    .update({
-      total_assets: newTotalAssets,
-      total_shares: newTotalShares,
-      updated_at: new Date().toISOString()
-    })
-    .eq('id', 1)
+  let updateError
+  if (vaultState) {
+    // Update existing vault state
+    const result = await (supabase as any)
+      .from('vault_state')
+      .update({
+        total_assets: newTotalAssets,
+        total_shares: newTotalShares,
+        updated_at: new Date().toISOString()
+      })
+      .eq('id', 1)
+    updateError = result.error
+  } else {
+    // Insert new vault state
+    const result = await (supabase as any)
+      .from('vault_state')
+      .insert({
+        id: 1,
+        total_assets: newTotalAssets,
+        total_shares: newTotalShares,
+        updated_at: new Date().toISOString()
+      })
+    updateError = result.error
+  }
 
   if (updateError) {
     console.error('Error updating vault state:', updateError)

@@ -58,12 +58,11 @@ export default defineEventHandler(async (event) => {
   console.log('Calculated: totalDeposited =', totalDeposited, 'currentUserShares =', currentUserShares)
 
   // Get latest portfolio snapshot for current market value (includes trading P&L)
-  const { data: snapshot, error: snapError } = await (supabase as any)
+  const { data: snapshots, error: snapError } = await (supabase as any)
     .from('portfolio_snapshots')
     .select('currentEquity, walletBalance, initialBalance')
     .order('timestamp', { ascending: false })
     .limit(1)
-    .single()
 
   if (snapError) {
     console.error('Error fetching portfolio snapshot:', snapError)
@@ -73,9 +72,11 @@ export default defineEventHandler(async (event) => {
     })
   }
 
-  const currentEquity = Number((snapshot as any).currentEquity)
-  const walletBalance = Number((snapshot as any).walletBalance)
-  const initialBalance = Number((snapshot as any).initialBalance)
+  // Handle case where no snapshots exist yet
+  const snapshot = snapshots?.[0]
+  const currentEquity = snapshot ? Number(snapshot.currentEquity) : 0
+  const walletBalance = snapshot ? Number(snapshot.walletBalance) : 0
+  const initialBalance = snapshot ? Number(snapshot.initialBalance) : 0
 
   console.log('Portfolio snapshot: currentEquity =', currentEquity, 'initialBalance =', initialBalance)
 

@@ -36,16 +36,25 @@ export default defineEventHandler(async (event) => {
   // For paper money demo, we'll skip this validation
 
   // Get current vault state
-  const { data: vaultState, error: vaultError } = await (supabase as any)
+  const { data: vaultStates, error: vaultError } = await (supabase as any)
     .from('vault_state')
     .select('total_assets, total_shares')
-    .single()
+    .limit(1)
 
   if (vaultError) {
     console.error('Error fetching vault state:', vaultError)
     throw createError({
       statusCode: 500,
       statusMessage: 'Failed to fetch vault state'
+    })
+  }
+
+  // Handle case where vault state doesn't exist yet
+  const vaultState = vaultStates?.[0]
+  if (!vaultState) {
+    throw createError({
+      statusCode: 400,
+      statusMessage: 'No vault state available for sending'
     })
   }
 

@@ -188,17 +188,19 @@ export default defineEventHandler(async (event) => {
   }
 
   // Add current equity point
-  const { data: latestSnapshot, error: snapError2 } = await (supabase as any)
+  const { data: latestSnapshots, error: snapError2 } = await (supabase as any)
     .from('portfolio_snapshots')
     .select('currentEquity')
     .order('timestamp', { ascending: false })
     .limit(1)
-    .single()
 
-  const { data: vaultState, error: vaultError } = await (supabase as any)
+  const { data: vaultStates, error: vaultError } = await (supabase as any)
     .from('vault_state')
     .select('total_shares')
-    .single()
+    .limit(1)
+
+  const latestSnapshot = latestSnapshots?.[0]
+  const vaultState = vaultStates?.[0]
 
   if (!snapError2 && !vaultError && latestSnapshot && vaultState) {
     const currentEquity = Number(latestSnapshot.currentEquity)
