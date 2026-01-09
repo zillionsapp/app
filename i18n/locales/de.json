@@ -240,7 +240,8 @@
       "previous": "Vorherige",
       "next": "Nächste",
       "no_trades_yet": "Noch keine Trades",
-      "transaction_history_here": "Ihr Transaktionsverlauf wird hier angezeigt"
+      "transaction_history_here": "Ihr Transaktionsverlauf wird hier angezeigt",
+      "no_performance_data": "Keine Performance-Daten verfügbar"
     },
     "wallet": {
       "portfolio_dashboard": "Portfolio Dashboard",

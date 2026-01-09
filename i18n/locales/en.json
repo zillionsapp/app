@@ -240,7 +240,8 @@
       "previous": "Previous",
       "next": "Next",
       "no_trades_yet": "No trades yet",
-      "transaction_history_here": "Your transaction history will appear here"
+      "transaction_history_here": "Your transaction history will appear here",
+      "no_performance_data": "No performance data available"
     },
     "wallet": {
       "portfolio_dashboard": "Portfolio Dashboard",
