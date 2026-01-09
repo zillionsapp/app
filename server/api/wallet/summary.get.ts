@@ -60,7 +60,7 @@ export default defineEventHandler(async (event) => {
   // Get latest portfolio snapshot for trading performance data
   const { data: snapshots, error: snapError } = await (supabase as any)
     .from('portfolio_snapshots')
-    .select('currentEquity, walletBalance, currentBalance, initialBalance, totalMarginUsed')
+    .select('currentEquity, walletBalance, currentBalance, initialBalance, totalMarginUsed, pnl, pnlPercentage')
     .order('timestamp', { ascending: false })
     .limit(1)
 
@@ -87,16 +87,19 @@ export default defineEventHandler(async (event) => {
   const currentBalance = snapshot ? Number(snapshot.currentBalance) : 0
   const initialBalance = snapshot ? Number(snapshot.initialBalance) : 0
   const totalMarginUsed = snapshot ? Number(snapshot.totalMarginUsed) : 0
+  const vaultPnl = snapshot ? Number(snapshot.pnl) : 0
+  const vaultPnlPercentage = snapshot ? Number(snapshot.pnlPercentage) : 0
 
   const vaultAssets = Number(vaultState.total_assets)
   const vaultShares = Number(vaultState.total_shares)
 
-  console.log('Portfolio snapshot: currentEquity =', currentEquity, 'walletBalance =', walletBalance, 'currentBalance =', currentBalance, 'initialBalance =', initialBalance)
+  console.log('Portfolio snapshot: currentEquity =', currentEquity, 'walletBalance =', walletBalance, 'currentBalance =', currentBalance, 'initialBalance =', initialBalance, 'vaultPnl =', vaultPnl, 'vaultPnlPercentage =', vaultPnlPercentage)
   console.log('Vault state: totalAssets =', vaultAssets, 'totalShares =', vaultShares)
 
-  // Calculate user's equity using share-based approach (most accurate)
-  // This represents what the user actually owns based on their share of the vault
-  const userEquity = vaultShares > 0 ? (currentUserShares / vaultShares) * vaultAssets : totalDeposited
+  // Calculate user's equity using deposit-based approach (most accurate for trading performance)
+  // This represents what the user actually owns based on their proportional share of vault performance
+  // Use portfolio_snapshot.currentEquity (not vault_state.total_assets) to reflect actual trading PnL
+  const userEquity = initialBalance > 0 ? (totalDeposited / initialBalance) * currentEquity : totalDeposited
 
   // Calculate user's available balance using currentBalance (not walletBalance)
   // currentBalance represents the actual available funds after accounting for margin
@@ -107,21 +110,22 @@ export default defineEventHandler(async (event) => {
   // This prevents the scenario where user balance appears larger than vault balance
   const userBalance = Math.min(availableBalance, userEquity)
 
-  // Calculate PnL: current equity - total deposited
-  const pnl = userEquity - totalDeposited
-  const pnlPercentage = totalDeposited > 0 ? (pnl / totalDeposited) * 100 : 0
+  // Calculate PnL using vault's actual PnL (not just equity difference)
+  // User's PnL should reflect their proportional share of the vault's trading performance
+  const userPnl = initialBalance > 0 ? (totalDeposited / initialBalance) * vaultPnl : 0
+  const userPnlPercentage = initialBalance > 0 ? (totalDeposited / initialBalance) * vaultPnlPercentage : 0
 
   // Calculate user's share of locked margin (for informational purposes)
   const userMarginLocked = initialBalance > 0 ? (totalDeposited / initialBalance) * totalMarginUsed : 0
 
-  console.log('User metrics: userEquity =', userEquity, 'userBalance =', userBalance, 'pnl =', pnl, 'pnlPercentage =', pnlPercentage, 'userMarginLocked =', userMarginLocked)
+  console.log('User metrics: userEquity =', userEquity, 'userBalance =', userBalance, 'userPnl =', userPnl, 'userPnlPercentage =', userPnlPercentage, 'userMarginLocked =', userMarginLocked)
 
   return {
     totalDeposited,
     balanceLeft: userBalance,
     totalEquity: userEquity,
-    pnl,
-    pnlPercentage,
+    pnl: userPnl,
+    pnlPercentage: userPnlPercentage,
     currentShares: currentUserShares,
     marginLocked: userMarginLocked,
     availableForWithdrawal: userBalance
