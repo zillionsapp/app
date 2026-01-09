@@ -83,6 +83,13 @@ export default defineEventHandler(async (event) => {
   console.log('Vault: assets =', vaultAssets, 'shares =', vaultShares)
   console.log('User: ownership =', userOwnership, 'equity =', userEquity)
 
+  // Get latest snapshot for margin used
+  const { data: latestSnapshot, error: latestSnapError } = await (supabase as any)
+    .from('portfolio_snapshots')
+    .select('totalMarginUsed')
+    .order('timestamp', { ascending: false })
+    .limit(1)
+
   // Get historical snapshots to calculate PnL
   const { data: snapshots, error: snapError } = await (supabase as any)
     .from('portfolio_snapshots')
@@ -206,8 +213,15 @@ export default defineEventHandler(async (event) => {
   // User's current equity including unrealized PnL
   const userCurrentEquity = userEquity + userUnrealizedPnL
 
-  // Available balance = deposited + realized PnL (since realized PnL is now part of user's balance)
-  const userBalance = totalDeposited + userRealizedPnl
+  // Get vault's total margin used (locked by open positions)
+  const vaultMarginUsed = Number(latestSnapshot?.[0]?.totalMarginUsed) || 0
+  
+  // User's proportional share of locked margin (this money is "at work" in the market)
+  const userMarginLocked = vaultMarginUsed * userOwnership
+
+  // Available balance = deposited + realized PnL - user's margin locked
+  // The margin locked is being used for open positions, so it can't be withdrawn
+  const userBalance = totalDeposited + userRealizedPnl - userMarginLocked
 
   console.log('Final: equity =', userEquity, 'currentEquity =', userCurrentEquity, 'balance =', userBalance)
   console.log('Realized PnL:', userRealizedPnl, 'Unrealized PnL:', userUnrealizedPnL)
@@ -220,7 +234,7 @@ export default defineEventHandler(async (event) => {
     pnl: userRealizedPnl,
     pnlPercentage: userPnlPercentage,
     currentShares: currentUserShares,
-    marginLocked: 0,
+    marginLocked: userMarginLocked,
     availableForWithdrawal: userBalance,
     unrealizedPnL: userUnrealizedPnL
   }
