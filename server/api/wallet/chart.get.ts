@@ -165,26 +165,26 @@ export default defineEventHandler(async (event) => {
       }
     }
 
-    // Calculate user's shares up to this snapshot time
-    let userShares = 0
-    for (const tx of allTransactions || []) {
-      if (tx.timestamp <= snapTime && tx.email === userEmail) {
-        if (tx.type === 'DEPOSIT') {
-          userShares += Number(tx.shares)
-        } else if (tx.type === 'WITHDRAWAL') {
-          userShares -= Number(tx.shares)
-        }
+  // Calculate user's shares up to this snapshot time
+  let userShares = 0
+  for (const tx of allTransactions || []) {
+    if (tx.timestamp <= snapTime && tx.email === userEmail) {
+      if (tx.type === 'DEPOSIT') {
+        userShares += Number(tx.shares)
+      } else if (tx.type === 'WITHDRAWAL') {
+        userShares -= Number(tx.shares)
       }
     }
+  }
 
-    // Calculate user's equity
-    const currentEquity = Number(snapshot.currentEquity)
-    const userEquity = totalShares > 0 ? (userShares / totalShares) * currentEquity : 0
+  // Calculate user's equity using the share-based approach for historical consistency
+  const currentEquity = Number(snapshot.currentEquity)
+  const userEquity = totalShares > 0 ? (userShares / totalShares) * currentEquity : 0
 
-    chartData.push({
-      timestamp: snapTime,
-      equity: userEquity
-    })
+  chartData.push({
+    timestamp: snapTime,
+    equity: userEquity
+  })
   }
 
   // Add current equity point

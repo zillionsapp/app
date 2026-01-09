@@ -76,15 +76,33 @@ export default defineEventHandler(async (event) => {
     }
   }
 
-  // Calculate user's current equity
+  // Calculate user's current equity and available balance
   const currentTotalAssets = Number(vaultState.total_assets)
   const currentTotalShares = Number(vaultState.total_shares)
   const userEquity = currentTotalShares > 0 ? (userTotalShares / currentTotalShares) * currentTotalAssets : 0
 
-  if (amount > userEquity) {
+  // Get current portfolio snapshot to check available funds
+  const { data: snapshots, error: snapError } = await (supabase as any)
+    .from('portfolio_snapshots')
+    .select('walletBalance, initialBalance')
+    .order('timestamp', { ascending: false })
+    .limit(1)
+
+  let availableBalance = userEquity // Default to full equity if no snapshot
+  if (!snapError && snapshots?.[0]) {
+    const snapshot = snapshots[0]
+    const walletBalance = Number(snapshot.walletBalance)
+    const initialBalance = Number(snapshot.initialBalance)
+    // Calculate available balance based on proportional share of available funds
+    availableBalance = initialBalance > 0 ? (userTotalDeposited / initialBalance) * walletBalance : 0
+    // Ensure available balance doesn't exceed total equity
+    availableBalance = Math.min(availableBalance, userEquity)
+  }
+
+  if (amount > availableBalance) {
     throw createError({
       statusCode: 400,
-      statusMessage: `Insufficient balance. You have $${userEquity.toFixed(2)} available.`
+      statusMessage: `Insufficient available balance. You have $${availableBalance.toFixed(2)} available for withdrawal (total equity: $${userEquity.toFixed(2)}).`
     })
   }
 
