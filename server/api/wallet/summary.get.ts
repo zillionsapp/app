@@ -211,7 +211,7 @@ export default defineEventHandler(async (event) => {
   }
 
   // User's current equity including unrealized PnL
-  const userCurrentEquity = userEquity + userUnrealizedPnL
+  const userCurrentEquity = userEquity + userUnrealizedPnL + userRealizedPnl
 
   // Get vault's total margin used (locked by open positions)
   const vaultMarginUsed = Number(latestSnapshot?.[0]?.totalMarginUsed) || 0
