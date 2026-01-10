@@ -234,23 +234,22 @@ export default defineEventHandler(async (event) => {
     return { data: [] }
   }
 
-  // Adjust the latest data point for recent vault changes and current unrealized PnL
+  // Get current equity from portfolio API to ensure consistency
+  let currentEquity = 0
+  try {
+    const portfolioResponse = await $fetch('/api/trading/portfolio') as any
+    // The vault page shows: portfolioData.currentEquity + totalUnrealizedPnL
+    // But since we're calculating totalUnrealizedPnL here, we use portfolioResponse.currentEquity
+    currentEquity = portfolioResponse.currentEquity || 0
+  } catch (error) {
+    console.error('Error fetching current portfolio data:', error)
+    // Fallback to last snapshot equity
+    currentEquity = snapshots?.[snapshots.length - 1]?.currentEquity || 0
+  }
+
+  // Set the latest chart point to current equity
   if (resampledData.length > 0) {
-    // Get the most recent snapshot
-    const latestSnapshot = snapshots?.[0]
-    if (latestSnapshot) {
-      const snapshotInitialBalance = latestSnapshot.initialBalance || 0
-      const snapshotUnrealizedPnL = (latestSnapshot.currentEquity || 0) - (latestSnapshot.walletBalance || 0)
-
-      const depositedAdjustment = currentTotalDeposited - snapshotInitialBalance
-
-      // The snapshot's equity includes unrealized PnL from when it was taken
-      // We need to replace it with current unrealized PnL
-      const unrealizedPnLAdjustment = currentUnrealizedPnL - snapshotUnrealizedPnL
-
-      // Adjust the most recent equity value
-      resampledData[resampledData.length - 1].equity += depositedAdjustment + unrealizedPnLAdjustment
-    }
+    resampledData[resampledData.length - 1].equity = currentEquity
   }
 
   return {
