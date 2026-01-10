@@ -55,6 +55,23 @@ export default defineEventHandler(async (event) => {
   const vaultAssets = Number(vaultState.total_assets)
   const vaultShares = Number(vaultState.total_shares)
 
+  // First, get closed trades to find the latest exit timestamp for baseline calculation
+  let maxTradeTimestamp = 0
+  try {
+    const { data: closedTradesForMax, error: closedTradesError } = await (supabase as any)
+      .from('trades')
+      .select('exitTimestamp')
+      .eq('status', 'CLOSED')
+
+    if (closedTradesError) {
+      console.error('Error fetching closed trades for max timestamp:', closedTradesError)
+    } else if (closedTradesForMax) {
+      maxTradeTimestamp = closedTradesForMax.length > 0 ? Math.max(...closedTradesForMax.map((t: any) => Number(t.exitTimestamp))) : 0
+    }
+  } catch (error) {
+    console.error('Error fetching closed trades for max timestamp:', error)
+  }
+
   // Calculate user's current shares from all their transactions
   let currentUserShares = 0
   let totalDeposited = 0
@@ -73,7 +90,27 @@ export default defineEventHandler(async (event) => {
     }
   }
 
+  // Calculate baseline deposited (capital invested up to the last trade)
+  let baselineDeposited = 0
+  for (const tx of userTransactions || []) {
+    if (Number(tx.timestamp) <= maxTradeTimestamp) {
+      if (tx.type === 'DEPOSIT' || tx.type === 'RECEIVE') {
+        baselineDeposited += Number(tx.amount)
+      } else if (tx.type === 'WITHDRAWAL' || tx.type === 'SEND') {
+        baselineDeposited -= Number(tx.amount)
+      } else if (tx.type === 'COMMISSION_EARNED') {
+        baselineDeposited += Number(tx.amount)
+      } else if (tx.type === 'COMMISSION_PAID') {
+        baselineDeposited -= Math.abs(Number(tx.amount))
+      }
+    }
+  }
+
   console.log('Calculated: totalDeposited =', totalDeposited, 'currentUserShares =', currentUserShares)
+
+  // Calculate totalDeposited at the time of the most recent closed trade
+  // This ensures new deposits/withdrawals after trading don't affect PnL percentage
+  let totalDepositedAtLastTrade = 0
 
   // Calculate user's current equity based on share ownership
   // User's share of vault = user_shares / total_shares
@@ -100,73 +137,82 @@ export default defineEventHandler(async (event) => {
     console.error('Error fetching snapshots:', snapError)
   }
 
-  // Calculate user's realized PnL based on historical ownership
-  // PnL is the sum of incremental PnL attributed to user at each snapshot
-  let userRealizedPnl = 0
-  let userPnlPercentage = 0
-
-  if (snapshots && snapshots.length > 0) {
-    // Find the user's first deposit timestamp
-    const firstDepositTime = userTransactions?.length > 0 
-      ? Number(userTransactions[0].timestamp) 
-      : 0
-
-    // For each snapshot, calculate user's ownership at that point in time
-    let prevTotalVaultShares = 0
-    let prevUserShares = 0
-    let prevSnapshotPnl = 0
-
-    for (const snapshot of snapshots) {
-      const snapshotTime = Number(snapshot.timestamp)
-
-      // Calculate total vault shares up to this snapshot
-      let totalVaultSharesAtSnapshot = 0
-      for (const tx of allTransactions || []) {
-        if (Number(tx.timestamp) <= snapshotTime) {
-          if (tx.type === 'DEPOSIT' || tx.type === 'RECEIVE') {
-            totalVaultSharesAtSnapshot += Number(tx.shares)
-          } else if (tx.type === 'WITHDRAWAL' || tx.type === 'SEND') {
-            totalVaultSharesAtSnapshot -= Number(tx.shares)
-          }
-        } else {
-          break
-        }
-      }
-
-      // Calculate user's shares up to this snapshot
-      let userSharesAtSnapshot = 0
-      for (const tx of userTransactions || []) {
-        if (Number(tx.timestamp) <= snapshotTime) {
-          if (tx.type === 'DEPOSIT' || tx.type === 'RECEIVE') {
-            userSharesAtSnapshot += Number(tx.shares)
-          } else if (tx.type === 'WITHDRAWAL' || tx.type === 'SEND') {
-            userSharesAtSnapshot -= Number(tx.shares)
-          }
-        } else {
-          break
-        }
-      }
-
-      // Only attribute PnL if user had shares at this point
-      if (totalVaultSharesAtSnapshot > 0 && userSharesAtSnapshot > 0) {
-        const ownershipAtSnapshot = userSharesAtSnapshot / totalVaultSharesAtSnapshot
-
-        // Get the incremental PnL since last snapshot
-        const currentSnapshotPnl = Number(snapshot.pnl) || 0
-        const incrementalPnl = currentSnapshotPnl - prevSnapshotPnl
-
-        // Attribute incremental PnL to user based on their ownership at that time
-        userRealizedPnl += incrementalPnl * ownershipAtSnapshot
-      }
-
-      prevTotalVaultShares = totalVaultSharesAtSnapshot
-      prevUserShares = userSharesAtSnapshot
-      prevSnapshotPnl = Number(snapshot.pnl) || 0
+  // Helper function to calculate trade PnL
+  const calculateTradePnL = (trade: any) => {
+    if (!trade.exitPrice) return 0
+    const quantity = Number(trade.quantity)
+    const entryPrice = Number(trade.price)
+    const exitPrice = Number(trade.exitPrice)
+    const entryValue = entryPrice * quantity
+    const exitValue = exitPrice * quantity
+    if (trade.side === 'BUY') {
+      return exitValue - entryValue
+    } else {
+      return entryValue - exitValue
     }
   }
 
-  // Calculate user's PnL percentage based on their equity vs deposited
-  userPnlPercentage = totalDeposited > 0 ? (userRealizedPnl / totalDeposited) * 100 : 0
+  // Helper function to calculate ownership at a specific timestamp
+  const calculateOwnershipAtTimestamp = (timestamp: number) => {
+    // Calculate total vault shares up to this timestamp
+    let totalVaultShares = 0
+    for (const tx of allTransactions || []) {
+      if (Number(tx.timestamp) <= timestamp) {
+        if (tx.type === 'DEPOSIT' || tx.type === 'RECEIVE') {
+          totalVaultShares += Number(tx.shares)
+        } else if (tx.type === 'WITHDRAWAL' || tx.type === 'SEND') {
+          totalVaultShares -= Number(tx.shares)
+        }
+      } else {
+        break
+      }
+    }
+
+    // Calculate user's shares up to this timestamp
+    let userShares = 0
+    for (const tx of userTransactions || []) {
+      if (Number(tx.timestamp) <= timestamp) {
+        if (tx.type === 'DEPOSIT' || tx.type === 'RECEIVE') {
+          userShares += Number(tx.shares)
+        } else if (tx.type === 'WITHDRAWAL' || tx.type === 'SEND') {
+          userShares -= Number(tx.shares)
+        }
+      } else {
+        break
+      }
+    }
+
+    return totalVaultShares > 0 ? userShares / totalVaultShares : 0
+  }
+
+  // Calculate user's realized PnL from individual closed trades
+  let userRealizedPnl = 0
+  let userPnlPercentage = 0
+  try {
+
+    // Get only closed trades for PnL calculation (only past trades)
+    const currentTime = Date.now()
+    const { data: closedTrades, error: tradesError } = await (supabase as any)
+      .from('trades')
+      .select('*')
+      .eq('status', 'CLOSED')
+      .lte('exitTimestamp', currentTime)
+
+    if (!tradesError && closedTrades) {
+      for (const trade of closedTrades) {
+        const tradePnL = calculateTradePnL(trade)
+        const ownershipAtClose = calculateOwnershipAtTimestamp(Number(trade.exitTimestamp))
+        userRealizedPnl += tradePnL * ownershipAtClose
+      }
+    } else {
+      console.error('Error fetching closed trades:', tradesError)
+    }
+  } catch (error) {
+    console.error('Error calculating user realized PnL from trades:', error)
+  }
+
+  // Calculate user's PnL percentage based on capital invested up to the last trade
+  userPnlPercentage = baselineDeposited > 0 ? (userRealizedPnl / baselineDeposited) * 100 : 0
 
   console.log('User realized PnL:', userRealizedPnl, 'Percentage:', userPnlPercentage)
 
