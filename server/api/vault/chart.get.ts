@@ -167,12 +167,90 @@ export default defineEventHandler(async (event) => {
     })
   }
 
+  // Get current total deposited balance from vault transactions
+  const { data: vaultTransactions, error: vaultTxError } = await (supabase as any)
+    .from('vault_transactions')
+    .select('amount, type, timestamp')
+    .order('timestamp', { ascending: true })
+
+  if (vaultTxError) {
+    console.error('Error fetching vault transactions:', vaultTxError)
+  }
+
+  // Calculate current total deposited
+  let currentTotalDeposited = 0
+  if (vaultTransactions) {
+    currentTotalDeposited = vaultTransactions.reduce((sum: number, tx: any) => {
+      if (tx.type === 'DEPOSIT') return sum + Number(tx.amount)
+      if (tx.type === 'WITHDRAWAL') return sum - Number(tx.amount)
+      if (tx.type === 'COMMISSION_EARNED') return sum + Number(tx.amount)
+      if (tx.type === 'COMMISSION_PAID') return sum + Number(tx.amount)
+      return sum
+    }, 0)
+  }
+
+  // Get current open trades to calculate unrealized PnL
+  const { data: openTrades, error: tradesError } = await (supabase as any)
+    .from('trades')
+    .select('*')
+    .eq('status', 'OPEN')
+
+  let currentUnrealizedPnL = 0
+  if (!tradesError && openTrades?.length > 0) {
+    // Get current prices for unrealized PnL calculation
+    const symbols = [...new Set(openTrades.map((trade: any) => trade.symbol))]
+    if (symbols.length > 0) {
+      try {
+        const pricesResponse = await $fetch(`/api/prices?symbols=${symbols.join(',')}`)
+        const prices = pricesResponse as Record<string, number>
+
+        if (prices) {
+          openTrades.forEach((trade: any) => {
+            const currentPrice = prices[trade.symbol]
+            if (!currentPrice) return
+
+            const entryPrice = Number(trade.price)
+            const quantity = Number(trade.quantity)
+            const leverage = trade.leverage || 1
+
+            const dollarPnL = trade.side === 'BUY'
+              ? (currentPrice - entryPrice) * quantity
+              : (entryPrice - currentPrice) * quantity
+
+            currentUnrealizedPnL += dollarPnL
+          })
+        }
+      } catch (pricesError) {
+        console.error('Error fetching prices for unrealized PnL:', pricesError)
+      }
+    }
+  }
+
   // Resample data to uniform intervals for balanced x-axis
-  const resampledData = resampleSnapshots(snapshots || [], period, startDate, now)
+  let resampledData = resampleSnapshots(snapshots || [], period, startDate, now)
 
   // If no data, return empty array
   if (resampledData.length === 0) {
     return { data: [] }
+  }
+
+  // Adjust the latest data point for recent vault changes and current unrealized PnL
+  if (resampledData.length > 0) {
+    // Get the most recent snapshot
+    const latestSnapshot = snapshots?.[0]
+    if (latestSnapshot) {
+      const snapshotInitialBalance = latestSnapshot.initialBalance || 0
+      const snapshotUnrealizedPnL = (latestSnapshot.currentEquity || 0) - (latestSnapshot.walletBalance || 0)
+
+      const depositedAdjustment = currentTotalDeposited - snapshotInitialBalance
+
+      // The snapshot's equity includes unrealized PnL from when it was taken
+      // We need to replace it with current unrealized PnL
+      const unrealizedPnLAdjustment = currentUnrealizedPnL - snapshotUnrealizedPnL
+
+      // Adjust the most recent equity value
+      resampledData[resampledData.length - 1].equity += depositedAdjustment + unrealizedPnLAdjustment
+    }
   }
 
   return {
