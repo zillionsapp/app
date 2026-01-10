@@ -191,7 +191,7 @@ watchEffect(() => {
                 <span>{{ $t('auth.code_validated') }}</span>
             </div>
             <div class="form-control mt-6">
-                <button type="submit" class="btn btn-primary" :disabled="inviteLoading">
+                <button type="submit" class="btn btn-primary w-full" :disabled="inviteLoading">
                     <span v-if="inviteLoading" class="loading loading-spinner"></span>
                     {{ $t('auth.validate_code') }}
                 </button>
@@ -230,7 +230,7 @@ watchEffect(() => {
                 <span>{{ errorMsg }}</span>
             </div>
             <div class="form-control mt-6">
-                <button type="submit" class="btn btn-primary" :disabled="loading">
+                <button type="submit" class="btn btn-primary w-full" :disabled="loading">
                     <span v-if="loading" class="loading loading-spinner"></span>
                     {{ $t('register_button') }}
                 </button>

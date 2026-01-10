@@ -61,7 +61,7 @@ watchEffect(() => {
                 <span>{{ errorMsg }}</span>
             </div>
             <div class="form-control mt-6">
-                <button type="submit" class="btn btn-primary" :disabled="loading">
+                <button type="submit" class="btn btn-primary w-full" :disabled="loading">
                     <span v-if="loading" class="loading loading-spinner"></span>
                     {{ $t('login_button') }}
                 </button>

@@ -32,6 +32,7 @@ const refreshData = async (period = currentPeriod.value) => {
   // Wait a bit for the query to update, then refresh
   await nextTick()
   await refreshChart()
+  await refreshSummary()
 }
 
 // Chart data for performance
