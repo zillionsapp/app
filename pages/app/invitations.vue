@@ -95,7 +95,7 @@ const createInviteCode = async () => {
 }
 
 const deactivateCode = async (codeId: string) => {
-  if (!confirm($t('app.referrals.confirm_deactivate'))) {
+  if (!confirm($t('app.invitations.confirm_deactivate'))) {
     return
   }
 
@@ -175,7 +175,7 @@ onMounted(async () => {
           </div>
           <div>
             <div class="text-2xl font-bold">{{ inviteCodes.length }}</div>
-            <div class="text-sm text-base-content/70">{{ $t('app.referrals.total_codes') }}</div>
+            <div class="text-sm text-base-content/70">{{ $t('app.invitations.total_codes') }}</div>
           </div>
         </div>
       </div>
@@ -191,7 +191,7 @@ onMounted(async () => {
           </div>
           <div>
             <div class="text-2xl font-bold">{{ inviteCodes.filter(c => c.is_active).length }}</div>
-            <div class="text-sm text-base-content/70">{{ $t('app.referrals.active_codes') }}</div>
+            <div class="text-sm text-base-content/70">{{ $t('app.invitations.active_codes') }}</div>
           </div>
         </div>
       </div>
@@ -207,7 +207,7 @@ onMounted(async () => {
           </div>
           <div>
             <div class="text-2xl font-bold">{{ inviteCodes.reduce((sum, c) => sum + c.current_uses, 0) }}</div>
-            <div class="text-sm text-base-content/70">{{ $t('app.referrals.total_uses') }}</div>
+            <div class="text-sm text-base-content/70">{{ $t('app.invitations.total_uses') }}</div>
           </div>
         </div>
       </div>
@@ -223,7 +223,7 @@ onMounted(async () => {
           </div>
           <div>
             <div class="text-2xl font-bold">${{ commissionSummary?.total_earned?.toFixed(2) || '0.00' }}</div>
-            <div class="text-sm text-base-content/70">{{ $t('app.referrals.total_commissions') }}</div>
+            <div class="text-sm text-base-content/70">{{ $t('app.invitations.total_commissions') }}</div>
           </div>
         </div>
       </div>
@@ -251,30 +251,30 @@ onMounted(async () => {
     <div class="card bg-base-100">
       <div class="card-body">
         <div class="flex justify-between items-center mb-6">
-          <h2 class="card-title">{{ $t('app.referrals.your_referral_codes') }}</h2>
+          <h2 class="card-title">{{ $t('app.invitations.your_invitation_codes') }}</h2>
           <button @click="openCreateModal" class="btn btn-primary btn-md gap-2" :disabled="loading">
             <svg v-if="!loading" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6v6m0 0v6m0-6h6m-6 0H6"></path>
             </svg>
             <span v-if="loading" class="loading loading-spinner loading-sm"></span>
-            {{ $t('app.referrals.generate_new_code') }}
+            {{ $t('app.invitations.generate_new_code') }}
           </button>
         </div>
 
         <!-- Loading State -->
         <div v-if="initialLoading" class="text-center py-12">
           <div class="loading loading-spinner loading-lg text-primary"></div>
-          <p class="mt-4 text-base-content/70">Loading your referral codes...</p>
+          <p class="mt-4 text-base-content/70">Loading your invitation codes...</p>
         </div>
 
         <!-- No codes state -->
         <div v-else-if="inviteCodes.length === 0" class="text-center py-12">
           <div class="text-6xl mb-4">🎁</div>
-          <h3 class="text-xl font-semibold mb-2">{{ $t('app.referrals.no_referral_codes_yet') }}</h3>
-          <p class="text-base-content/70 mb-6">{{ $t('app.referrals.create_first_code_desc') }}</p>
+          <h3 class="text-xl font-semibold mb-2">{{ $t('app.invitations.no_invitation_codes_yet') }}</h3>
+          <p class="text-base-content/70 mb-6">{{ $t('app.invitations.create_first_code_desc') }}</p>
           <button @click="openCreateModal" class="btn btn-primary btn-lg" :disabled="loading">
             <span v-if="loading" class="loading loading-spinner"></span>
-            {{ $t('app.referrals.create_first_code') }}
+            {{ $t('app.invitations.create_first_code') }}
           </button>
         </div>
 
@@ -285,13 +285,13 @@ onMounted(async () => {
               <!-- Table Head -->
               <thead>
                 <tr>
-                  <th>{{ $t('app.referrals.code') }}</th>
-                  <th>{{ $t('app.referrals.status') }}</th>
-                  <th>{{ $t('app.referrals.created') }}</th>
-                  <th>{{ $t('app.referrals.uses') }}</th>
+                  <th>{{ $t('app.invitations.code') }}</th>
+                  <th>{{ $t('app.invitations.status') }}</th>
+                  <th>{{ $t('app.invitations.created') }}</th>
+                  <th>{{ $t('app.invitations.uses') }}</th>
                   <th>Commission</th>
-                  <th>{{ $t('app.referrals.used_by') }}</th>
-                  <th>{{ $t('app.referrals.actions') }}</th>
+                  <th>{{ $t('app.invitations.used_by') }}</th>
+                  <th>{{ $t('app.invitations.actions') }}</th>
                 </tr>
               </thead>
               <!-- Table Body -->
@@ -302,8 +302,8 @@ onMounted(async () => {
                       <code class="font-mono bg-base-200 px-2 py-1 rounded text-sm">{{ code.code }}</code>
                     </td>
                     <td>
-                      <div v-if="code.is_active" class="badge badge-success">{{ $t('app.referrals.active') }}</div>
-                      <div v-else class="badge badge-neutral">{{ $t('app.referrals.inactive') }}</div>
+                      <div v-if="code.is_active" class="badge badge-success">{{ $t('app.invitations.active') }}</div>
+                      <div v-else class="badge badge-neutral">{{ $t('app.invitations.inactive') }}</div>
                     </td>
                     <td class="text-sm">{{ formatDate(code.created_at) }}</td>
                     <td class="text-sm">
@@ -440,14 +440,14 @@ onMounted(async () => {
   <!-- Share Modal -->
   <div v-if="showShareModal" class="modal modal-open">
     <div class="modal-box">
-      <h3 class="font-bold text-lg mb-4">{{ $t('app.referrals.share_invite_code') }}</h3>
-      <p class="mb-4">{{ $t('app.referrals.share_link_desc') }}</p>
+      <h3 class="font-bold text-lg mb-4">{{ $t('app.invitations.share_invite_code') }}</h3>
+      <p class="mb-4">{{ $t('app.invitations.share_link_desc') }}</p>
       <div class="bg-base-200 p-4 rounded-lg mb-4">
         <code class="text-sm break-all">{{ shareUrl }}</code>
       </div>
       <div class="modal-action">
-        <button @click="copyShareUrl" class="btn btn-primary">{{ $t('app.referrals.copy_link') }}</button>
-        <button @click="showShareModal = false" class="btn">{{ $t('app.referrals.close') }}</button>
+        <button @click="copyShareUrl" class="btn btn-primary">{{ $t('app.invitations.copy_link') }}</button>
+        <button @click="showShareModal = false" class="btn">{{ $t('app.invitations.close') }}</button>
       </div>
     </div>
   </div>

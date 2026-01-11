@@ -200,7 +200,7 @@
       "dashboard": "Vault",
       "wallet": "Wallet",
       "transactions": "Transactions",
-      "referrals": "Referrals",
+      "invitations": "Invitations",
       "signals": "Signals",
       "settings": "Settings",
       "profile": "Profile",
@@ -298,7 +298,7 @@
       "history_appears_here": "Your transaction history will appear here",
       "loading_transactions": "Loading transactions..."
     },
-    "referrals": {
+    "invitations": {
       "generate_new_code": "Generate New Code",
       "total_codes": "Total Codes",
       "active_codes": "Active Codes",
@@ -306,10 +306,10 @@
       "uses": "Uses",
       "total_uses": "Total Uses",
       "total_commissions": "Total Commissions",
-      "your_referral_codes": "Your Referral Codes",
-      "no_referral_codes_yet": "No referral codes yet",
+      "your_invitation_codes": "Your Invitation Codes",
+      "no_invitation_codes_yet": "No invitation codes yet",
       "create_first_code": "Create First Code",
-      "create_first_code_desc": "Create your first invite code to start referring friends!",
+      "create_first_code_desc": "Create your first invite code to start inviting friends!",
       "code": "Code",
       "status": "Status",
       "created": "Created",

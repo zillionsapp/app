@@ -200,7 +200,7 @@
       "dashboard": "Tresor",
       "wallet": "Wallet",
       "transactions": "Transaktionen",
-      "referrals": "Empfehlungen",
+      "invitations": "Einladungen",
       "signals": "Signale",
       "settings": "Einstellungen",
       "profile": "Profil",
@@ -298,7 +298,7 @@
       "history_appears_here": "Ihr Transaktionsverlauf wird hier angezeigt",
       "loading_transactions": "Transaktionen werden geladen..."
     },
-    "referrals": {
+    "invitations": {
       "generate_new_code": "Neuen Code generieren",
       "total_codes": "Gesamt Codes",
       "active_codes": "Aktive Codes",
@@ -306,8 +306,8 @@
       "uses": "Verwendungen",
       "total_uses": "Gesamtverwendungen",
       "total_commissions": "Gesamtprovisionen",
-      "your_referral_codes": "Ihre Empfehlungscodes",
-      "no_referral_codes_yet": "Noch keine Empfehlungscodes",
+      "your_invitation_codes": "Ihre Einladungscodes",
+      "no_invitation_codes_yet": "Noch keine Einladungscodes",
       "create_first_code": "Ersten Code erstellen",
       "create_first_code_desc": "Erstellen Sie Ihren ersten Einladungscode, um Freunde einzuladen!",
       "code": "Code",

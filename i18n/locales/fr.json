@@ -200,7 +200,7 @@
       "dashboard": "Coffre-fort",
       "wallet": "Portefeuille",
       "transactions": "Opérations",
-      "referrals": "Parrainages",
+      "invitations": "Invitations",
       "signals": "Signaux",
       "settings": "Paramètres",
       "profile": "Profil",
@@ -298,7 +298,7 @@
       "history_appears_here": "Votre historique de transactions apparaîtra ici",
       "loading_transactions": "Chargement des transactions..."
     },
-    "referrals": {
+    "invitations": {
       "generate_new_code": "Générer un nouveau code",
       "total_codes": "Codes totaux",
       "active_codes": "Codes actifs",
@@ -306,8 +306,8 @@
       "uses": "Utilisations",
       "total_uses": "Utilisations totales",
       "total_commissions": "Commissions totales",
-      "your_referral_codes": "Vos codes de parrainage",
-      "no_referral_codes_yet": "Pas encore de codes de parrainage",
+      "your_invitation_codes": "Vos codes d'invitation",
+      "no_invitation_codes_yet": "Pas encore de codes d'invitation",
       "create_first_code": "Créer le premier code",
       "create_first_code_desc": "Créez votre premier code d'invitation pour inviter des amis !",
       "code": "Code",
