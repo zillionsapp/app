@@ -29,6 +29,10 @@ const logout = async () => {
     <div class="drawer-content flex flex-col min-h-screen">
       <!-- Main Content -->
       <main class="flex-1">
+        <div class="p-2">
+          <PaperTradeWarning />
+        </div>
+        
         <div class="grid grid-cols-12 grid-rows-[min-content] gap-y-12 p-4 lg:gap-x-12 lg:p-10">
           <!-- header -->
           <header class="col-span-12 flex items-center gap-2 lg:gap-4">
