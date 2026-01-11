@@ -152,7 +152,8 @@ const handleSend = async () => {
                     :class="{
                       'badge-success': transaction.type === 'deposit' || transaction.type === 'received',
                       'badge-error': transaction.type === 'withdrawal' || transaction.type === 'sent',
-                      'badge-info': transaction.type === 'transfer'
+                      'badge-info': transaction.type === 'transfer',
+                      'badge-warning': transaction.type === 'commission'
                     }"
                   >
                     {{ transaction.type }}

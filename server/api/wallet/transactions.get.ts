@@ -15,12 +15,12 @@ export default defineEventHandler(async (event) => {
 
   const userEmail = user.email!
 
-  // Get user's transactions from vault_transactions (deposits, withdrawals, sends, receives, earned commissions)
+  // Get user's transactions from vault_transactions (deposits, withdrawals, sends, receives, commissions)
   const { data: allTransactions, error: txError } = await (supabase as any)
     .from('vault_transactions')
     .select('id, amount, shares, type, timestamp, email, inviter_id, invited_user_id, invited_portfolio_value, invited_daily_pnl, commission_rate')
     .eq('email', userEmail)
-    .in('type', ['DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', 'COMMISSION_EARNED'])
+    .in('type', ['DEPOSIT', 'WITHDRAWAL', 'SEND', 'RECEIVE', 'COMMISSION_EARNED', 'COMMISSION_PAID'])
     .order('timestamp', { ascending: true })
 
   if (txError) {
