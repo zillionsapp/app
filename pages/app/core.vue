@@ -299,6 +299,8 @@ const yFormatter = (value: number): string => {
                 <tr class="bg-base-200">
                   <th>{{ $t('app.dashboard.status') }}</th>
                   <th>{{ $t('app.dashboard.date_time') }}</th>
+                  <th>{{ $t('app.dashboard.exit_date_time') }}</th>
+                  <th>{{ $t('app.dashboard.exit_reason') }}</th>
                   <th>{{ $t('app.dashboard.symbol') }}</th>
                   <th>{{ $t('app.dashboard.side') }}</th>
                   <th>{{ $t('app.dashboard.qty_value') }}</th>
@@ -318,6 +320,15 @@ const yFormatter = (value: number): string => {
                   <td class="font-mono text-sm">
                     <div>{{ new Date(trade.timestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</div>
                     <div class="text-xs opacity-70">{{ new Date(trade.timestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) }}</div>
+                  </td>
+                  <td class="font-mono text-sm">
+                    <div v-if="trade.exitTimestamp">{{ new Date(trade.exitTimestamp).toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }) }}</div>
+                    <div v-if="trade.exitTimestamp" class="text-xs opacity-70">{{ new Date(trade.exitTimestamp).toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: false }) }}</div>
+                    <span v-else>-</span>
+                  </td>
+                  <td>
+                    <span v-if="trade.exitReason">{{ trade.exitReason }}</span>
+                    <span v-else>-</span>
                   </td>
                   <td class="font-bold">{{ trade.symbol }}</td>
                   <td>

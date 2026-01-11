@@ -86,6 +86,7 @@ export default defineEventHandler(async (event) => {
       strategyName: trade.strategyName || 'MANUAL',
       symbol: trade.symbol,
       timestamp: trade.timestamp,
+      exitTimestamp: trade.exitTimestamp,
       side: trade.side,
       leverage: trade.leverage || 1,
       price: trade.price,
