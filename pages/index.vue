@@ -26,6 +26,41 @@ const modernType = ref('modern')
 
 // Strategy selection state
 const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>('trend')
+
+// Vault stats data
+const vaultStats = ref({
+  currentBalance: 0,
+  currentEquity: 0,
+  winRate: 0,
+  profitFactor: 0,
+  totalPnL: 0,
+  totalPnLPercentage: 0,
+  openTradesCount: 0,
+  totalMarginUsed: 0,
+  closedTrades: 0,
+  winningTrades: 0,
+  losingTrades: 0,
+  initialBalance: 0
+})
+const vaultStatsLoading = ref(true)
+
+// Fetch vault stats on mount
+onMounted(async () => {
+  await fetchVaultStats()
+})
+
+// Fetch real vault stats from public API
+const fetchVaultStats = async () => {
+  try {
+    const data = await $fetch('/api/public/vault-stats')
+    vaultStats.value = data
+  } catch (error) {
+    console.error('Failed to fetch vault stats:', error)
+    // Keep default values if fetch fails
+  } finally {
+    vaultStatsLoading.value = false
+  }
+}
 </script>
 
 <template>
@@ -111,6 +146,65 @@ const selectedStrategy = ref<'trend' | 'signals' | 'confirm' | 'risk' | 'size'>(
           <div class="stat bg-base-200/50 rounded-2xl p-4 md:p-6 hover:border-primary/20 transition-all duration-300">
             <div class="stat-title text-xs uppercase tracking-wider opacity-70 text-base-content/50">{{ $t('stats.handsFree') }}</div>
             <div class="stat-value text-lg md:text-2xl mt-1 font-bold text-base-content">{{ $t('stats.handsFreeValue') }}</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Vault Stats -->
+    <section class="py-16 lg:py-24 bg-base-100/40">
+      <div class="max-w-7xl mx-auto px-4 lg:px-6">
+        <div class="text-center mb-8">
+          <div class="badge badge-info badge-sm mb-4 animate-fade-in gap-1">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" class="w-3 h-3 stroke-current">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
+            </svg>
+            {{ $t('vault.paperTradeMode') }}
+          </div>
+          <h2 class="text-2xl md:text-3xl font-bold">{{ $t('vault.liveStats') }}</h2>
+          <p class="mt-2 text-base-content/70">{{ $t('vault.stressTesting') }}</p>
+        </div>
+
+        <!-- Trading Stats -->
+        <div class="stats stats-vertical w-full xl:stats-horizontal bg-base-200/50 rounded-box mb-8">
+          <div class="stat">
+            <div class="stat-title">{{ $t('app.dashboard.current_balance') }}</div>
+            <div class="stat-value">${{ vaultStats.currentBalance.toLocaleString() }}</div>
+            <div class="stat-desc">{{ $t('app.dashboard.available_cash') }}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-title">{{ $t('app.dashboard.current_equity') }}</div>
+            <div class="stat-value">${{ vaultStats.currentEquity.toLocaleString() }}</div>
+            <div class="stat-desc">
+              <span :class="(vaultStats.currentEquity - vaultStats.currentBalance) >= 0 ? 'text-success' : 'text-error'">
+                {{ (vaultStats.currentEquity - vaultStats.currentBalance) >= 0 ? '+' : '-' }}$
+                {{ Math.abs(vaultStats.currentEquity - vaultStats.currentBalance).toFixed(2) }}
+                ({{ ((vaultStats.currentEquity - vaultStats.currentBalance) / vaultStats.currentBalance * 100).toFixed(2) }}%)
+              </span> {{ $t('app.dashboard.unrealized_pnl') }}
+            </div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-title">{{ $t('app.dashboard.win_rate') }}</div>
+            <div class="stat-value">{{ (vaultStats.winRate * 100).toFixed(1) }}%</div>
+            <div class="stat-desc">{{ $t('app.dashboard.based_on_closed_trades') }}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-title">{{ $t('app.dashboard.profit_factor') }}</div>
+            <div class="stat-value">{{ vaultStats.profitFactor.toFixed(2) }}</div>
+            <div class="stat-desc">{{ $t('app.dashboard.gross_profit_gross_loss') }}</div>
+          </div>
+
+          <div class="stat">
+            <div class="stat-title">{{ $t('app.dashboard.total_pnl') }}</div>
+            <div class="stat-value" :class="vaultStats.totalPnL >= 0 ? 'text-success' : 'text-error'">
+              {{ vaultStats.totalPnL >= 0 ? '+' : '-' }}${{ Math.abs(vaultStats.totalPnL).toFixed(2) }}
+            </div>
+            <div class="stat-desc">
+              {{ vaultStats.totalPnLPercentage >= 0 ? '+' : '' }}{{ vaultStats.totalPnLPercentage.toFixed(2) }}% {{ $t('app.dashboard.realized_pnl') }}
+            </div>
           </div>
         </div>
       </div>

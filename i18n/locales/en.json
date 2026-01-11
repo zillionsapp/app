@@ -26,6 +26,11 @@
     "handsFree": "Hands‑off",
     "handsFreeValue": "Auto‑pilot"
   },
+  "vault": {
+    "paperTradeMode": "Paper Trade Mode",
+    "liveStats": "Live Trading Statistics",
+    "stressTesting": "Currently stress-testing our Smart Money algorithm in paper trade mode"
+  },
   "features": {
     "title": "Why Zillions is different",
     "subtitle": "Zillions App is the easiest to use trading bot and feels like a crypto wallet. You simply deposit and withdraw funds and send and receive funds with friends. It has a built-in Vault system and the bot trades automatically with it in a safe way and uses a proprietary Smart Money Concepts Strategy to stay competitive.",

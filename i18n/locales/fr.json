@@ -18,13 +18,18 @@
   },
   "stats": {
     "noExpertise": "Aucune expertise requise",
-    "noExpertiseValue": "Pour tout le monde",
+    "noExpertiseValue": "Pour tous",
     "onChain": "Sur chaîne",
     "onChainValue": "Transparent",
     "adaptive": "Concept",
-    "adaptiveValue": "Smart Money",
+    "adaptiveValue": "Argent Intelligent",
     "handsFree": "Mains libres",
     "handsFreeValue": "Pilote automatique"
+  },
+  "vault": {
+    "paperTradeMode": "Mode Commerce Papier",
+    "liveStats": "Statistiques de Trading en Direct",
+    "stressTesting": "Actuellement en train de tester notre algorithme d'Argent Intelligent en mode commerce papier"
   },
   "features": {
     "title": "Pourquoi Zillions est différent",

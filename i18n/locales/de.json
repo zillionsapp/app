@@ -26,6 +26,11 @@
     "handsFree": "Hände‑frei",
     "handsFreeValue": "Auto‑Pilot"
   },
+  "vault": {
+    "paperTradeMode": "Papierhandelsmodus",
+    "liveStats": "Live Handelsstatistiken",
+    "stressTesting": "Derzeit unser Smart Money Algorithmus im Papierhandelsmodus stresstesten"
+  },
   "features": {
     "title": "Warum Zillions anders ist",
     "subtitle": "Die Zillions App ist der einfachste zu verwendende Trading-Bot und fühlt sich wie eine Krypto-Wallet an. Sie können einfach Gelder einzahlen und abheben sowie Gelder mit Freunden senden und empfangen. Sie verfügt über ein integriertes Vault-System und der Bot handelt automatisch damit auf sichere Weise und verwendet eine proprietäre Smart Money Concepts Strategie, um wettbewerbsfähig zu bleiben.",

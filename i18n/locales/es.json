@@ -22,9 +22,14 @@
     "onChain": "En cadena",
     "onChainValue": "Transparente",
     "adaptive": "Concepto",
-    "adaptiveValue": "Smart Money",
+    "adaptiveValue": "Dinero Inteligente",
     "handsFree": "Manos libres",
     "handsFreeValue": "Piloto automático"
+  },
+  "vault": {
+    "paperTradeMode": "Modo de Comercio en Papel",
+    "liveStats": "Estadísticas de Trading en Vivo",
+    "stressTesting": "Actualmente probando nuestro algoritmo de Dinero Inteligente en modo de comercio en papel"
   },
   "features": {
     "title": "Por qué Zillions es diferente",
