@@ -191,7 +191,7 @@ const prevPage = () => {
     <!-- Main Content -->
     <div v-else class="space-y-8">
       <!-- Action Buttons -->
-    <div class="flex flex-wrap gap-4">
+    <div class="flex flex-wrap gap-4 w-full">
       <button class="btn btn-primary" @click="showDepositModal = true">
         <svg data-src="https://unpkg.com/heroicons/20/solid/plus.svg" class="h-5 w-5"></svg>
         {{ $t('app.wallet.deposit_funds') }}
