@@ -2,6 +2,11 @@ import { serverSupabaseClient } from '#supabase/server'
 
 export default defineEventHandler(async (event) => {
   const supabase = await serverSupabaseClient(event)
+  const query = getQuery(event)
+
+  // Get pagination parameters
+  const limit = Math.min(parseInt(query.limit as string) || 50, 100) // Max 100 per page
+  const offset = parseInt(query.offset as string) || 0
 
   // Get the current user
   const { data: { user }, error: userError } = await supabase.auth.getUser()
@@ -113,11 +118,17 @@ export default defineEventHandler(async (event) => {
     }
   })
 
-  // Reverse for display (newest first)
-  // The balances are already calculated correctly in chronological order
+  // Reverse for display (newest first), then apply pagination
   const formattedTransactions = transactionsWithBalance.reverse()
 
+  // Apply pagination
+  const paginatedTransactions = formattedTransactions.slice(offset, offset + limit)
+  const total = formattedTransactions.length
+
   return {
-    transactions: formattedTransactions
+    transactions: paginatedTransactions,
+    total,
+    limit,
+    offset
   }
 })

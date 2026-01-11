@@ -16,13 +16,73 @@ const sendAmount = ref('')
 const sendRecipient = ref('')
 
 // Loading states
+const loading = ref(true)
 const depositLoading = ref(false)
 const withdrawLoading = ref(false)
 const sendLoading = ref(false)
 
-// Fetch transactions
-const { data: transactionsData, pending: transactionsPending, refresh: refreshTransactions } = await useFetch('/api/wallet/transactions')
-const { data: walletData } = await useFetch('/api/wallet/summary')
+// Pagination
+const currentPage = ref(1)
+const pageSize = ref(20)
+const totalTransactions = ref(0)
+
+// Fetch all transactions (we'll paginate on frontend for correct balances)
+const { data: transactionsData, pending: transactionsPending, refresh: refreshTransactions } = useFetch('/api/wallet/transactions?limit=1000')
+const { data: pnlData, pending: pnlPending, refresh: refreshPnl } = useFetch('/api/wallet/pnl?limit=1000')
+const { data: walletData } = useFetch('/api/wallet/summary')
+
+// Watch for data changes to set loading state
+watch([transactionsData, pnlData], () => {
+  if (transactionsData.value && pnlData.value) {
+    loading.value = false
+  }
+}, { immediate: true })
+
+// Also watch pending states
+watch([transactionsPending, pnlPending], () => {
+  if (!transactionsPending.value && !pnlPending.value) {
+    loading.value = false
+  }
+}, { immediate: true })
+
+// Combine all transactions
+const allTransactions = computed(() => {
+  const walletTxs = (transactionsData.value as any)?.transactions || []
+  const pnlTxs = (pnlData.value as any)?.transactions || []
+  const combined = [...walletTxs, ...pnlTxs]
+  totalTransactions.value = combined.length
+  return combined
+})
+
+// Paginated transactions for display
+const paginatedTransactions = computed(() => {
+  const start = (currentPage.value - 1) * pageSize.value
+  const end = start + pageSize.value
+  return transactionsWithBalance.value.slice(start, end)
+})
+
+// Calculate running balance for all transactions (chronological order)
+const transactionsWithBalance = computed(() => {
+  // Sort by timestamp ascending (oldest first) for balance calculation
+  const sortedForBalance = allTransactions.value.sort((a, b) => a.timestamp - b.timestamp)
+
+  let cashBalance = 0
+  const transactionsWithCalculatedBalance = sortedForBalance.map((tx: any) => {
+    cashBalance += tx.amountChange || 0
+    return {
+      ...tx,
+      balance: `$${cashBalance.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`
+    }
+  })
+
+  // Set loading to false when we have data
+  if (transactionsWithCalculatedBalance.length > 0 || (!transactionsPending.value && !pnlPending.value)) {
+    loading.value = false
+  }
+
+  // Return sorted by timestamp descending (newest first) for display
+  return transactionsWithCalculatedBalance.sort((a, b) => b.timestamp - a.timestamp)
+})
 
 // Modal functions
 const closeModals = () => {
@@ -47,6 +107,7 @@ const handleDeposit = async () => {
 
     if (response.success) {
       await refreshTransactions()
+      await refreshPnl()
       closeModals()
     }
   } catch (error: any) {
@@ -68,6 +129,7 @@ const handleWithdraw = async () => {
 
     if (response.success) {
       await refreshTransactions()
+      await refreshPnl()
       closeModals()
     }
   } catch (error: any) {
@@ -92,6 +154,7 @@ const handleSend = async () => {
 
     if (response.success) {
       await refreshTransactions()
+      await refreshPnl()
       closeModals()
     }
   } catch (error: any) {
@@ -100,11 +163,34 @@ const handleSend = async () => {
     sendLoading.value = false
   }
 }
+
+// Pagination methods
+const nextPage = () => {
+  if (currentPage.value * pageSize.value < totalTransactions.value) {
+    currentPage.value++
+  }
+}
+
+const prevPage = () => {
+  if (currentPage.value > 1) {
+    currentPage.value--
+  }
+}
 </script>
 
 <template>
-  <div class="space-y-8 col-span-12">
-    <!-- Action Buttons -->
+  <div class="col-span-12">
+    <!-- Loading State -->
+    <div v-if="loading" class="flex justify-center items-center min-h-96">
+      <div class="text-center">
+        <span class="loading loading-spinner loading-lg"></span>
+        <p class="mt-4">{{ $t('app.transactions.loading_transactions') }}</p>
+      </div>
+    </div>
+
+    <!-- Main Content -->
+    <div v-else class="space-y-8">
+      <!-- Action Buttons -->
     <div class="flex flex-wrap gap-4">
       <button class="btn btn-primary" @click="showDepositModal = true">
         <svg data-src="https://unpkg.com/heroicons/20/solid/plus.svg" class="h-5 w-5"></svg>
@@ -137,7 +223,7 @@ const handleSend = async () => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="transaction in transactionsData?.transactions || []" :key="transaction.id" class="hover">
+              <tr v-for="transaction in paginatedTransactions" :key="transaction.id" class="hover">
                 <td class="font-mono text-sm">{{ transaction.date }}</td>
                 <td class="font-mono text-sm opacity-70">{{ transaction.time }}</td>
                 <td class="font-semibold">{{ transaction.description }}</td>
@@ -150,8 +236,8 @@ const handleSend = async () => {
                   <span
                     class="badge badge-sm"
                     :class="{
-                      'badge-success': transaction.type === 'deposit' || transaction.type === 'received',
-                      'badge-error': transaction.type === 'withdrawal' || transaction.type === 'sent',
+                      'badge-success': transaction.type === 'deposit' || transaction.type === 'received' || transaction.type === 'profit',
+                      'badge-error': transaction.type === 'withdrawal' || transaction.type === 'sent' || transaction.type === 'loss',
                       'badge-info': transaction.type === 'transfer',
                       'badge-warning': transaction.type === 'commission'
                     }"
@@ -164,13 +250,44 @@ const handleSend = async () => {
           </table>
         </div>
 
-        <div v-if="!transactionsData?.transactions?.length && !transactionsPending" class="text-center py-12 opacity-60">
+        <div v-if="!transactionsWithBalance.length && !transactionsPending && !pnlPending" class="text-center py-12 opacity-60">
           <div class="text-4xl mb-2">📜</div>
           <p>{{ $t('app.transactions.no_transactions_yet') }}</p>
           <p class="text-sm opacity-70">{{ $t('app.transactions.history_appears_here') }}</p>
         </div>
 
-        <div v-if="transactionsPending" class="text-center py-12">
+        <!-- Pagination -->
+        <div v-if="totalTransactions > pageSize" class="flex justify-center mt-6">
+          <div class="join">
+            <button
+              class="btn btn-outline"
+              :disabled="currentPage <= 1"
+              @click="prevPage"
+            >
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path>
+              </svg>
+              {{ $t('app.dashboard.previous') }}
+            </button>
+
+            <button class="btn btn-outline btn-active px-6">
+              {{ $t('app.dashboard.page') }} {{ currentPage }} {{ $t('app.dashboard.of') }} {{ Math.ceil(totalTransactions / pageSize) }}
+            </button>
+
+            <button
+              class="btn btn-outline"
+              :disabled="currentPage >= Math.ceil(totalTransactions / pageSize)"
+              @click="nextPage"
+            >
+              {{ $t('app.dashboard.next') }}
+              <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div v-if="transactionsPending || pnlPending" class="text-center py-12">
           <span class="loading loading-spinner loading-lg"></span>
           <p class="mt-4">{{ $t('app.transactions.loading_transactions') }}</p>
         </div>
@@ -287,6 +404,7 @@ const handleSend = async () => {
           </button>
         </div>
       </div>
+    </div>
     </div>
   </div>
 </template>
