@@ -206,6 +206,11 @@
       "profile": "Profil",
       "logout": "Abmelden"
     },
+    "paperTradeWarning": {
+      "title": "Nur Papierhandelsmodus",
+      "message": "Dies ist nur der Papierhandelsmodus temporär für Januar zum Stresstest des Systems! Mehr Infos bald.",
+      "acknowledge": "Ok"
+    },
     "dashboard": {
       "loading": "Trading-Dashboard wird geladen...",
       "current_balance": "Aktueller Kontostand",

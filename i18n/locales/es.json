@@ -206,6 +206,11 @@
       "profile": "Perfil",
       "logout": "Cerrar sesión"
     },
+    "paperTradeWarning": {
+      "title": "Solo Modo de Prueba",
+      "message": "Esto es solo Modo de Prueba temporal para enero para hacer pruebas de estrés del sistema! Más información pronto.",
+      "acknowledge": "Ok"
+    },
     "dashboard": {
       "loading": "Cargando panel de trading...",
       "current_balance": "Saldo actual",

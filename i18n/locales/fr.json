@@ -206,6 +206,11 @@
       "profile": "Profil",
       "logout": "Déconnexion"
     },
+    "paperTradeWarning": {
+      "title": "Mode Simulation Uniquement",
+      "message": "Ceci est uniquement le Mode Simulation temporaire pour janvier pour tester le système ! Plus d'infos bientôt.",
+      "acknowledge": "Ok"
+    },
     "dashboard": {
       "loading": "Chargement du tableau de trading...",
       "current_balance": "Solde actuel",

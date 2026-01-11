@@ -206,6 +206,11 @@
       "profile": "Profile",
       "logout": "Logout"
     },
+    "paperTradeWarning": {
+      "title": "Paper Trade Mode Only",
+      "message": "This is Paper Trade Mode Only temporary for Jan to stresstest the system! More infos soon.",
+      "acknowledge": "Ok"
+    },
     "dashboard": {
       "loading": "Loading trading dashboard...",
       "current_balance": "Current Balance",
