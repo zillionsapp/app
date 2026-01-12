@@ -4,6 +4,29 @@ definePageMeta({
   middleware: 'auth'
 })
 
+const client = useSupabaseClient()
+const user = useSupabaseUser()
+
+// Check for pending invite code usage on first authenticated access
+onMounted(async () => {
+  if (user.value?.user_metadata?.invite_code && !user.value?.user_metadata?.invite_used) {
+    try {
+      await $fetch('/api/invites/use', {
+        method: 'POST',
+        body: { inviteCode: user.value.user_metadata.invite_code }
+      })
+
+      // Mark invite code as used in user metadata
+      await client.auth.updateUser({
+        data: { invite_used: true }
+      })
+    } catch (error) {
+      console.error('Failed to use invite code:', error)
+      // Don't show error to user, just log it
+    }
+  }
+})
+
 const currentPeriod = ref('all')
 
 // Modal states

@@ -119,28 +119,18 @@ const register = async () => {
         return
     }
 
+    // Get invite code from query or localStorage
+    const inviteCode = route.query.invite as string || (process.client ? localStorage.getItem('inviteCode') : null)
+
     try {
         const { error } = await client.auth.signUp({
             email: email.value.trim().toLowerCase(),
-            password: password.value
+            password: password.value,
+            options: {
+                data: inviteCode ? { invite_code: inviteCode } : {}
+            }
         })
         if (error) throw error
-
-        // Get invite code from query or localStorage
-        const inviteCode = route.query.invite as string || (process.client ? localStorage.getItem('inviteCode') : null)
-
-        // If we have an invite code, use it
-        if (inviteCode) {
-            try {
-                await $fetch('/api/invites/use', {
-                    method: 'POST',
-                    body: { inviteCode }
-                })
-            } catch (inviteError) {
-                console.error('Failed to use invite code:', inviteError)
-                // Don't fail registration if invite code usage fails
-            }
-        }
 
         // Provide clear next steps for the user
         alert('Registration successful! Please check your email for a confirmation link to complete your account setup.')
