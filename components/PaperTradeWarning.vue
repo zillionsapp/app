@@ -1,6 +1,5 @@
 <script setup lang="ts">
-const { $t } = useI18n()
-const client = useSupabaseClient()
+const { t } = useI18n()
 
 // Reactive state for showing the warning
 const showWarning = ref(true)
@@ -56,13 +55,13 @@ onMounted(() => {
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-2.5L13.732 4c-.77-.833-1.964-.833-2.732 0L3.732 16.5c-.77.833.192 2.5 1.732 2.5z" />
       </svg>
       <div>
-        <h3 class="font-bold">{{ $t('app.paperTradeWarning.title') }}</h3>
-        <div class="text-xs">{{ $t('app.paperTradeWarning.message') }}</div>
+        <h3 class="font-bold">{{ t('app.paperTradeWarning.title') }}</h3>
+        <div class="text-xs">{{ t('app.paperTradeWarning.message') }}</div>
       </div>
     </div>
     <div class="flex-none">
       <button class="btn btn-lg btn-warning bg-yellow-400 hover:bg-yellow-300 px-8" @click="acknowledgeWarning">
-        {{ $t('app.paperTradeWarning.acknowledge') }}
+        {{ t('app.paperTradeWarning.acknowledge') }}
       </button>
     </div>
   </div>
