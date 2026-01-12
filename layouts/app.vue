@@ -8,6 +8,7 @@ const pageTitle = computed(() => {
   if (route.path === '/app') return t('app.nav.wallet')
   if (route.path === '/app/core') return t('app.nav.dashboard')
   if (route.path === '/app/transactions') return t('app.nav.transactions')
+  if (route.path === '/app/invitations') return t('app.nav.invitations')
   if (route.path === '/app/settings') return t('app.nav.settings')
   if (route.path === '/app/profile') return t('app.nav.profile')
   if (route.path === '/app/referrals') return t('app.nav.referrals')

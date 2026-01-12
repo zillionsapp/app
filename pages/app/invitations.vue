@@ -239,7 +239,7 @@ onMounted(async () => {
           </div>
           <div>
             <div class="text-2xl font-bold">${{ commissionSummary?.total_paid?.toFixed(2) || '0.00' }}</div>
-            <div class="text-sm text-base-content/70">Commission Paid</div>
+            <div class="text-sm text-base-content/70">{{ $t('app.invitations.commission_paid') }}</div>
           </div>
         </div>
       </div>
@@ -264,7 +264,7 @@ onMounted(async () => {
         <!-- Loading State -->
         <div v-if="initialLoading" class="text-center py-12">
           <div class="loading loading-spinner loading-lg text-primary"></div>
-          <p class="mt-4 text-base-content/70">Loading your invitation codes...</p>
+          <p class="mt-4 text-base-content/70">{{ $t('app.invitations.loading_invitation_codes') }}</p>
         </div>
 
         <!-- No codes state -->
@@ -289,7 +289,7 @@ onMounted(async () => {
                   <th>{{ $t('app.invitations.status') }}</th>
                   <th>{{ $t('app.invitations.created') }}</th>
                   <th>{{ $t('app.invitations.uses') }}</th>
-                  <th>Commission</th>
+                  <th>{{ $t('app.invitations.commission') }}</th>
                   <th>{{ $t('app.invitations.used_by') }}</th>
                   <th>{{ $t('app.invitations.actions') }}</th>
                 </tr>
@@ -367,7 +367,7 @@ onMounted(async () => {
                   <tr v-if="code.usages.length > 2" :key="`${code.id}-details`">
                     <td colspan="6" class="bg-base-200/50">
                       <div class="py-2">
-                        <div class="text-sm font-medium mb-2">All users who used this code:</div>
+                        <div class="text-sm font-medium mb-2">{{ $t('app.invitations.all_users_used_code') }}</div>
                         <div class="space-y-1">
                           <div v-for="usage in code.usages" :key="usage.id" class="flex justify-between items-center text-sm">
                             <span>{{ usage.used_by.email }}</span>
@@ -389,12 +389,12 @@ onMounted(async () => {
   <!-- Create Modal -->
   <div v-if="showCreateModal" class="modal modal-open">
     <div class="modal-box">
-      <h3 class="font-bold text-lg mb-4">Create Invite Code</h3>
-      <p class="mb-4">Configure your referral code settings</p>
+      <h3 class="font-bold text-lg mb-4">{{ $t('app.invitations.create_invite_code') }}</h3>
+      <p class="mb-4">{{ $t('app.invitations.configure_invite_settings') }}</p>
 
       <div class="form-control mb-4">
         <label class="label">
-          <span class="label-text">Maximum Uses</span>
+          <span class="label-text">{{ $t('app.invitations.maximum_uses') }}</span>
         </label>
         <input
           v-model.number="maxUsesInput"
@@ -402,16 +402,16 @@ onMounted(async () => {
           min="1"
           max="1000"
           class="input input-bordered"
-          placeholder="Enter number of uses"
+          :placeholder="$t('app.invitations.enter_number_uses')"
         />
         <label class="label">
-          <span class="label-text-alt">How many times can this code be used? (1-1000)</span>
+          <span class="label-text-alt">{{ $t('app.invitations.how_many_times_used') }}</span>
         </label>
       </div>
 
       <div class="form-control mb-4">
         <label class="label">
-          <span class="label-text">Commission Rate (%)</span>
+          <span class="label-text">{{ $t('app.invitations.commission_rate_percent') }}</span>
         </label>
         <input
           v-model.number="commissionRateInput"
@@ -420,19 +420,19 @@ onMounted(async () => {
           max="50"
           step="0.1"
           class="input input-bordered"
-          placeholder="Enter commission percentage"
+          :placeholder="$t('app.invitations.enter_commission_percentage')"
         />
         <label class="label">
-          <span class="label-text-alt">What percentage of referred users' profits do you want? (0-50%)</span>
+          <span class="label-text-alt">{{ $t('app.invitations.percentage_invited_profits') }}</span>
         </label>
       </div>
 
       <div class="modal-action">
         <button @click="createInviteCode" class="btn btn-primary" :disabled="loading || maxUsesInput < 1 || commissionRateInput < 0 || commissionRateInput > 50">
           <span v-if="loading" class="loading loading-spinner loading-sm"></span>
-          Create Code
+          {{ $t('app.invitations.create_code') }}
         </button>
-        <button @click="showCreateModal = false" class="btn">Cancel</button>
+        <button @click="showCreateModal = false" class="btn">{{ $t('app.invitations.cancel') }}</button>
       </div>
     </div>
   </div>
