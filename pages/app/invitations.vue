@@ -417,7 +417,7 @@ onMounted(async () => {
           v-model.number="commissionRateInput"
           type="number"
           min="0"
-          max="50"
+          max="20"
           step="0.1"
           class="input input-bordered"
           :placeholder="$t('app.invitations.enter_commission_percentage')"
@@ -428,7 +428,7 @@ onMounted(async () => {
       </div>
 
       <div class="modal-action">
-        <button @click="createInviteCode" class="btn btn-primary" :disabled="loading || maxUsesInput < 1 || commissionRateInput < 0 || commissionRateInput > 50">
+        <button @click="createInviteCode" class="btn btn-primary" :disabled="loading || maxUsesInput < 1 || commissionRateInput < 0 || commissionRateInput > 20">
           <span v-if="loading" class="loading loading-spinner loading-sm"></span>
           {{ $t('app.invitations.create_code') }}
         </button>

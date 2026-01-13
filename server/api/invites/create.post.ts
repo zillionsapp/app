@@ -31,10 +31,10 @@ export default defineEventHandler(async (event) => {
   }
 
   // Validate commissionRate
-  if (typeof commissionRate !== 'number' || commissionRate < 0 || commissionRate > 0.5) {
+  if (typeof commissionRate !== 'number' || commissionRate < 0 || commissionRate > 0.2) {
     throw createError({
       statusCode: 400,
-      statusMessage: 'commissionRate must be a number between 0 and 0.5 (e.g., 0.10 for 10%, max 50%)'
+      statusMessage: 'commissionRate must be a number between 0 and 0.2 (e.g., 0.10 for 10%, max 20%)'
     })
   }
 

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS invite_codes (
     created_by UUID REFERENCES auth.users(id) ON DELETE CASCADE,
     max_uses INTEGER DEFAULT 1 CHECK (max_uses > 0),
     current_uses INTEGER DEFAULT 0,
-    commission_rate NUMERIC DEFAULT 0.10 CHECK (commission_rate >= 0 AND commission_rate <= 0.5),
+    commission_rate NUMERIC DEFAULT 0.10 CHECK (commission_rate >= 0 AND commission_rate <= 0.2),
     created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
     is_active BOOLEAN DEFAULT TRUE
 );
