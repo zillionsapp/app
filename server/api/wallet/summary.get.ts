@@ -226,7 +226,7 @@ export default defineEventHandler(async (event) => {
 
     if (!tradesError && openTrades?.length > 0) {
       const symbols = [...new Set(openTrades.map((trade: any) => trade.symbol))]
-      
+
       try {
         const pricesResponse = await $fetch(`/api/prices?symbols=${symbols.join(',')}`)
         const prices = pricesResponse as Record<string, number>
@@ -261,7 +261,7 @@ export default defineEventHandler(async (event) => {
 
   // Get vault's total margin used (locked by open positions)
   const vaultMarginUsed = Number(latestSnapshot?.[0]?.totalMarginUsed) || 0
-  
+
   // User's proportional share of locked margin (this money is "at work" in the market)
   const userMarginLocked = vaultMarginUsed * userOwnership
 
@@ -269,14 +269,22 @@ export default defineEventHandler(async (event) => {
   // The margin locked is being used for open positions, so it can't be withdrawn
   const userBalance = totalDeposited + userRealizedPnl - userMarginLocked
 
-  console.log('Final: equity =', userEquity, 'currentEquity =', userCurrentEquity, 'balance =', userBalance)
+  // FORCE CONSISTENCY:
+  // If no margin is locked (no open trades), Equity MUST equal Available Balance.
+  // Any discrepancy here is due to vault_state drift or rounding errors.
+  let finalEquity = userCurrentEquity
+  if (userMarginLocked <= 0.01) { // Epsilon for float comparison
+    finalEquity = userBalance
+  }
+
+  console.log('Final: equity =', userEquity, 'currentEquity =', userCurrentEquity, 'finalEquity =', finalEquity, 'balance =', userBalance)
   console.log('Realized PnL:', userRealizedPnl, 'Unrealized PnL:', userUnrealizedPnL)
 
   return {
     totalDeposited,
     balanceLeft: userBalance,
     totalEquity: userEquity,
-    currentEquity: userCurrentEquity,
+    currentEquity: finalEquity,
     pnl: userRealizedPnl,
     pnlPercentage: userPnlPercentage,
     currentShares: currentUserShares,

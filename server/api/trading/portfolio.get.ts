@@ -88,18 +88,25 @@ export default defineEventHandler(async (event) => {
   const adjustedCurrentBalance = Math.max(0, (snapshot.currentBalance || 0) + depositedAdjustment)
   const adjustedCurrentEquity = (snapshot.currentEquity || 0) + depositedAdjustment + unrealizedPnLAdjustment
 
+  // Recalculate PnL percentage based on the adjusted initial balance
+  // This fixes the issue where PnL % is calculated against a default/old initial balance (e.g. 1000)
+  // instead of the actual current capital in the vault.
+  const adjustedInitialBalance = Math.max(1, currentTotalDeposited) // Prevent division by zero
+  const currentTotalPnL = snapshot.pnl || 0
+  const adjustedPnLPercentage = (currentTotalPnL / adjustedInitialBalance) * 100
+
   return {
     currentBalance: adjustedCurrentBalance,
     currentEquity: adjustedCurrentEquity,
     winRate: snapshot.winRate || 0,
     profitFactor: snapshot.profitFactor || 0,
-    totalPnL: snapshot.pnl || 0,
-    totalPnLPercentage: snapshot.pnlPercentage || 0,
+    totalPnL: currentTotalPnL,
+    totalPnLPercentage: adjustedPnLPercentage,
     openTradesCount: snapshot.openTradesCount || 0,
     totalMarginUsed: snapshot.totalMarginUsed || 0,
     closedTrades: (snapshot.winningTrades || 0) + (snapshot.losingTrades || 0),
     winningTrades: snapshot.winningTrades || 0,
     losingTrades: snapshot.losingTrades || 0,
-    initialBalance: snapshot.initialBalance || 0
+    initialBalance: adjustedInitialBalance
   }
 })
